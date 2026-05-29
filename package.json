@@ -1,0 +1,43 @@
+{
+  "name": "@glitchoff/markify",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "rehype-katex": "^7.0.1",
+    "highlight.js": "^11.11.1",
+    "katex": "^0.16.28",
+    "mermaid": "^11.12.2",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  }
+}

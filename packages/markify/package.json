@@ -1,0 +1,55 @@
+{
+  "name": "markify",
+  "version": "1.0.0",
+  "description": "A markdown renderer designed for streaming content from AI models",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./code": {
+      "import": "./dist/plugins/code.js"
+    },
+    "./mermaid": {
+      "import": "./dist/plugins/mermaid.js"
+    },
+    "./math": {
+      "import": "./dist/plugins/math.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build.ts",
+    "dev": "bun --watch build.ts"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-markdown": "^9.0.0",
+    "remark-gfm": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "remark-math": {
+      "optional": true
+    },
+    "rehype-katex": {
+      "optional": true
+    },
+    "katex": {
+      "optional": true
+    },
+    "mermaid": {
+      "optional": true
+    }
+  },
+  "keywords": ["markdown", "ai", "streaming", "react"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/glitchoff/markify"
+  }
+}
