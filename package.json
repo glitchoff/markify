@@ -1,5 +1,5 @@
 {
-  "name": "markify-stream",
+  "name": "@glitchoff/markify",
   "version": "0.1.0",
   "private": false,
   "type": "module",
