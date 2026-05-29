@@ -17,8 +17,8 @@ const katexOptions = {
   throwOnError: false,
 };
 
-const baseRemarkPlugins = [remarkGfm, remarkMath, remarkFixKaTeXUnicode];
-const baseRehypePlugins = [[rehypeKatex, katexOptions]];
+const baseRemarkPlugins: any[] = [remarkGfm, remarkMath, remarkFixKaTeXUnicode];
+const baseRehypePlugins: any[] = [[rehypeKatex, katexOptions]];
 
 export { baseRemarkPlugins, baseRehypePlugins };
 

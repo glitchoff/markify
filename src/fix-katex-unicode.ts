@@ -1,7 +1,5 @@
-import type { Root } from "hast";
-
 export function remarkFixKaTeXUnicode() {
-  return (tree: Root) => {
+  return (tree: any) => {
     function visit(node: any) {
       if (node.type === "inlineMath" || node.type === "math") {
         if (node.value) {
