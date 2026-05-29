@@ -9,7 +9,7 @@ interface MermaidBlockProps {
   className?: string;
 }
 
-const DEFAULT_CONFIG: mermaid.MermaidConfig = {
+const DEFAULT_CONFIG: any = {
   startOnLoad: false,
   theme: "default",
   securityLevel: "loose",
