@@ -98,12 +98,12 @@ function downloadTable(table: HTMLTableElement, format: "csv" | "tsv" | "md") {
 
 function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; children?: React.ReactNode }) {
   const styles: Record<number, string> = {
-    1: "text-3xl font-bold mt-6 mb-3 border-b border-border pb-1",
-    2: "text-2xl font-semibold mt-5 mb-2",
-    3: "text-xl font-medium mt-4 mb-1",
-    4: "text-lg font-medium mt-3 mb-1",
-    5: "text-base font-medium mt-2 mb-0",
-    6: "text-sm font-medium mt-2 mb-0",
+    1: "text-3xl font-bold mt-8 mb-3 pb-2 border-b border-border",
+    2: "text-2xl font-semibold mt-7 mb-3 pb-1.5 border-b border-border",
+    3: "text-xl font-medium mt-6 mb-3 pb-1 border-b border-border",
+    4: "text-lg font-medium mt-5 mb-3 pb-1 border-b border-border",
+    5: "text-base font-medium mt-4 mb-3 pb-1 border-b border-border",
+    6: "text-sm font-medium mt-3 mb-3 pb-1 border-b border-border",
   };
   const Tag = `h${level}` as React.ElementType;
   return (
@@ -116,7 +116,7 @@ function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; 
 function Paragraph({ children }: { children?: React.ReactNode }) {
   const content = children ? getText(children).trim() : "";
   if (!content) return null;
-  return <p className="mb-4 last:mb-0 leading-relaxed text-base text-foreground/90">{children}</p>;
+  return <p className="mb-3 last:mb-0 leading-relaxed text-base text-foreground/90">{children}</p>;
 }
 
 function Link({ href, children, ...props }: { href?: string; children: React.ReactNode }) {
@@ -153,7 +153,7 @@ function Image({ src, alt, ...props }: { src?: string; alt?: string }) {
       src={src}
       alt={alt || ""}
       loading="lazy"
-      className="max-w-full h-auto rounded-lg shadow-md mx-auto my-2"
+      className="max-w-full h-auto rounded-lg shadow-md mx-auto mb-3"
       {...props}
     />
   );
@@ -175,7 +175,7 @@ function Blockquote({ children, ...props }: { children: React.ReactNode }) {
       TIP: "Tip",
     };
     return (
-      <div className={cn("my-4 rounded-lg border-l-4 p-4", styles[type])} {...props}>
+      <div className={cn("mb-3 rounded-lg border-l-4 p-4", styles[type])} {...props}>
         <strong className="mb-1 block font-semibold text-foreground">{titles[type]}</strong>
         <ReactMarkdown remarkPlugins={baseRemarkPlugins} rehypePlugins={baseRehypePlugins}>
           {content}
@@ -186,7 +186,7 @@ function Blockquote({ children, ...props }: { children: React.ReactNode }) {
 
   return (
     <blockquote
-      className="my-4 border-l-4 border-muted-foreground/30 pl-4 text-muted-foreground italic"
+      className="mb-3 border-l-4 border-muted-foreground/30 pl-4 text-muted-foreground italic"
       {...props}
     >
       {children}
@@ -222,7 +222,7 @@ function Table({ children, ...props }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="group relative my-4 overflow-hidden rounded-lg border border-border bg-card"
+      className="group relative mb-3 overflow-hidden rounded-lg border border-border bg-card"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
@@ -339,7 +339,7 @@ function List({ children, ordered, ...props }: { children?: React.ReactNode; ord
   return (
     <Tag
       className={cn(
-        "my-3 ml-6",
+        "mb-3 ml-6",
         ordered ? "list-decimal" : "list-disc",
       )}
       {...props}
@@ -358,10 +358,10 @@ function ListItem({ children, ...props }: { children: React.ReactNode }) {
 }
 
 function Hr() {
-  return <hr className="my-6 border-border" />;
+  return <hr className="mb-3 border-border" />;
 }
 
-function PreWithWorker({ worker, hljsTheme, hljsCustomCss, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; children?: React.ReactNode; className?: string }) {
+function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeBg, codeBlockClassName, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; children?: React.ReactNode; className?: string }) {
   const lang = extractLanguage(props.children, props.className);
 
   if (lang === "mermaid") {
@@ -371,7 +371,7 @@ function PreWithWorker({ worker, hljsTheme, hljsCustomCss, ...props }: { worker:
   }
 
   return (
-    <CodeBlock className={props.className} language={lang} worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss}>
+    <CodeBlock className={props.className} language={lang} worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName}>
       {props.children}
     </CodeBlock>
   );
@@ -382,12 +382,16 @@ export interface MarkdownComponentOptions {
   table?: TableOptions;
   hljsTheme?: HljsTheme;
   hljsCustomCss?: string;
+  hljsThemeBg?: boolean;
+  codeBlockClassName?: string;
 }
 
 export function createMarkdownComponents(opts?: MarkdownComponentOptions): Components {
   const worker = opts?.codeBlockWorker ?? false;
   const hljsTheme = opts?.hljsTheme ?? "dark";
   const hljsCustomCss = opts?.hljsCustomCss;
+  const hljsThemeBg = opts?.hljsThemeBg ?? false;
+  const codeBlockClassName = opts?.codeBlockClassName;
   return {
     style: () => null as any,
     script: () => null as any,
@@ -408,7 +412,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     tr: TR as any,
     th: TH as any,
     td: TD as any,
-    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} {...props} />,
+    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} {...props} />,
     ol: (props) => <List ordered {...props} />,
     ul: (props) => <List {...props} />,
     li: ListItem as any,

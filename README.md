@@ -113,6 +113,7 @@ Where `useIsDark` watches `document.documentElement.classList.contains("dark")`.
 | `codeBlockWorker` | `boolean` | `false` | Offload hljs highlighting to Web Worker |
 | `hljsTheme` | `"dark" \| "light"` | `"dark"` | Atom One theme for code blocks |
 | `hljsCustomCss` | `string` | — | Custom inline hljs CSS (overrides `hljsTheme`) |
+| `codeBlockClassName` | `string` | — | Additional CSS classes for the code block wrapper |
 | `table` | `TableOptions` | — | Table display config |
 
 ## Exports

@@ -13,7 +13,9 @@ interface CodeBlockProps {
   worker?: boolean;
   hljsTheme?: HljsTheme;
   hljsCustomCss?: string;
+  hljsThemeBg?: boolean;
   isDark?: boolean;
+  codeBlockClassName?: string;
 }
 
 const LANG_META: Record<string, { label: string; color: string }> = {
@@ -81,20 +83,16 @@ function Btn({
   title,
   active,
   activeClass,
-  isDark,
   children,
 }: {
   onClick: () => void;
   title?: string;
   active?: boolean;
   activeClass?: string;
-  isDark: boolean;
   children: React.ReactNode;
 }) {
-  const idleClass = isDark
-    ? "text-white/35 hover:text-white/75 hover:bg-white/[0.07]"
-    : "text-black/40 hover:text-black/70 hover:bg-black/[0.07]";
-  const defaultActive = isDark ? "bg-white/15 text-white" : "bg-black/10 text-black/80";
+  const idleClass = "text-muted-foreground/60 hover:text-foreground/80 hover:bg-muted-foreground/10";
+  const defaultActive = "bg-primary/10 text-primary";
   return (
     <button
       onClick={onClick}
@@ -128,12 +126,10 @@ function Header({
   showCollapse: boolean;
   isDark: boolean;
 }) {
-  const headerBg = isDark
-    ? "bg-[#0d1117] border-b border-white/[0.06]"
-    : "bg-[#f0f2f4] border-b border-black/[0.08]";
-  const labelCls = isDark ? "text-white/70" : "text-black/60";
-  const chevronCls = isDark ? "text-white/50" : "text-black/40";
-  const chevronHover = isDark ? "hover:bg-white/10" : "hover:bg-black/[0.07]";
+  const headerBg = "bg-muted border-b border-border";
+  const labelCls = "text-muted-foreground";
+  const chevronCls = "text-muted-foreground/60";
+  const chevronHover = "hover:bg-accent";
   return (
     <div className={`flex items-center justify-between px-3 py-2 ${headerBg}`}>
       <div className="flex items-center gap-2">
@@ -162,10 +158,10 @@ function Header({
   );
 }
 
-function CodeBlockInner({ children, className, language: langProp, worker, hljsTheme = "dark", hljsCustomCss, isDark: isDarkProp }: CodeBlockProps) {
+function CodeBlockInner({ children, className, language: langProp, worker, hljsTheme = "dark", hljsCustomCss, hljsThemeBg = false, isDark: isDarkProp, codeBlockClassName }: CodeBlockProps) {
   const codeText = useMemo(() => getCodeText(children), [children]);
   const [copied, setCopied] = useState(false);
-  const [wrapped, setWrapped] = useState(false);
+  const [wrapped, setWrapped] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const COLLAPSE_THRESHOLD = 5;
@@ -277,23 +273,20 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
 
   const isMermaid = language === "mermaid";
 
-  const codeBg = isDark ? "bg-[#0d1117] text-white/90" : "bg-[#f6f8fa] text-black/85";
-  const wrapperBorder = isDark
-    ? "border-white/[0.07] shadow-black/30"
-    : "border-black/10 shadow-black/10";
-  const expandCls = isDark
-    ? "bg-[#161b22] border border-white/[0.1] text-white/50 hover:text-white/80 hover:bg-[#1f242c] hover:border-white/[0.15] shadow-black/40"
-    : "bg-[#e8eaed] border border-black/[0.1] text-black/50 hover:text-black/80 hover:bg-[#d0d3d6] hover:border-black/[0.15] shadow-black/10";
+  const codeBg = "text-foreground/90";
+  const wrapperBorder = "border-border";
+  const expandCls = "border border-border text-muted-foreground hover:text-foreground hover:bg-accent shadow-sm";
+  const wrapperCls = `rounded-md overflow-hidden border shadow-lg mb-3 ${wrapperBorder} ${codeBlockClassName ?? ""}`
 
   const preClass = [
     `m-0 p-4 font-mono text-[0.8rem] leading-[1.7] ${codeBg}`,
-    wrapped ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto",
+    wrapped ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent",
   ].join(" ");
 
   const headerActions = (
     <>
       {!isCollapsed && (
-        <Btn onClick={() => setWrapped((p) => !p)} title={wrapped ? "Unwrap lines" : "Wrap long lines"} active={wrapped} isDark={isDark}>
+        <Btn onClick={() => setWrapped((p) => !p)} title={wrapped ? "Unwrap lines" : "Wrap long lines"} active={wrapped}>
           <WrapText size={13} strokeWidth={2} />
         </Btn>
       )}
@@ -302,7 +295,6 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
         title={copied ? "Copied!" : "Copy code"}
         active={copied}
         activeClass="bg-emerald-500/20 text-emerald-400"
-        isDark={isDark}
       >
         {copied ? <Check size={13} strokeWidth={2.5} /> : <Copy size={13} strokeWidth={2} />}
       </Btn>
@@ -311,8 +303,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
 
   if (isMermaid) {
     return (
-      <div className={`my-3 rounded-md overflow-hidden border shadow-lg ${wrapperBorder}`}>
-        <Header
+      <div className={wrapperCls}>  <Header
           label={langMeta.label}
           color={langMeta.color}
           isCollapsed={isCollapsed}
@@ -330,7 +321,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
   }
 
   return (
-    <div className={`my-3 rounded-md overflow-hidden border shadow-lg ${wrapperBorder}`}>
+    <div className={wrapperCls}>
       <Header
         label={langMeta.label}
         color={langMeta.color}

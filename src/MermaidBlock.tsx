@@ -184,7 +184,7 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
     <div
       ref={containerRef}
       className={cn(
-        "relative my-4 overflow-hidden rounded-lg border border-border bg-card",
+        "relative mb-3 overflow-hidden rounded-lg border border-border bg-card",
         fullscreen && "fixed inset-0 z-50 m-0",
         className,
       )}

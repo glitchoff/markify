@@ -15,6 +15,8 @@ export interface MarkifyProps {
   table?: TableOptions;
   hljsTheme?: HljsTheme;
   hljsCustomCss?: string;
+  hljsThemeBg?: boolean;
+  codeBlockClassName?: string;
 }
 
 function parseBlocks(content: string): string[] {
@@ -42,7 +44,7 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeBg = false, codeBlockClassName }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
 
   const tableOptions = useMemo(() => ({
@@ -52,8 +54,8 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
   }), [tableOpts]);
 
   const components = useMemo(
-    () => createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss }),
-    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss],
+    () => createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeBg }),
+    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeBg],
   );
 
   const blocks = useMemo(() => parseBlocks(content), [content]);
