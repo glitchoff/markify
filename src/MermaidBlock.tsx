@@ -15,6 +15,7 @@ const DEFAULT_CONFIG: any = {
   theme: "default",
   securityLevel: "loose",
   fontFamily: "monospace",
+  suppressErrorRendering: true,
 };
 
 let initialized = false;
@@ -29,10 +30,12 @@ function getInstance() {
 
 function MermaidBlockInner({ code, className }: MermaidBlockProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastValidSvgRef = useRef("");
   const [state, setState] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [svg, setSvg] = useState("");
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
+
 
   // ── Lazy visibility ──────────────────────────────────────────────
   useEffect(() => {
@@ -60,7 +63,9 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
     let cancelled = false;
 
     (async () => {
-      setState("loading");
+      if (!lastValidSvgRef.current) {
+        setState("loading");
+      }
       try {
         const instance = getInstance();
         const id = `mermaid-${Math.abs(
@@ -70,12 +75,20 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
         const { svg: result } = await instance.render(id, code);
         if (!cancelled) {
           setSvg(result);
+          lastValidSvgRef.current = result;
           setState("success");
+          setError("");
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to render diagram");
-          setState("error");
+          const errMsg = err instanceof Error ? err.message : "Failed to render diagram";
+          setError(errMsg);
+          if (lastValidSvgRef.current) {
+            setSvg(lastValidSvgRef.current);
+            setState("success");
+          } else {
+            setState("error");
+          }
         }
       }
     })();
@@ -213,7 +226,7 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
       <div
         className={cn(
           "flex items-center justify-center overflow-hidden p-4",
-          state === "success" && "min-h-[120px]",
+          (state === "success" || svg) && "min-h-[120px]",
         )}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
@@ -223,14 +236,14 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
         onDoubleClick={handleDoubleClick}
         style={{ cursor: isPanning.current ? "grabbing" : "grab" }}
       >
-        {state === "loading" && (
+        {state === "loading" && !svg && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
             Rendering diagram...
           </div>
         )}
 
-        {state === "error" && (
+        {state === "error" && !svg && (
           <div className="flex flex-col items-center gap-2 p-4 text-center">
             <p className="text-sm text-destructive">Failed to render diagram</p>
             <p className="max-w-md text-xs text-muted-foreground">{error}</p>
@@ -252,7 +265,7 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
           </div>
         )}
 
-        {state === "success" && (
+        {svg && (
           <div
             className="mermaid-svg transition-transform duration-75 ease-out"
             style={{
@@ -262,7 +275,7 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
           />
         )}
 
-        {state === "idle" && (
+        {state === "idle" && !svg && (
           <div className="h-24" />
         )}
       </div>
