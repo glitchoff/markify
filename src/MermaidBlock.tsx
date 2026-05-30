@@ -205,8 +205,8 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
     <div
       ref={containerRef}
       className={cn(
-        "relative mb-3 overflow-hidden rounded-lg border border-border bg-card",
-        fullscreen && "fixed inset-0 z-50 m-0",
+        "relative mb-3 overflow-hidden rounded-lg border border-border bg-card flex flex-col",
+        fullscreen && "fixed inset-0 z-50 m-0 rounded-none h-screen w-screen",
         className,
       )}
     >
@@ -233,8 +233,9 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
       {/* Body */}
       <div
         className={cn(
-          "flex items-center justify-center overflow-hidden p-4",
+          "flex items-center justify-center overflow-hidden p-4 flex-1",
           (state === "success" || svg) && "min-h-[120px]",
+          fullscreen && "h-full w-full",
         )}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
@@ -289,10 +290,10 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
       </div>
 
       {/* Zoom controls panel */}
-      {svg && (
+      {svg && fullscreen && (
         <div className={cn(
           "absolute z-10 flex flex-col gap-1 rounded-md border border-border bg-background/80 p-1 supports-[backdrop-filter]:bg-background/70 supports-[backdrop-filter]:backdrop-blur-sm shadow-sm",
-          fullscreen ? "bottom-4 left-4" : "bottom-2 left-2"
+          "bottom-4 left-4"
         )}>
           <button
             className="flex cursor-pointer items-center justify-center rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
@@ -324,8 +325,8 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
       )}
 
       {/* Zoom indicator */}
-      {state === "success" && scale !== 1 && (
-        <div className="absolute bottom-2 right-2 flex items-center gap-1">
+      {state === "success" && scale !== 1 && fullscreen && (
+        <div className="absolute bottom-4 right-4 flex items-center gap-1">
           <button
             onClick={resetZoom}
             className="cursor-pointer rounded bg-background/80 px-2 py-0.5 text-xs text-muted-foreground backdrop-blur hover:text-foreground"
