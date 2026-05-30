@@ -13,9 +13,11 @@ interface CodeBlockProps {
   worker?: boolean;
   hljsTheme?: HljsTheme;
   hljsCustomCss?: string;
+  hljsThemeUrl?: string;
   hljsThemeBg?: boolean;
   isDark?: boolean;
   codeBlockClassName?: string;
+  codeFontFamily?: string;
 }
 
 const LANG_META: Record<string, { label: string; color: string }> = {
@@ -158,7 +160,7 @@ function Header({
   );
 }
 
-function CodeBlockInner({ children, className, language: langProp, worker, hljsTheme = "dark", hljsCustomCss, hljsThemeBg = false, isDark: isDarkProp, codeBlockClassName }: CodeBlockProps) {
+function CodeBlockInner({ children, className, language: langProp, worker, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, isDark: isDarkProp, codeBlockClassName, codeFontFamily }: CodeBlockProps) {
   const codeText = useMemo(() => getCodeText(children), [children]);
   const [copied, setCopied] = useState(false);
   const [wrapped, setWrapped] = useState(true);
@@ -236,7 +238,20 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
     };
   }, [displayCode, language, worker]);
 
-  useEffect(() => { injectHljsTheme(hljsTheme, hljsCustomCss); }, [hljsTheme, hljsCustomCss]);
+  useEffect(() => {
+    if (hljsThemeUrl) {
+      let link = document.getElementById("markify-hljs-link") as HTMLLinkElement | null;
+      if (!link) {
+        link = document.createElement("link");
+        link.id = "markify-hljs-link";
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+      }
+      link.href = hljsThemeUrl;
+    } else {
+      injectHljsTheme(hljsTheme, hljsCustomCss);
+    }
+  }, [hljsThemeUrl, hljsTheme, hljsCustomCss]);
 
   useEffect(() => {
     return () => {
@@ -283,6 +298,8 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
     wrapped ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent",
   ].join(" ");
 
+  const preStyle: React.CSSProperties = codeFontFamily ? { fontFamily: codeFontFamily } : {};
+
   const headerActions = (
     <>
       {!isCollapsed && (
@@ -313,7 +330,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
         >
           {headerActions}
         </Header>
-        <pre className={`mermaid ${preClass}`}>
+        <pre className={`mermaid ${preClass}`} style={preStyle}>
           <code className={`language-${language}`}>{displayCode}</code>
         </pre>
       </div>
@@ -333,7 +350,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
         {headerActions}
       </Header>
       <div className="relative">
-        <pre className={preClass}>
+        <pre className={preClass} style={preStyle}>
           <code
             className={`language-${language}`}
             {...(isLoading ? {} : { dangerouslySetInnerHTML: { __html: displayHtml } })}

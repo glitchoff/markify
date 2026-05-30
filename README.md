@@ -68,24 +68,31 @@ For a custom hljs theme, pass raw CSS:
 <Markify hljsCustomCss=".hljs { color: #fff; background: #000; }">...</Markify>
 ```
 
-Or import a CSS file directly (auto-injection skipped if already loaded):
+Or load an external CSS file via URL:
 
-```css
-/* layout.css or globals.css */
-@import "@glitchoff/markify/themes/atom-dark.css";
+```tsx
+<Markify hljsThemeUrl="/path/to/rose-pine.css">...</Markify>
 ```
+
+When `hljsThemeUrl` is provided, it injects a `<link>` element and skips the built-in Atom One injection.
 
 ### Theme switching with next-themes
 
 ```tsx
-import { useIsDark } from "@/hooks/use-is-dark";
-
-<Markify hljsTheme={isDark ? "dark" : "light"}>
+<Markify hljsThemeUrl={isDark ? "/rose-pine.css" : "/rose-pine-dawn.css"}>
   {content}
 </Markify>
 ```
 
-Where `useIsDark` watches `document.documentElement.classList.contains("dark")`.
+### Font customization
+
+```tsx
+// Content font
+<Markify fontFamily="Georgia, serif">...</Markify>
+
+// Code block font (overrides monospace default)
+<Markify codeFontFamily='"JetBrains Mono", monospace'>...</Markify>
+```
 
 ### Tables
 
@@ -113,7 +120,10 @@ Where `useIsDark` watches `document.documentElement.classList.contains("dark")`.
 | `codeBlockWorker` | `boolean` | `false` | Offload hljs highlighting to Web Worker |
 | `hljsTheme` | `"dark" \| "light"` | `"dark"` | Atom One theme for code blocks |
 | `hljsCustomCss` | `string` | — | Custom inline hljs CSS (overrides `hljsTheme`) |
+| `hljsThemeUrl` | `string` | — | External CSS file URL for hljs (skips built-in injection) |
 | `codeBlockClassName` | `string` | — | Additional CSS classes for the code block wrapper |
+| `fontFamily` | `string` | — | Content font-family |
+| `codeFontFamily` | `string` | — | Code block font-family |
 | `table` | `TableOptions` | — | Table display config |
 
 ## Exports

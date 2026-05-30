@@ -361,7 +361,7 @@ function Hr() {
   return <hr className="mb-3 border-border" />;
 }
 
-function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeBg, codeBlockClassName, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; children?: React.ReactNode; className?: string }) {
+function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; children?: React.ReactNode; className?: string }) {
   const lang = extractLanguage(props.children, props.className);
 
   if (lang === "mermaid") {
@@ -371,7 +371,7 @@ function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeBg, codeBloc
   }
 
   return (
-    <CodeBlock className={props.className} language={lang} worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName}>
+    <CodeBlock className={props.className} language={lang} worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeUrl={hljsThemeUrl} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} codeFontFamily={codeFontFamily}>
       {props.children}
     </CodeBlock>
   );
@@ -382,16 +382,20 @@ export interface MarkdownComponentOptions {
   table?: TableOptions;
   hljsTheme?: HljsTheme;
   hljsCustomCss?: string;
+  hljsThemeUrl?: string;
   hljsThemeBg?: boolean;
   codeBlockClassName?: string;
+  codeFontFamily?: string;
 }
 
 export function createMarkdownComponents(opts?: MarkdownComponentOptions): Components {
   const worker = opts?.codeBlockWorker ?? false;
   const hljsTheme = opts?.hljsTheme ?? "dark";
   const hljsCustomCss = opts?.hljsCustomCss;
+  const hljsThemeUrl = opts?.hljsThemeUrl;
   const hljsThemeBg = opts?.hljsThemeBg ?? false;
   const codeBlockClassName = opts?.codeBlockClassName;
+  const codeFontFamily = opts?.codeFontFamily;
   return {
     style: () => null as any,
     script: () => null as any,
@@ -412,7 +416,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     tr: TR as any,
     th: TH as any,
     td: TD as any,
-    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} {...props} />,
+    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeUrl={hljsThemeUrl} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} codeFontFamily={codeFontFamily} {...props} />,
     ol: (props) => <List ordered {...props} />,
     ul: (props) => <List {...props} />,
     li: ListItem as any,

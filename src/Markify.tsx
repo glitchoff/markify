@@ -15,8 +15,11 @@ export interface MarkifyProps {
   table?: TableOptions;
   hljsTheme?: HljsTheme;
   hljsCustomCss?: string;
+  hljsThemeUrl?: string;
   hljsThemeBg?: boolean;
   codeBlockClassName?: string;
+  fontFamily?: string;
+  codeFontFamily?: string;
 }
 
 function parseBlocks(content: string): string[] {
@@ -44,7 +47,7 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeBg = false, codeBlockClassName }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
 
   const tableOptions = useMemo(() => ({
@@ -54,8 +57,8 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
   }), [tableOpts]);
 
   const components = useMemo(
-    () => createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeBg }),
-    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeBg],
+    () => createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily }),
+    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily],
   );
 
   const blocks = useMemo(() => parseBlocks(content), [content]);
@@ -68,7 +71,7 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
         "text-foreground [&_table]:w-full [&_img]:max-w-full",
         className,
       )}
-      style={{ willChange: "contents" }}
+      style={{ fontFamily: fontFamily ?? undefined, willChange: "contents" }}
     >
       {blocks.map((block, i) => {
         const isLast = i === blocks.length - 1;

@@ -1,6 +1,6 @@
 {
   "name": "@glitchoff/markify",
-  "version": "0.2.9",
+  "version": "0.4.1",
   "private": false,
   "type": "module",
   "main": "./dist/index.js",
