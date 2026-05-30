@@ -2,16 +2,19 @@
 
 import { memo, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
-import remend from "remend";
 import { cn } from "./utils";
 import { useStreamingReveal } from "./streaming";
-import { createMarkdownComponents, baseRemarkPlugins, baseRehypePlugins } from "./markdown-components";
+import { createMarkdownComponents, baseRemarkPlugins, baseRehypePlugins, TableOptionsContext, type TableOptions } from "./markdown-components";
+import type { HljsTheme } from "./themes";
 
 export interface MarkifyProps {
   children: string;
   isStreaming?: boolean;
   className?: string;
   codeBlockWorker?: boolean;
+  table?: TableOptions;
+  hljsTheme?: HljsTheme;
+  hljsCustomCss?: string;
 }
 
 function parseBlocks(content: string): string[] {
@@ -39,25 +42,31 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false }: MarkifyProps) {
-  const revealed = useStreamingReveal(children, isStreaming);
-  const repaired = isStreaming ? remend(revealed) : revealed;
-  const content = isStreaming ? repaired : children;
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss }: MarkifyProps) {
+  const content = useStreamingReveal(children, isStreaming);
+
+  const tableOptions = useMemo(() => ({
+    showCopyButton: tableOpts?.showCopyButton ?? true,
+    downloadFormats: tableOpts?.downloadFormats ?? [],
+    scrollable: tableOpts?.scrollable ?? true,
+  }), [tableOpts]);
 
   const components = useMemo(
-    () => createMarkdownComponents(codeBlockWorker),
-    [codeBlockWorker],
+    () => createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss }),
+    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss],
   );
 
   const blocks = useMemo(() => parseBlocks(content), [content]);
 
   return (
+    <TableOptionsContext.Provider value={tableOptions}>
     <div
       data-streaming={isStreaming || undefined}
       className={cn(
         "text-foreground [&_table]:w-full [&_img]:max-w-full",
         className,
       )}
+      style={{ willChange: "contents" }}
     >
       {blocks.map((block, i) => {
         const isLast = i === blocks.length - 1;
@@ -73,6 +82,7 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
         );
       })}
     </div>
+    </TableOptionsContext.Provider>
   );
 }
 

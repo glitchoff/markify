@@ -1,6 +1,6 @@
 {
   "name": "@glitchoff/markify",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "main": "./dist/index.js",
@@ -10,25 +10,28 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./themes/*": "./dist/themes/*"
   },
   "files": [
-    "dist"
+    "dist",
+    "dist/themes"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && node -e \"require('fs').cpSync('src/themes', 'dist/themes', {recursive: true})\"",
     "dev": "tsup --watch"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
     "katex": "^0.16.28",
+    "lucide-react": "^1.17.0",
     "mermaid": "^11.12.2",
     "react-markdown": "^10.1.0",
     "rehype-katex": "^7.0.1",
-    "remend": "^1.3.0",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
+    "remend": "^1.3.0",
     "tailwind-merge": "^3.6.0"
   },
   "peerDependencies": {

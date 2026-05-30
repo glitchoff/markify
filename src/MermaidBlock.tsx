@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import mermaid from "mermaid";
+import { Copy, Check, Download, Maximize, Minimize } from "lucide-react";
 import { cn } from "./utils";
 
 interface MermaidBlockProps {
@@ -192,19 +193,18 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
       <div className="flex items-center justify-between border-b border-border bg-muted px-4 py-1.5">
         <span className="font-mono text-xs text-muted-foreground">mermaid</span>
         <div className="flex gap-1">
-          <ActionButton onClick={handleCopy} copied={copied}>
-            {copied ? "Copied" : "Copy"}
+          <ActionButton onClick={handleCopy} copied={copied} title={copied ? "Copied" : "Copy"}>
+            {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
           </ActionButton>
 
-          {/* Download dropdown */}
           <DownloadDropdown
             onSVG={handleDownloadSVG}
             onPNG={handleDownloadPNG}
             onMMD={handleDownloadMMD}
           />
 
-          <ActionButton onClick={() => setFullscreen((f) => !f)}>
-            {fullscreen ? "Exit" : "Fullscreen"}
+          <ActionButton onClick={() => setFullscreen((f) => !f)} title={fullscreen ? "Exit fullscreen" : "Fullscreen"}>
+            {fullscreen ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
           </ActionButton>
         </div>
       </div>
@@ -290,14 +290,17 @@ function ActionButton({
   children,
   onClick,
   copied,
+  title,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   copied?: boolean;
+  title?: string;
 }) {
   return (
     <button
       onClick={onClick}
+      title={title}
       className={cn(
         "cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors",
         copied
@@ -324,7 +327,9 @@ function DownloadDropdown({
 
   return (
     <div className="relative">
-      <ActionButton onClick={() => setOpen((o) => !o)}>Download</ActionButton>
+      <ActionButton onClick={() => setOpen((o) => !o)} title="Download">
+        <Download className="size-3.5" />
+      </ActionButton>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />

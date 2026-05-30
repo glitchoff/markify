@@ -1,16 +1,18 @@
 "use client";
 
-import { memo, useState, useRef, useCallback } from "react";
+import { createContext, memo, useContext, useState, useRef, useCallback, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import { Copy, Check, Download } from "lucide-react";
 import { cn } from "./utils";
 import { parseCallout, getText } from "./callout";
 import { remarkFixKaTeXUnicode } from "./fix-katex-unicode";
 import { CodeBlock } from "./CodeBlock";
 import { MermaidBlock } from "./MermaidBlock";
 import type { Components } from "react-markdown";
+import type { HljsTheme } from "./themes";
 
 const katexOptions = {
   strict: false,
@@ -22,8 +24,79 @@ const baseRehypePlugins: any[] = [[rehypeKatex, katexOptions]];
 
 export { baseRemarkPlugins, baseRehypePlugins };
 
-function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; children: React.ReactNode }) {
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+export interface TableOptions {
+  showCopyButton?: boolean;
+  downloadFormats?: ("csv" | "tsv" | "md")[];
+  scrollable?: boolean;
+}
+
+const defaultTableOptions: TableOptions = {
+  showCopyButton: true,
+  downloadFormats: [],
+  scrollable: true,
+};
+
+const TableOptionsContext = createContext<TableOptions>(defaultTableOptions);
+
+export function useTableOptions(): TableOptions {
+  return useContext(TableOptionsContext);
+}
+
+export { TableOptionsContext };
+
+// ── Table helpers ────────────────────────────────────────────────────
+
+function getTableData(table: HTMLTableElement) {
+  const thRows = table.querySelectorAll("th");
+  const headers = Array.from(thRows).map((th) => (th as HTMLElement).innerText.trim());
+  const dataRows = table.querySelectorAll("tbody tr");
+  const rows = Array.from(dataRows).map((tr) =>
+    Array.from(tr.querySelectorAll("td")).map((td) => (td as HTMLElement).innerText.trim()),
+  );
+  return { headers, rows };
+}
+
+function toCSV(headers: string[], rows: string[][]): string {
+  const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
+  return [headers.map(esc).join(","), ...rows.map((r) => r.map(esc).join(","))].join("\n");
+}
+
+function toTSV(headers: string[], rows: string[][]): string {
+  return [headers.join("\t"), ...rows.map((r) => r.join("\t"))].join("\n");
+}
+
+function toMD(headers: string[], rows: string[][]): string {
+  const sep = `| ${headers.map(() => "---").join(" | ")} |`;
+  return [
+    `| ${headers.join(" | ")} |`,
+    sep,
+    ...rows.map((r) => `| ${r.join(" | ")} |`),
+  ].join("\n");
+}
+
+const FORMATTERS: Record<string, { ext: string; mime: string; fmt: (h: string[], r: string[][]) => string }> = {
+  csv: { ext: "csv", mime: "text/csv", fmt: toCSV },
+  tsv: { ext: "tsv", mime: "text/tab-separated-values", fmt: toTSV },
+  md: { ext: "md", mime: "text/markdown", fmt: toMD },
+};
+
+function downloadTable(table: HTMLTableElement, format: "csv" | "tsv" | "md") {
+  const { headers, rows } = getTableData(table);
+  const f = FORMATTERS[format];
+  if (!f) return;
+  const content = f.fmt(headers, rows);
+  const blob = new Blob([content], { type: f.mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `table.${f.ext}`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Components ───────────────────────────────────────────────────────
+
+function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; children?: React.ReactNode }) {
   const styles: Record<number, string> = {
     1: "text-3xl font-bold mt-6 mb-3 border-b border-border pb-1",
     2: "text-2xl font-semibold mt-5 mb-2",
@@ -32,6 +105,7 @@ function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; 
     5: "text-base font-medium mt-2 mb-0",
     6: "text-sm font-medium mt-2 mb-0",
   };
+  const Tag = `h${level}` as React.ElementType;
   return (
     <Tag className={cn(styles[level], "text-foreground")} {...props}>
       {children}
@@ -39,8 +113,8 @@ function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; 
   );
 }
 
-function Paragraph({ children }: { children: React.ReactNode }) {
-  const content = getText(children).trim();
+function Paragraph({ children }: { children?: React.ReactNode }) {
+  const content = children ? getText(children).trim() : "";
   if (!content) return null;
   return <p className="mb-4 last:mb-0 leading-relaxed text-base text-foreground/90">{children}</p>;
 }
@@ -121,58 +195,80 @@ function Blockquote({ children, ...props }: { children: React.ReactNode }) {
 }
 
 function Table({ children, ...props }: { children: React.ReactNode }) {
+  const opts = useTableOptions();
   const tableRef = useRef<HTMLTableElement>(null);
   const [copied, setCopied] = useState(false);
-  const [showCopy, setShowCopy] = useState(false);
+  const [showActions, setShowActions] = useState(false);
 
-  const handleCopy = useCallback(
-    async (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (!tableRef.current) return;
-      try {
-        const rows = tableRef.current.querySelectorAll("tr");
-        let md = "";
-        rows.forEach((row, i) => {
-          const cells = row.querySelectorAll("th, td");
-          const vals = Array.from(cells).map((c) => (c as HTMLElement).innerText.trim());
-          if (vals.length === 0) return;
-          md += `| ${vals.join(" | ")} |\n`;
-          if (i === 0 && row.querySelectorAll("th").length > 0) {
-            md += `| ${vals.map(() => "---").join(" | ")} |\n`;
-          }
-        });
-        await navigator.clipboard.writeText(md);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        // silently fail
-      }
-    },
-    [],
-  );
+  const handleCopy = useCallback(async () => {
+    if (!tableRef.current) return;
+    const { headers, rows } = getTableData(tableRef.current);
+    const md = toMD(headers, rows);
+    try {
+      await navigator.clipboard.writeText(md);
+    } catch {
+      return;
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, []);
+
+  const handleDownload = useCallback((format: "csv" | "tsv" | "md") => {
+    if (!tableRef.current) return;
+    downloadTable(tableRef.current, format);
+  }, []);
+
+  const hasDownloads = (opts.downloadFormats?.length ?? 0) > 0;
 
   return (
     <div
       className="group relative my-4 overflow-hidden rounded-lg border border-border bg-card"
-      onMouseEnter={() => setShowCopy(true)}
-      onMouseLeave={() => setShowCopy(false)}
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
     >
-      <button
-        onClick={handleCopy}
+      <div
         className={cn(
-          "absolute right-1 top-1 z-10 rounded-md border border-border bg-background/90 px-2 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur transition-all",
-          showCopy ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
-          copied && "border-primary/20 bg-primary/10 text-primary",
+          "absolute right-1 top-1 z-10 flex items-center gap-1 transition-all",
+          showActions ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
         )}
-        type="button"
       >
-        {copied ? "Copied" : "Copy as Markdown"}
-      </button>
-      <div className="overflow-x-auto">
+        {opts.showCopyButton && (
+          <button
+            onClick={handleCopy}
+            className={cn(
+              "rounded-md border border-border bg-background/90 p-1.5 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:text-foreground",
+              copied && "border-primary/20 bg-primary/10 text-primary",
+            )}
+            type="button"
+            title={copied ? "Copied" : "Copy as Markdown"}
+          >
+            {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+          </button>
+        )}
+        {opts.downloadFormats?.map((fmt) => (
+          <button
+            key={fmt}
+            onClick={() => handleDownload(fmt)}
+            className="rounded-md border border-border bg-background/90 p-1.5 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:text-foreground"
+            type="button"
+            title={`Download as ${fmt.toUpperCase()}`}
+          >
+            <Download className="size-4" />
+            <span className="ml-1 text-xs font-medium">{fmt.toUpperCase()}</span>
+          </button>
+        ))}
+      </div>
+      {opts.scrollable ? (
+        <div className="overflow-x-auto">
+          <table ref={tableRef} className="w-full border-collapse text-sm" {...props}>
+            {children}
+          </table>
+        </div>
+      ) : (
         <table ref={tableRef} className="w-full border-collapse text-sm" {...props}>
           {children}
         </table>
-      </div>
+      )}
     </div>
   );
 }
@@ -238,7 +334,7 @@ function extractLanguage(node: React.ReactNode, className?: string): string {
   return match ? match[1] : "";
 }
 
-function List({ children, ordered, ...props }: { children: React.ReactNode; ordered?: boolean }) {
+function List({ children, ordered, ...props }: { children?: React.ReactNode; ordered?: boolean }) {
   const Tag = ordered ? "ol" : "ul";
   return (
     <Tag
@@ -265,7 +361,7 @@ function Hr() {
   return <hr className="my-6 border-border" />;
 }
 
-function PreWithWorker({ worker, ...props }: { worker: boolean; children: React.ReactNode; className?: string }) {
+function PreWithWorker({ worker, hljsTheme, hljsCustomCss, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; children?: React.ReactNode; className?: string }) {
   const lang = extractLanguage(props.children, props.className);
 
   if (lang === "mermaid") {
@@ -275,13 +371,23 @@ function PreWithWorker({ worker, ...props }: { worker: boolean; children: React.
   }
 
   return (
-    <CodeBlock className={props.className} language={lang} worker={worker}>
+    <CodeBlock className={props.className} language={lang} worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss}>
       {props.children}
     </CodeBlock>
   );
 }
 
-export function createMarkdownComponents(worker?: boolean): Components {
+export interface MarkdownComponentOptions {
+  codeBlockWorker?: boolean;
+  table?: TableOptions;
+  hljsTheme?: HljsTheme;
+  hljsCustomCss?: string;
+}
+
+export function createMarkdownComponents(opts?: MarkdownComponentOptions): Components {
+  const worker = opts?.codeBlockWorker ?? false;
+  const hljsTheme = opts?.hljsTheme ?? "dark";
+  const hljsCustomCss = opts?.hljsCustomCss;
   return {
     style: () => null as any,
     script: () => null as any,
@@ -302,7 +408,7 @@ export function createMarkdownComponents(worker?: boolean): Components {
     tr: TR as any,
     th: TH as any,
     td: TD as any,
-    pre: (props) => <PreWithWorker worker={worker ?? false} {...props} />,
+    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} {...props} />,
     ol: (props) => <List ordered {...props} />,
     ul: (props) => <List {...props} />,
     li: ListItem as any,

@@ -2,13 +2,67 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
 import hljs from "highlight.js";
-import { cn } from "./utils";
+import { Copy, Check, WrapText, ChevronDown } from "lucide-react";
+import { cn, injectHljsTheme } from "./utils";
+import type { HljsTheme } from "./themes";
 
 interface CodeBlockProps {
   children: React.ReactNode;
   className?: string;
   language?: string;
   worker?: boolean;
+  hljsTheme?: HljsTheme;
+  hljsCustomCss?: string;
+  isDark?: boolean;
+}
+
+const LANG_META: Record<string, { label: string; color: string }> = {
+  js: { label: "JavaScript", color: "#f7df1e" },
+  javascript: { label: "JavaScript", color: "#f7df1e" },
+  jsx: { label: "JSX", color: "#61dafb" },
+  tsx: { label: "TSX", color: "#61dafb" },
+  ts: { label: "TypeScript", color: "#3178c6" },
+  typescript: { label: "TypeScript", color: "#3178c6" },
+  py: { label: "Python", color: "#3572a5" },
+  python: { label: "Python", color: "#3572a5" },
+  rust: { label: "Rust", color: "#dea584" },
+  go: { label: "Go", color: "#00acd7" },
+  java: { label: "Java", color: "#b07219" },
+  cpp: { label: "C++", color: "#f34b7d" },
+  c: { label: "C", color: "#aaaaaa" },
+  cs: { label: "C#", color: "#239120" },
+  rb: { label: "Ruby", color: "#cc342d" },
+  ruby: { label: "Ruby", color: "#cc342d" },
+  php: { label: "PHP", color: "#777bb4" },
+  swift: { label: "Swift", color: "#fa7343" },
+  kotlin: { label: "Kotlin", color: "#7f52ff" },
+  sh: { label: "Shell", color: "#89e051" },
+  bash: { label: "Bash", color: "#89e051" },
+  zsh: { label: "Zsh", color: "#89e051" },
+  html: { label: "HTML", color: "#e34c26" },
+  css: { label: "CSS", color: "#8a4baf" },
+  scss: { label: "SCSS", color: "#c6538c" },
+  json: { label: "JSON", color: "#cbcb41" },
+  yaml: { label: "YAML", color: "#cb171e" },
+  yml: { label: "YAML", color: "#cb171e" },
+  toml: { label: "TOML", color: "#9c4221" },
+  md: { label: "Markdown", color: "#083fa1" },
+  sql: { label: "SQL", color: "#e38c00" },
+  graphql: { label: "GraphQL", color: "#e10098" },
+  latex: { label: "LaTeX", color: "#008080" },
+  tex: { label: "LaTeX", color: "#008080" },
+  mermaid: { label: "Mermaid", color: "#ff3670" },
+  plaintext: { label: "Plain Text", color: "#6b7280" },
+  text: { label: "Plain Text", color: "#6b7280" },
+};
+
+function getLangMeta(lang?: string) {
+  return (
+    LANG_META[lang?.toLowerCase() ?? ""] ?? {
+      label: lang?.toUpperCase() ?? "Code",
+      color: "#6b7280",
+    }
+  );
 }
 
 function getCodeText(children: React.ReactNode): string {
@@ -22,15 +76,102 @@ function getCodeText(children: React.ReactNode): string {
   return "";
 }
 
-function CodeBlockInner({ children, className, language: langProp, worker }: CodeBlockProps) {
+function Btn({
+  onClick,
+  title,
+  active,
+  activeClass,
+  isDark,
+  children,
+}: {
+  onClick: () => void;
+  title?: string;
+  active?: boolean;
+  activeClass?: string;
+  isDark: boolean;
+  children: React.ReactNode;
+}) {
+  const idleClass = isDark
+    ? "text-white/35 hover:text-white/75 hover:bg-white/[0.07]"
+    : "text-black/40 hover:text-black/70 hover:bg-black/[0.07]";
+  const defaultActive = isDark ? "bg-white/15 text-white" : "bg-black/10 text-black/80";
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      className={[
+        "flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium",
+        "transition-all duration-150 select-none whitespace-nowrap",
+        active ? (activeClass ?? defaultActive) : idleClass,
+      ].join(" ")}
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Header({
+  label,
+  color,
+  children,
+  isCollapsed,
+  onToggleCollapse,
+  showCollapse,
+  isDark,
+}: {
+  label: string;
+  color: string;
+  children: React.ReactNode;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+  showCollapse: boolean;
+  isDark: boolean;
+}) {
+  const headerBg = isDark
+    ? "bg-[#0d1117] border-b border-white/[0.06]"
+    : "bg-[#f0f2f4] border-b border-black/[0.08]";
+  const labelCls = isDark ? "text-white/70" : "text-black/60";
+  const chevronCls = isDark ? "text-white/50" : "text-black/40";
+  const chevronHover = isDark ? "hover:bg-white/10" : "hover:bg-black/[0.07]";
+  return (
+    <div className={`flex items-center justify-between px-3 py-2 ${headerBg}`}>
+      <div className="flex items-center gap-2">
+        {showCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className={`flex items-center justify-center w-5 h-5 rounded ${chevronHover} transition-colors`}
+            title={isCollapsed ? "Expand" : "Collapse"}
+            type="button"
+          >
+            <ChevronDown
+              size={14}
+              strokeWidth={2}
+              className={`${chevronCls} transition-transform duration-200 ${isCollapsed ? "-rotate-90" : ""}`}
+            />
+          </button>
+        )}
+        <span
+          className="w-2 h-2 rounded-full flex-shrink-0"
+          style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}60` }}
+        />
+        <span className={`${labelCls} text-[11px] font-medium tracking-wide`}>{label}</span>
+      </div>
+      <div className="flex items-center gap-0.5">{children}</div>
+    </div>
+  );
+}
+
+function CodeBlockInner({ children, className, language: langProp, worker, hljsTheme = "dark", hljsCustomCss, isDark: isDarkProp }: CodeBlockProps) {
   const codeText = useMemo(() => getCodeText(children), [children]);
   const [copied, setCopied] = useState(false);
-  const [wrapped, setWrapped] = useState(true);
+  const [wrapped, setWrapped] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // ── Highlighting (sync or worker) ──────────────────────────────────
-  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
-  const workerRef = useRef<Worker | null>(null);
-  const pendingIdRef = useRef(0);
+  const COLLAPSE_THRESHOLD = 5;
+  const COLLAPSED_LINES = 5;
+
+  const isDark = isDarkProp ?? (hljsTheme === "dark");
 
   const language = useMemo(() => {
     if (langProp) return langProp;
@@ -38,23 +179,38 @@ function CodeBlockInner({ children, className, language: langProp, worker }: Cod
     return match ? match[1] : "";
   }, [langProp, className]);
 
-  // Sync highlighting
+  const langMeta = useMemo(() => getLangMeta(language), [language]);
+
+  const lineCount = useMemo(() => codeText.split("\n").length, [codeText]);
+  const shouldCollapse = lineCount > COLLAPSE_THRESHOLD;
+
+  const displayCode = useMemo(() => {
+    if (!isCollapsed || !shouldCollapse) return codeText;
+    return codeText.split("\n").slice(0, COLLAPSED_LINES).join("\n");
+  }, [codeText, isCollapsed, shouldCollapse]);
+
+  const hiddenLines = shouldCollapse && isCollapsed ? lineCount - COLLAPSED_LINES : 0;
+
+  // ── Highlighting (sync or worker) ──────────────────────────────────
+  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+  const pendingIdRef = useRef(0);
+
   const syncHtml = useMemo(() => {
     if (worker) return null;
-    if (!codeText) return "";
+    if (!displayCode) return "";
     try {
-      if (language && language !== "plaintext" && language !== "text") {
-        return hljs.highlight(codeText, { language, ignoreIllegals: true }).value;
+      if (language && language !== "plaintext" && language !== "text" && language !== "mermaid") {
+        return hljs.highlight(displayCode, { language, ignoreIllegals: true }).value;
       }
-      return hljs.highlightAuto(codeText).value;
+      return hljs.highlightAuto(displayCode).value;
     } catch {
-      return codeText;
+      return displayCode;
     }
-  }, [codeText, language, worker]);
+  }, [displayCode, language, worker]);
 
-  // Worker highlighting
   useEffect(() => {
-    if (!worker || !codeText) return;
+    if (!worker || !displayCode) return;
 
     const id = ++pendingIdRef.current;
     let workerInstance = workerRef.current;
@@ -77,14 +233,15 @@ function CodeBlockInner({ children, className, language: langProp, worker }: Cod
       }
     }
 
-    workerInstance.postMessage({ code: codeText, language, id });
+    workerInstance.postMessage({ code: displayCode, language, id });
 
     return () => {
       pendingIdRef.current = -1;
     };
-  }, [codeText, language, worker]);
+  }, [displayCode, language, worker]);
 
-  // Cleanup worker on unmount
+  useEffect(() => { injectHljsTheme(hljsTheme, hljsCustomCss); }, [hljsTheme, hljsCustomCss]);
+
   useEffect(() => {
     return () => {
       if (workerRef.current) {
@@ -94,8 +251,8 @@ function CodeBlockInner({ children, className, language: langProp, worker }: Cod
     };
   }, []);
 
-  const displayHtml = worker ? (highlightedHtml ?? codeText) : (syncHtml ?? codeText);
-  const isLoading = worker && !highlightedHtml && codeText.length > 0;
+  const displayHtml = worker ? (highlightedHtml ?? displayCode) : (syncHtml ?? displayCode);
+  const isLoading = worker && !highlightedHtml && displayCode.length > 0;
 
   const handleCopy = useCallback(async () => {
     try {
@@ -114,87 +271,96 @@ function CodeBlockInner({ children, className, language: langProp, worker }: Cod
     }
   }, [codeText]);
 
+  const toggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => !prev);
+  }, []);
+
   const isMermaid = language === "mermaid";
+
+  const codeBg = isDark ? "bg-[#0d1117] text-white/90" : "bg-[#f6f8fa] text-black/85";
+  const wrapperBorder = isDark
+    ? "border-white/[0.07] shadow-black/30"
+    : "border-black/10 shadow-black/10";
+  const expandCls = isDark
+    ? "bg-[#161b22] border border-white/[0.1] text-white/50 hover:text-white/80 hover:bg-[#1f242c] hover:border-white/[0.15] shadow-black/40"
+    : "bg-[#e8eaed] border border-black/[0.1] text-black/50 hover:text-black/80 hover:bg-[#d0d3d6] hover:border-black/[0.15] shadow-black/10";
+
+  const preClass = [
+    `m-0 p-4 font-mono text-[0.8rem] leading-[1.7] ${codeBg}`,
+    wrapped ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto",
+  ].join(" ");
+
+  const headerActions = (
+    <>
+      {!isCollapsed && (
+        <Btn onClick={() => setWrapped((p) => !p)} title={wrapped ? "Unwrap lines" : "Wrap long lines"} active={wrapped} isDark={isDark}>
+          <WrapText size={13} strokeWidth={2} />
+        </Btn>
+      )}
+      <Btn
+        onClick={handleCopy}
+        title={copied ? "Copied!" : "Copy code"}
+        active={copied}
+        activeClass="bg-emerald-500/20 text-emerald-400"
+        isDark={isDark}
+      >
+        {copied ? <Check size={13} strokeWidth={2.5} /> : <Copy size={13} strokeWidth={2} />}
+      </Btn>
+    </>
+  );
 
   if (isMermaid) {
     return (
-      <div className="relative my-4 w-full">
-        <div
-          className={cn(
-            "rounded-lg border border-border bg-card p-4 font-mono text-sm",
-            wrapped ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto",
-            className,
-          )}
+      <div className={`my-3 rounded-md overflow-hidden border shadow-lg ${wrapperBorder}`}>
+        <Header
+          label={langMeta.label}
+          color={langMeta.color}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={toggleCollapse}
+          showCollapse={shouldCollapse}
+          isDark={isDark}
         >
-          <code>{codeText}</code>
-        </div>
-        <div className="absolute right-2 top-2 flex gap-1">
-          <ActionButton onClick={() => setWrapped((p) => !p)}>
-            {wrapped ? "Unwrap" : "Wrap"}
-          </ActionButton>
-          <ActionButton copied={copied} onClick={handleCopy}>
-            {copied ? "Copied" : "Copy"}
-          </ActionButton>
-        </div>
+          {headerActions}
+        </Header>
+        <pre className={`mermaid ${preClass}`}>
+          <code className={`language-${language}`}>{displayCode}</code>
+        </pre>
       </div>
     );
   }
 
   return (
-    <div className="relative my-4 w-full">
-      <div className="flex items-center justify-between rounded-t-lg border border-border bg-muted px-4 py-1.5">
-        <span className="font-mono text-xs text-muted-foreground lowercase">
-          {language || "code"}
-        </span>
-        <div className="flex gap-1">
-          <ActionButton onClick={() => setWrapped((p) => !p)}>
-            {wrapped ? "Unwrap" : "Wrap"}
-          </ActionButton>
-          <ActionButton copied={copied} onClick={handleCopy}>
-            {copied ? "Copied" : "Copy"}
-          </ActionButton>
-        </div>
-      </div>
-      <pre
-        className={cn(
-          "overflow-x-auto rounded-b-lg border border-t-0 border-border bg-card p-4 text-sm",
-          wrapped && "whitespace-pre-wrap break-words",
-          className,
-        )}
+    <div className={`my-3 rounded-md overflow-hidden border shadow-lg ${wrapperBorder}`}>
+      <Header
+        label={langMeta.label}
+        color={langMeta.color}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={toggleCollapse}
+        showCollapse={shouldCollapse}
+        isDark={isDark}
       >
-        <code
-          className={cn("font-mono text-sm", language && `language-${language}`)}
-          {...(isLoading ? {} : { dangerouslySetInnerHTML: { __html: displayHtml } })}
-        >
-          {isLoading ? codeText : undefined}
-        </code>
-      </pre>
+        {headerActions}
+      </Header>
+      <div className="relative">
+        <pre className={preClass}>
+          <code
+            className={`language-${language}`}
+            {...(isLoading ? {} : { dangerouslySetInnerHTML: { __html: displayHtml } })}
+          >
+            {isLoading ? displayCode : undefined}
+          </code>
+        </pre>
+        {hiddenLines > 0 && (
+          <button
+            onClick={toggleCollapse}
+            className={`absolute bottom-0 left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-full text-[11px] transition-all shadow-lg ${expandCls}`}
+            type="button"
+          >
+            {hiddenLines} more lines
+          </button>
+        )}
+      </div>
     </div>
-  );
-}
-
-function ActionButton({
-  children,
-  onClick,
-  copied,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  copied?: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors",
-        copied
-          ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground",
-      )}
-      type="button"
-    >
-      {children}
-    </button>
   );
 }
 

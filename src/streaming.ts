@@ -1,9 +1,9 @@
-import { useDeferredValue } from "react";
+import remend from "remend";
 
 export function useStreamingReveal(
   content: string,
   isStreaming: boolean,
 ): string {
-  const deferred = useDeferredValue(content);
-  return isStreaming ? deferred : content;
+  if (!content) return "";
+  return isStreaming ? remend(content) : content;
 }
