@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import mermaid from "mermaid";
-import { Copy, Check, Download, Maximize, Minimize } from "lucide-react";
+import { Copy, Check, Download, Maximize, Minimize, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { cn } from "./utils";
 
 interface MermaidBlockProps {
@@ -143,6 +143,14 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
     setPosition({ x: 0, y: 0 });
   }, []);
 
+  const zoomIn = useCallback(() => {
+    setScale((s) => Math.min(5, s + 0.1));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setScale((s) => Math.max(0.3, s - 0.1));
+  }, []);
+
   // ── Download ─────────────────────────────────────────────────────
   const handleDownloadSVG = useCallback(() => {
     downloadFile(svg, "diagram.svg", "image/svg+xml");
@@ -279,6 +287,41 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
           <div className="h-24" />
         )}
       </div>
+
+      {/* Zoom controls panel */}
+      {svg && (
+        <div className={cn(
+          "absolute z-10 flex flex-col gap-1 rounded-md border border-border bg-background/80 p-1 supports-[backdrop-filter]:bg-background/70 supports-[backdrop-filter]:backdrop-blur-sm shadow-sm",
+          fullscreen ? "bottom-4 left-4" : "bottom-2 left-2"
+        )}>
+          <button
+            className="flex cursor-pointer items-center justify-center rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={scale >= 5}
+            onClick={zoomIn}
+            title="Zoom in"
+            type="button"
+          >
+            <ZoomIn size={15} />
+          </button>
+          <button
+            className="flex cursor-pointer items-center justify-center rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={scale <= 0.3}
+            onClick={zoomOut}
+            title="Zoom out"
+            type="button"
+          >
+            <ZoomOut size={15} />
+          </button>
+          <button
+            className="flex cursor-pointer items-center justify-center rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            onClick={resetZoom}
+            title="Reset zoom and pan"
+            type="button"
+          >
+            <RotateCcw size={15} />
+          </button>
+        </div>
+      )}
 
       {/* Zoom indicator */}
       {state === "success" && scale !== 1 && (
