@@ -198,7 +198,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
     if (worker) return null;
     if (!displayCode) return "";
     try {
-      if (language && language !== "plaintext" && language !== "text" && language !== "mermaid") {
+      if (language && language !== "plaintext" && language !== "text" && language !== "mermaid" && hljs.getLanguage(language)) {
         return hljs.highlight(displayCode, { language, ignoreIllegals: true }).value;
       }
       return hljs.highlightAuto(displayCode).value;

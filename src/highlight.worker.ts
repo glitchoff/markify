@@ -72,7 +72,7 @@ self.onmessage = (e: MessageEvent<{ code: string; language: string; id: number }
       return;
     }
 
-    const result = language && language !== "plaintext" && language !== "text"
+    const result = language && language !== "plaintext" && language !== "text" && hljs.getLanguage(language)
       ? hljs.highlight(code, { language, ignoreIllegals: true })
       : hljs.highlightAuto(code);
 
