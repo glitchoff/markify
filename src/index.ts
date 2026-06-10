@@ -1,6 +1,9 @@
 export { Markify } from "./Markify";
 export type { MarkifyProps } from "./Markify";
 
+// Re-export react-markdown types for custom components
+export type { Components } from "react-markdown";
+
 export { useStreamingReveal } from "./streaming";
 export { remarkFixKaTeXUnicode } from "./fix-katex-unicode";
 export { parseCallout, getText } from "./callout";

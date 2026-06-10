@@ -2,6 +2,7 @@
 
 import { memo, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 import { cn } from "./utils";
 import { useStreamingReveal } from "./streaming";
 import { createMarkdownComponents, baseRemarkPlugins, baseRehypePlugins, TableOptionsContext, type TableOptions } from "./markdown-components";
@@ -20,6 +21,7 @@ export interface MarkifyProps {
   codeBlockClassName?: string;
   fontFamily?: string;
   codeFontFamily?: string;
+  components?: Partial<Components>;
 }
 
 function parseBlocks(content: string): string[] {
@@ -47,7 +49,7 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, components: overrides }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
 
   const tableOptions = useMemo(() => ({
@@ -57,8 +59,8 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
   }), [tableOpts]);
 
   const components = useMemo(
-    () => createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily }),
-    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily],
+    () => ({ ...createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily }), ...overrides }),
+    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, overrides],
   );
 
   const blocks = useMemo(() => parseBlocks(content), [content]);
