@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, memo, useContext, useState, useRef, useCallback, useMemo } from "react";
+import { createContext, memo, useContext, useState, useRef, useCallback, useMemo, isValidElement } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -113,9 +113,17 @@ function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; 
   );
 }
 
+function hasElements(node: React.ReactNode): boolean {
+  if (isValidElement(node)) return true;
+  if (Array.isArray(node)) {
+    return node.some(hasElements);
+  }
+  return false;
+}
+
 function Paragraph({ children }: { children?: React.ReactNode }) {
   const content = children ? getText(children).trim() : "";
-  if (!content) return null;
+  if (!content && !hasElements(children)) return null;
   return <p className="mb-3 last:mb-0 leading-relaxed text-base text-foreground/90">{children}</p>;
 }
 
