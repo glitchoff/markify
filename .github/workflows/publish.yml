@@ -37,5 +37,7 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Publish to npm (OIDC trusted publishing)
+      - name: Publish to npm
         run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
