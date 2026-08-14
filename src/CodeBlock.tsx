@@ -291,10 +291,10 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
   const codeBg = "text-foreground/90";
   const wrapperBorder = "border-border";
   const expandCls = "border border-border text-muted-foreground hover:text-foreground hover:bg-accent shadow-sm";
-  const wrapperCls = `rounded-md overflow-hidden border shadow-lg mb-3 ${wrapperBorder} ${codeBlockClassName ?? ""}`
+  const wrapperCls = `w-full rounded-md overflow-hidden border shadow-lg mb-3 ${wrapperBorder} ${codeBlockClassName ?? ""}`
 
   const preClass = [
-    `m-0 p-4 font-mono text-[0.8rem] leading-[1.7] ${codeBg}`,
+    `m-0 p-4 font-mono text-[0.8rem] leading-[1.7] w-full ${codeBg}`,
     wrapped ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent",
   ].join(" ");
 
@@ -331,7 +331,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
           {headerActions}
         </Header>
         <pre className={`mermaid ${preClass}`} style={preStyle}>
-          <code className={`language-${language}`}>{displayCode}</code>
+          <code className={`hljs language-${language}`}>{displayCode}</code>
         </pre>
       </div>
     );
@@ -352,7 +352,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
       <div className="relative">
         <pre className={preClass} style={preStyle}>
           <code
-            className={`language-${language}`}
+            className={`hljs language-${language}`}
             {...(isLoading ? {} : { dangerouslySetInnerHTML: { __html: displayHtml } })}
           >
             {isLoading ? displayCode : undefined}
