@@ -19,7 +19,8 @@
   ],
   "scripts": {
     "build": "tsup && node -e \"require('fs').cpSync('src/themes', 'dist/themes', {recursive: true})\"",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "clsx": "^2.1.1",
