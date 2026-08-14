@@ -1,15 +1,15 @@
 {
   "name": "@glitchoff/markify",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "private": false,
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
-  "type": "git",
-  "url": "https://github.com/glitchoff/markify"
-},
+    "type": "git",
+    "url": "https://github.com/glitchoff/markify"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
