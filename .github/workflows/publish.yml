@@ -8,6 +8,11 @@ on:
 permissions:
   contents: read
   id-token: write
+  pages: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   publish:
@@ -36,3 +41,39 @@ jobs:
 
       - name: Publish to npm (OIDC trusted publishing)
         run: npm publish
+
+  pages:
+    runs-on: ubuntu-latest
+    needs: publish
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build demo landing page
+        run: pnpm --filter demo build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/demo/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
