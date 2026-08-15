@@ -8,6 +8,7 @@ import { cn } from "./utils";
 interface MermaidBlockProps {
   code: string;
   className?: string;
+  theme?: "default" | "dark" | "neutral" | "forest" | "base";
 }
 
 const DEFAULT_CONFIG: any = {
@@ -19,6 +20,7 @@ const DEFAULT_CONFIG: any = {
 };
 
 let initialized = false;
+let currentTheme: string = "default";
 
 function getInstance() {
   if (!initialized) {
@@ -28,7 +30,7 @@ function getInstance() {
   return mermaid;
 }
 
-function MermaidBlockInner({ code, className }: MermaidBlockProps) {
+function MermaidBlockInner({ code, className, theme = "default" }: MermaidBlockProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lastValidSvgRef = useRef("");
   const [state, setState] = useState<"idle" | "loading" | "error" | "success">("idle");
@@ -68,6 +70,10 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
       }
       try {
         const instance = getInstance();
+        if (currentTheme !== theme) {
+          currentTheme = theme;
+          instance.initialize({ ...DEFAULT_CONFIG, theme });
+        }
         const id = `mermaid-${Math.abs(
           code.split("").reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0),
         )}-${Date.now()}`;

@@ -375,7 +375,7 @@ function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThe
   if (lang === "mermaid") {
     const rawCode = getCodeChildren(props.children);
     const codeText = typeof rawCode === "string" ? rawCode : getText(rawCode);
-    return <MermaidBlock code={codeText} />;
+    return <MermaidBlock code={codeText} theme={hljsTheme === "dark" ? "dark" : "neutral"} />;
   }
 
   return (

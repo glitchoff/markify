@@ -1,28 +1,64 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import { Markify } from 'markify';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Moon,
+  Sun,
+  Zap,
+  Code2,
+  Table2,
+  GitBranch,
+  Sigma,
+  Sparkles,
+  Gauge,
+  RefreshCw,
+} from 'lucide-react';
 
-const DEMO = `# Welcome to Markify
+const STREAMING_DOC = `# Markify in action
 
-A high-performance markdown renderer designed for **streaming content** from AI models.
+Meet **Markify** — a high-performance markdown renderer built for *streaming* AI content. Watch it render live below.
 
-## Features
+## Why it's fast
 
-- **Streaming** — Smooth character-by-character reveal with adaptive speed
-- **Syntax highlighting** — 20+ languages with copy buttons
-- **Math support** — LaTeX equations via KaTeX: $E = mc^2$
-- **Mermaid diagrams** — Flowcharts and sequence diagrams
-- **Lazy images** — Load on scroll with fade-in
-- **Customizable** — Override any component or add plugins
-- **GFM** — Tables, task lists, strikethrough, autolinks
+> [!TIP]
+> Only the final block streams. Completed blocks render statically, so heavy content stays smooth.
 
-## Code Example
+| Feature | Markify | react-markdown | streamdown |
+| --- | --- | --- | --- |
+| Streaming reveal | ✅ | ❌ | ✅ |
+| Syntax highlighting | ✅ | ✅ | ✅ |
+| KaTeX math | ✅ | ✅ | ✅ |
+| Mermaid diagrams | ✅ | ❌ | ✅ |
+| Table copy / download | ✅ | ❌ | ❌ |
+| Web Worker highlighting | ✅ | ❌ | ❌ |
+| Bundle size | ~15KB | ~40KB | ~25KB |
+
+## Streaming math
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}
+$$
+
+Inline math like $E = mc^2$ works while streaming too.
+
+## A live diagram
+
+\`\`\`mermaid
+flowchart LR
+    U[User] -->|prompt| AI[AI Model]
+    AI -->|markdown| MK[Markify]
+    MK -->|streams| UI[UI]
+    UI --> U
+\`\`\`
+
+## Code that shines
 
 \`\`\`javascript
 import { Markify } from 'markify';
 
-function Chat({ message }) {
+export function Chat({ message }) {
   return (
     <Markify isStreaming={message.status === 'streaming'}>
       {message.content}
@@ -31,188 +67,285 @@ function Chat({ message }) {
 }
 \`\`\`
 
-## Math
-
-Inline math: $\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$
-
-Block math:
-
-$$
-f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!}(x-a)^n
-$$
-
-## Tables
-
-| Feature | Markify | react-markdown | streamdown |
-|---------|---------|----------------|------------|
-| Streaming | ✅ | ❌ | ✅ |
-| Syntax HL | ✅ | ❌ | ✅ |
-| Math | ✅ | ✅ | ✅ |
-| Mermaid | ✅ | ❌ | ✅ |
-| Customizable | ✅ | ✅ | ✅ |
-| Bundle size | ~15KB | ~40KB | ~25KB |
-
-## Callouts
-
-> [!TIP]
-> Use GitHub-style callouts for notes, warnings, and tips!
-
-> [!WARNING]
-> Always validate user input before rendering markdown.
+## Notes
 
 > [!NOTE]
-> This is a note callout example.
+> Every code block ships with copy and wrap controls.
 
-## Mermaid Diagram
+> [!WARNING]
+> Always sanitize untrusted AI output before rendering.
 
-\`\`\`mermaid
-graph TD
-    A[User] -->|types| B[Input]
-    B --> C{Valid?}
-    C -->|yes| D[Process]
-    C -->|no| E[Show Error]
-    D --> F[AI Model]
-    F --> G[Response]
-    G --> H[Markify]
-    H --> I[Rendered]
-\`\`\`
-
-## Task Lists
-
-- [x] Streaming support
-- [x] Syntax highlighting
-- [x] Code copy button
-- [ ] Live preview button
-- [x] Math equations
-- [x] Tables
-
-## Links & Inline Code
-
-Check out [Markify on GitHub](https://github.com/glitchoff/markify).
-
-Use \`npm install markify\` to get started.
-
----
-
-Built for AI-powered applications. Open source and free to use.
+Done — that's Markify from tip to tail. 🎉
 `;
 
-export default function App() {
-  const [content, setContent] = useState('');
-  const [isStreaming, setIsStreaming] = useState(true);
-  const [showCursor, setShowCursor] = useState(true);
-  const ref = useRef(DEMO);
+const STATIC_DOC = `# All features, at a glance
 
-  const plugins = useMemo(() => ({
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex],
-  }), []);
+## Syntax highlighting
+
+\`\`\`python
+def stream_response(prompt):
+    for token in model.generate(prompt):
+        yield token
+\`\`\`
+
+## Tables you can take with you
+
+| Format | Ext | MIME |
+| --- | --- | --- |
+| CSV | .csv | text/csv |
+| TSV | .tsv | text/tab-separated-values |
+| Markdown | .md | text/markdown |
+
+## Diagrams
+
+\`\`\`mermaid
+sequenceDiagram
+    participant U as User
+    participant M as Markify
+    U->>M: stream markdown
+    M-->>U: rendered blocks
+\`\`\`
+
+> [!TIP]
+> Hover a table to copy it as markdown or download as CSV/TSV/MD.
+`;
+
+// In-house component overrides — Markify merges these on top of its defaults,
+// so you can restyle any element without losing built-in behavior.
+const customComponents = {
+  a: memo(({ href, children, ...props }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-medium text-primary underline underline-offset-4 transition-colors hover:text-emerald-400"
+      {...props}
+    >
+      {children}
+    </a>
+  )),
+  blockquote: memo(({ children, ...props }) => (
+    <blockquote className="my-4 rounded-r-lg border-l-4 border-primary/60 bg-primary/5 px-4 py-3 text-muted-foreground" {...props}>
+      {children}
+    </blockquote>
+  )),
+};
+
+export default function App() {
+  const [mode, setMode] = useState('stream');
+  const [theme, setTheme] = useState('dark');
+  const [worker, setWorker] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(true);
+  const [content, setContent] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
+  const docRef = useRef(STREAMING_DOC);
+  const rafRef = useRef(null);
 
   useEffect(() => {
     let i = 0;
-    const interval = setInterval(() => {
-      if (i < ref.current.length) {
-        setContent(ref.current.slice(0, i + 1));
+    const tick = () => {
+      if (i < docRef.current.length) {
+        setContent(docRef.current.slice(0, i + 1));
         i += Math.random() * 4 + 1;
+        rafRef.current = requestAnimationFrame(tick);
       } else {
         setIsStreaming(false);
-        clearInterval(interval);
       }
-    }, 20);
-    return () => clearInterval(interval);
-  }, []);
+    };
+    if (isStreaming && rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(tick);
+    }
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isStreaming]);
 
   useEffect(() => {
-    const interval = setInterval(() => setShowCursor(c => !c), 500);
+    const interval = setInterval(() => setShowCursor((c) => !c), 500);
     return () => clearInterval(interval);
   }, []);
 
+  const restart = useCallback(() => {
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    setContent('');
+    setIsStreaming(true);
+  }, []);
+
+  const changeMode = useCallback((m) => {
+    setMode(m);
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    docRef.current = m === 'stream' ? STREAMING_DOC : STATIC_DOC;
+    setContent(m === 'stream' ? '' : STATIC_DOC);
+    setIsStreaming(m === 'stream');
+  }, []);
+
+  const markdown = mode === 'stream' ? content : STATIC_DOC;
+  const showCursorBlock = isStreaming && showCursor;
+
+  const navItems = [
+    { id: 'features', label: 'Features' },
+    { id: 'demo', label: 'Demo' },
+    { id: 'get-started', label: 'Install' },
+  ];
+
+  const features = [
+    { icon: Zap, t: 'Streaming', d: 'Adaptive reveal that catches up fast', color: '#22c55e' },
+    { icon: Code2, t: 'Highlighting', d: '20+ languages, copy & wrap', color: '#f59e0b' },
+    { icon: Sigma, t: 'KaTeX math', d: 'Inline and block equations', color: '#3b82f6' },
+    { icon: GitBranch, t: 'Mermaid', d: 'Zoom, pan, fullscreen, download', color: '#ec4899' },
+    { icon: Table2, t: 'Tables', d: 'Copy or download as CSV/TSV/MD', color: '#8b5cf6' },
+    { icon: Gauge, t: 'Worker offload', d: 'Highlight off the main thread', color: '#06b6d4' },
+  ];
+
   return (
-    <div style={{ minHeight: '100vh', background: '#09090b' }}>
-      <header style={{ borderBottom: '1px solid #27272a', padding: '1rem 2rem' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: 32, height: 32, background: '#22c55e', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#000' }}>M</div>
-            <span style={{ fontWeight: 600, fontSize: '1.25rem' }}>Markify</span>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Top bar */}
+      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-primary-foreground">M</div>
+            <span className="text-lg font-semibold">Markify</span>
           </div>
-          <nav style={{ display: 'flex', gap: '2rem', fontSize: '0.875rem', color: '#a1a1aa' }}>
-            <a href="#features" style={{ color: '#a1a1aa' }}>Features</a>
-            <a href="#demo" style={{ color: '#a1a1aa' }}>Demo</a>
-            <a href="https://github.com/glitchoff/markify" style={{ color: '#a1a1aa' }}>GitHub</a>
+          <nav className="flex items-center gap-6 text-sm text-muted-foreground">
+            {navItems.map((n) => (
+              <a key={n.id} href={`#${n.id}`} className="transition-colors hover:text-foreground">{n.label}</a>
+            ))}
+            <button
+              onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-muted"
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
           </nav>
         </div>
       </header>
 
-      <section style={{ padding: '5rem 2rem', textAlign: 'center' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '3rem', fontWeight: 700, marginBottom: '1rem', lineHeight: 1.1 }}>
-            Markdown for<br /><span style={{ color: '#22c55e' }}>AI Streaming</span>
+      {/* Hero */}
+      <section className="mx-auto max-w-6xl px-6 pb-16 pt-24 text-center">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <Sparkles className="size-3.5" /> Built for AI streaming
+          </span>
+          <h1 className="text-5xl font-bold leading-tight sm:text-6xl">
+            Markdown for <span className="text-primary">AI Streaming</span>
           </h1>
-          <p style={{ fontSize: '1.25rem', color: '#a1a1aa', marginBottom: '2rem' }}>
-            High-performance markdown renderer for streaming AI content.
+          <p className="max-w-2xl text-lg text-muted-foreground">
+            A fast, feature-packed markdown renderer for React — smooth streaming, syntax
+            highlighting, KaTeX math, Mermaid diagrams, and exportable tables.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            <a href="#demo" style={{ padding: '0.75rem 1.5rem', background: '#22c55e', color: '#000', fontWeight: 500, borderRadius: 8 }}>See Demo</a>
-            <a href="https://github.com/glitchoff/markify" style={{ padding: '0.75rem 1.5rem', background: '#27272a', fontWeight: 500, borderRadius: 8 }}>GitHub</a>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a href="#demo" className="rounded-lg bg-primary px-5 py-2.5 font-medium text-primary-foreground transition-opacity hover:opacity-90">Live demo</a>
+            <a href="#get-started" className="rounded-lg border border-border bg-card px-5 py-2.5 font-medium transition-colors hover:bg-muted">Install</a>
+            <code className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">npm i markify</code>
           </div>
         </div>
       </section>
 
-      <section id="features" style={{ padding: '4rem 2rem', borderTop: '1px solid #27272a' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: '3rem' }}>Everything you need</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
-            {[
-              { t: 'Streaming', d: 'Smooth character reveal with adaptive speed' },
-              { t: 'Syntax Highlighting', d: '20+ languages with copy buttons' },
-              { t: 'Math Support', d: 'LaTeX equations via KaTeX' },
-              { t: 'Mermaid Diagrams', d: 'Flowcharts and sequence diagrams' },
-              { t: 'Lazy Images', d: 'Load on scroll with fade-in' },
-              { t: 'Customizable', d: 'Override components or add plugins' },
-            ].map(f => (
-              <div key={f.t} style={{ padding: '1.5rem', background: '#18181b', borderRadius: 12, border: '1px solid #27272a' }}>
-                <h3 style={{ fontWeight: 600, marginBottom: '0.5rem', color: '#22c55e' }}>{f.t}</h3>
-                <p style={{ color: '#a1a1aa', fontSize: '0.875rem', margin: 0 }}>{f.d}</p>
+      {/* Features */}
+      <section id="features" className="border-t border-border bg-card/40 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center text-2xl font-bold">Everything you need</h2>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f) => (
+              <div key={f.t} className="rounded-xl border border-border bg-background p-6 transition-colors hover:border-muted-foreground/30">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg" style={{ background: `${f.color}1a`, color: f.color }}>
+                  <f.icon className="size-5" />
+                </div>
+                <h3 className="mb-1 font-semibold">{f.t}</h3>
+                <p className="text-sm text-muted-foreground">{f.d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="demo" style={{ padding: '4rem 2rem', borderTop: '1px solid #27272a' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: '0.5rem' }}>Live Demo</h2>
-          <p style={{ textAlign: 'center', color: '#a1a1aa', marginBottom: '2rem' }}>Watch streaming in action</p>
-          <div style={{ background: '#18181b', borderRadius: 12, border: '1px solid #27272a', overflow: 'hidden' }}>
-            <div style={{ borderBottom: '1px solid #27272a', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#ef4444' }} />
-              <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#eab308' }} />
-              <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#22c55e' }} />
-              <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#71717a' }}>markify demo</span>
+      {/* Demo */}
+      <section id="demo" className="py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center text-2xl font-bold">Live demo</h2>
+          <p className="mt-2 text-center text-muted-foreground">Stream it, highlight it, export it.</p>
+
+          {/* Controls */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="flex overflow-hidden rounded-lg border border-border">
+              {(['stream', 'static']).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => changeMode(m)}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${mode === m ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:text-foreground'}`}
+                >
+                  {m === 'stream' ? 'Streaming' : 'Static'}
+                </button>
+              ))}
             </div>
-            <div style={{ padding: '1rem', minHeight: 500 }}>
-              <Markify isStreaming={isStreaming}>
-                {content}
-                {isStreaming && showCursor && <span style={{ display: 'inline-block', width: 2, height: '1.25rem', background: '#22c55e', marginLeft: 2, verticalAlign: 'middle' }} />}
-              </Markify>
+
+            <div className="flex overflow-hidden rounded-lg border border-border">
+              <button onClick={() => setWorker((w) => !w)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors bg-card text-muted-foreground hover:text-foreground">
+                <RefreshCw className={`size-4 transition-opacity ${worker ? 'text-primary' : 'opacity-40'}`} />
+                Worker
+              </button>
+            </div>
+
+            {mode === 'stream' && (
+              <div className="flex overflow-hidden rounded-lg border border-border">
+                <button onClick={() => setIsStreaming((s) => !s)} className="flex items-center gap-2 bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                  {isStreaming ? <Pause className="size-4" /> : <Play className="size-4" />}
+                  {isStreaming ? 'Pause' : 'Resume'}
+                </button>
+                <button onClick={restart} className="flex items-center gap-2 border-l border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                  <RotateCcw className="size-4" /> Restart
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Markdown window */}
+          <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+            <div className="flex items-center gap-2 border-b border-border bg-muted px-4 py-2.5">
+              <span className="h-3 w-3 rounded-full bg-red-500/80" />
+              <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
+              <span className="h-3 w-3 rounded-full bg-green-500/80" />
+              <span className="ml-2 font-mono text-xs text-muted-foreground">markify demo</span>
+              <span className="ml-auto font-mono text-xs text-muted-foreground">{worker ? 'worker' : 'main'}</span>
+            </div>
+            <div className="p-6 sm:p-8">
+              <div className="mx-auto max-w-3xl">
+                <Markify
+                  isStreaming={isStreaming}
+                  hljsTheme={theme}
+                  hljsThemeBg
+                  codeBlockWorker={worker}
+                  table={{ downloadFormats: ['csv', 'tsv', 'md'] }}
+                  components={customComponents}
+                  className="size-full text-[17px] leading-[1.9] font-normal [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+                  fontFamily='-apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"'
+                >
+                  {markdown}
+                </Markify>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section style={{ padding: '4rem 2rem', borderTop: '1px solid #27272a' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '2rem' }}>Get started</h2>
-          <div style={{ background: '#18181b', borderRadius: 12, border: '1px solid #27272a', textAlign: 'left' }}>
-            <pre style={{ margin: 0, padding: '1rem', overflow: 'auto', fontSize: '0.875rem' }}>
-              <code style={{ color: '#a1a1aa' }}>npm install markify</code>
-            </pre>
+      {/* Get started */}
+      <section id="get-started" className="border-t border-border bg-card/40 py-16">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <h2 className="text-2xl font-bold">Get started</h2>
+          <p className="mt-2 text-muted-foreground">One dependency, drop it in.</p>
+          <div className="mt-6 overflow-hidden rounded-lg border border-border bg-background text-left">
+            <pre className="overflow-x-auto p-4 text-sm text-foreground"><code>{`import { Markify } from 'markify';
+
+<Markify isStreaming>
+  {\`# Hello, world\`}
+</Markify>`}</code></pre>
           </div>
         </div>
       </section>
 
-      <footer style={{ padding: '3rem 2rem', borderTop: '1px solid #27272a', textAlign: 'center', color: '#71717a', fontSize: '0.875rem' }}>
-        <p>© 2026 Markify — <a href="https://github.com/glitchoff" style={{ color: '#22c55e' }}>glitchoff</a></p>
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+        <p>© 2026 Markify — <a href="https://github.com/glitchoff/markify" className="text-primary hover:underline">github.com/glitchoff/markify</a></p>
       </footer>
     </div>
   );
