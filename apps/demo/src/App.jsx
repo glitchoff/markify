@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, memo } from 'react';
-import { Markify } from 'markify';
+import { Markify } from '@glitchoff/markify';
 import {
   Play,
   Pause,
@@ -237,7 +237,7 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a href="#demo" className="rounded-lg bg-primary px-5 py-2.5 font-medium text-primary-foreground transition-opacity hover:opacity-90">Live demo</a>
             <a href="#get-started" className="rounded-lg border border-border bg-card px-5 py-2.5 font-medium transition-colors hover:bg-muted">Install</a>
-            <code className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">npm i markify</code>
+            <code className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">npm i @glitchoff/markify</code>
           </div>
         </div>
       </section>
@@ -335,7 +335,7 @@ export default function App() {
           <h2 className="text-2xl font-bold">Get started</h2>
           <p className="mt-2 text-muted-foreground">One dependency, drop it in.</p>
           <div className="mt-6 overflow-hidden rounded-lg border border-border bg-background text-left">
-            <pre className="overflow-x-auto p-4 text-sm text-foreground"><code>{`import { Markify } from 'markify';
+            <pre className="overflow-x-auto p-4 text-sm text-foreground"><code>{`import { Markify } from '@glitchoff/markify';
 
 <Markify isStreaming>
   {\`# Hello, world\`}

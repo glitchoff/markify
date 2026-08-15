@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      'markify': path.resolve(__dirname, '../../src/index.ts'),
+      '@glitchoff/markify': path.resolve(__dirname, '../../src/index.ts'),
     },
   },
   server: {

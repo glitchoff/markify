@@ -72,6 +72,9 @@ importers:
 
   apps/demo:
     dependencies:
+      '@glitchoff/markify':
+        specifier: workspace:*
+        version: link:../..
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -84,9 +87,6 @@ importers:
       lucide-react:
         specifier: ^1.0.0
         version: 1.17.0(react@19.2.6)
-      markify:
-        specifier: workspace:*
-        version: link:../../packages/markify
       mermaid:
         specifier: ^11.0.0
         version: 11.15.0
