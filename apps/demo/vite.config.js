@@ -6,11 +6,14 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      'markify': path.resolve(__dirname, '../../packages/markify/src/index.jsx'),
+      '@glitchoff/markify': path.resolve(__dirname, '../../src/index.ts'),
     },
   },
   server: {
     port: 3000,
     host: true,
+    fs: {
+      allow: [path.resolve(__dirname, '../..')],
+    },
   },
 });
