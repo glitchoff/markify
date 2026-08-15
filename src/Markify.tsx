@@ -70,7 +70,7 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
     <div
       data-streaming={isStreaming || undefined}
       className={cn(
-        "text-foreground [&_table]:w-full [&_img]:max-w-full",
+        "markify-root text-foreground [&_table]:w-full [&_img]:max-w-full",
         className,
       )}
       style={{ fontFamily: fontFamily ?? undefined, willChange: "contents" }}
