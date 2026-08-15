@@ -6,10 +6,12 @@ export default defineConfig({
   base: '/markify/',
   plugins: [react()],
   resolve: {
-    alias: {
-      '@glitchoff/markify': path.resolve(__dirname, '../../src/index.ts'),
-      '@glitchoff/markify/themes/shadcn.css': path.resolve(__dirname, '../../src/themes/shadcn.css'),
-    },
+    alias: [
+      {
+        find: /^@glitchoff\/markify$/,
+        replacement: path.resolve(__dirname, '../../src/index.ts'),
+      },
+    ],
   },
   server: {
     port: 3000,

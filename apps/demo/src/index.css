@@ -1,4 +1,4 @@
-@import '@glitchoff/markify/themes/shadcn.css';
+@import '../../../src/themes/shadcn.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
