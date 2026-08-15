@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@glitchoff/markify': path.resolve(__dirname, '../../src/index.ts'),
+      '@glitchoff/markify/themes/shadcn.css': path.resolve(__dirname, '../../src/themes/shadcn.css'),
     },
   },
   server: {

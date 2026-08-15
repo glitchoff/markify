@@ -27,6 +27,17 @@ pnpm add @glitchoff/markify
 
 Peer dependencies: `react ^18 || ^19`, `react-dom ^18 || ^19`
 
+## Zero-config styling
+
+Markify's built-in components use shadcn CSS variables. If your app doesn't already define them, import the bundled theme:
+
+```tsx
+import "@glitchoff/markify/themes/shadcn.css";
+import { Markify } from "@glitchoff/markify";
+```
+
+The theme includes light tokens by default, dark tokens under `.dark`, and a `prefers-color-scheme: dark` fallback. If your project already has shadcn variables, you don't need this import.
+
 ## Usage
 
 ```tsx

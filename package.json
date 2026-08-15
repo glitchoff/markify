@@ -15,7 +15,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./themes/*": "./dist/themes/*"
+    "./themes/*": "./dist/themes/*",
+    "./themes/shadcn.css": "./dist/themes/shadcn.css"
   },
   "files": [
     "dist",
