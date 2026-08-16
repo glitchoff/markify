@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useMemo, useState, memo } from "react";
+import { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { Copy, Check, Eye, Code2 } from "lucide-react";
+import { Copy, Check, Eye, Code2, RotateCcw } from "lucide-react";
 import { cn } from "../utils";
 
 export interface FenBoardProps {
@@ -11,7 +11,7 @@ export interface FenBoardProps {
   className?: string;
   showNotation?: boolean;
   isStreaming?: boolean;
-  /** Max board width in px. The board fills its container up to this size. */
+  /** Max board width in px. The card shrinks to fit. */
   maxWidth?: number;
 }
 
@@ -21,6 +21,99 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
   const [copied, setCopied] = useState(false);
 
   const parsed = useMemo(() => parseFen(fen, isStreaming), [fen, isStreaming]);
+
+  // Live, playable game state — initialized from the parsed FEN, updated as
+  // the user drags pieces. Reset restores the original position.
+  const [game, setGame] = useState<Chess | null>(null);
+
+  useEffect(() => {
+    if (parsed.error || parsed.streaming) {
+      setGame(null);
+      return;
+    }
+    setGame(new Chess(parsed.fen));
+    setMovesPlayed(0);
+  }, [parsed.fen, parsed.error, parsed.streaming]);
+
+  const playable = game !== null;
+  const [movesPlayed, setMovesPlayed] = useState(0);
+
+  const [selected, setSelected] = useState<string | null>(null);
+
+  // Click-to-move: select a piece, then click a destination.
+  const handleSquareClick = useCallback(({ square, piece }: { square: string; piece: { pieceType: string } | null }) => {
+    if (!game) return;
+    if (selected === null) {
+      if (piece) setSelected(square);
+      return;
+    }
+    if (selected === square) {
+      setSelected(null);
+      return;
+    }
+    const ng = new Chess(game.fen());
+    try {
+      ng.move({ from: selected, to: square, promotion: "q" });
+    } catch {
+      // Illegal — if clicking another own piece, reselect; else deselect.
+      if (piece) setSelected(square);
+      else setSelected(null);
+      return;
+    }
+    setGame(ng);
+    setSelected(null);
+    setMovesPlayed((n) => n + 1);
+  }, [game, selected]);
+
+  // Highlight selected square + legal target squares.
+  const squareStyles = useMemo(() => {
+    if (!game || !selected) return {};
+    const styles: Record<string, React.CSSProperties> = {
+      [selected]: { background: "rgba(20, 130, 240, 0.35)" },
+    };
+    const g = new Chess(game.fen());
+    const moves = g.moves({ square: selected as any, verbose: true });
+    for (const m of moves) {
+      styles[m.to] = { background: "radial-gradient(circle, rgba(20,130,240,0.3) 25%, transparent 25%)" };
+    }
+    return styles;
+  }, [game, selected]);
+
+  const onPieceDrop = useCallback(({ sourceSquare, targetSquare }: { piece: { pieceType: string }; sourceSquare: string; targetSquare: string | null }) => {
+    if (!game || !targetSquare) return false;
+    const ng = new Chess(game.fen());
+    try {
+      ng.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
+    } catch {
+      return false;
+    }
+    setGame(ng);
+    setSelected(null);
+    setMovesPlayed((n) => n + 1);
+    return true;
+  }, [game]);
+
+  const handleReset = useCallback(() => {
+    if (parsed.error || parsed.streaming) return;
+    setGame(new Chess(parsed.fen));
+    setSelected(null);
+    setMovesPlayed(0);
+  }, [parsed.fen, parsed.error, parsed.streaming]);
+
+  const liveLabel = useMemo(() => {
+    if (!game) return parsed.streaming ? "" : parsed.label;
+    const turn = game.turn() === "w" ? "White" : "Black";
+    if (game.isCheckmate()) return `Checkmate — ${game.turn() === "w" ? "Black" : "White"} wins`;
+    if (game.isStalemate()) return "Stalemate";
+    if (game.isThreefoldRepetition()) return "Draw (repetition)";
+    if (game.isInsufficientMaterial()) return "Draw (insufficient material)";
+    if (game.isDraw()) return "Draw";
+    if (game.isGameOver()) return "Game over";
+    if (game.inCheck()) return `${turn} is in check`;
+    return `${turn} to move`;
+  }, [game, parsed.streaming, parsed.label]);
+
+  const positionFen = game ? game.fen() : parsed.fen;
 
   const handleCopy = useCallback(async () => {
     try {
@@ -42,13 +135,13 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
   return (
     <div className={cn("relative mb-3 overflow-hidden rounded-lg border border-border bg-card flex flex-col w-full min-w-0", className)} style={{ maxWidth }}>
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted px-3 py-1.5">
+      <div className="flex items-center justify-between gap-1.5 border-b border-border bg-muted px-2.5 py-1.5 sm:px-3">
         <span className="font-mono text-xs font-medium text-muted-foreground">fen</span>
-        <div className="flex gap-1">
+        <div className="flex gap-0.5 sm:gap-1">
           <button
             onClick={() => setPreview((p) => !p)}
             title={preview ? "Show code" : "Show board"}
-            className="flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-muted-foreground transition-colors hover:bg-muted-foreground/10 hover:text-foreground"
+            className="flex min-h-7 min-w-7 cursor-pointer items-center justify-center rounded-md px-1.5 py-1 text-muted-foreground transition-colors hover:bg-muted-foreground/10 hover:text-foreground sm:min-h-8 sm:min-w-8 sm:px-2"
             type="button"
           >
             {preview ? <Code2 className="size-4" /> : <Eye className="size-4" />}
@@ -56,16 +149,35 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
           <button
             onClick={() => setOrientation((o) => (o === "white" ? "black" : "white"))}
             title="Flip board"
-            className="flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-muted-foreground transition-colors hover:bg-muted-foreground/10 hover:text-foreground"
+            className="flex min-h-7 min-w-7 cursor-pointer items-center justify-center rounded-md px-1.5 py-1 text-muted-foreground transition-colors hover:bg-muted-foreground/10 hover:text-foreground sm:min-h-8 sm:min-w-8 sm:px-2"
             type="button"
           >
             <span className="text-xs font-bold">⇅</span>
           </button>
           <button
+            onClick={handleReset}
+            disabled={!playable || movesPlayed === 0}
+            title={movesPlayed === 0 ? "No moves played" : `Reset to starting position (${movesPlayed} move${movesPlayed === 1 ? "" : "s"} played)`}
+            className={cn(
+              "relative flex min-h-7 min-w-7 cursor-pointer items-center justify-center rounded-md px-1.5 py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-8 sm:min-w-8 sm:px-2",
+              movesPlayed > 0
+                ? "text-red-500 hover:bg-red-500/10"
+                : "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground",
+            )}
+            type="button"
+          >
+            <RotateCcw className="size-4" />
+            {movesPlayed > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold leading-none text-white">
+                {movesPlayed}
+              </span>
+            )}
+          </button>
+          <button
             onClick={handleCopy}
             title={copied ? "Copied" : "Copy FEN"}
             className={cn(
-              "flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-md px-2 py-1.5 transition-colors",
+              "flex min-h-7 min-w-7 cursor-pointer items-center justify-center rounded-md px-1.5 py-1 transition-colors sm:min-h-8 sm:min-w-8 sm:px-2",
               copied
                 ? "bg-emerald-500/20 text-emerald-400"
                 : "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground",
@@ -87,25 +199,31 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
             ) : (
               <Chessboard
                 options={{
-                  position: parsed.fen,
+                  position: positionFen,
                   boardOrientation: orientation,
-                  allowDragging: false,
-                  allowDrawingArrows: true,
+                  allowDragging: playable,
+                  allowDrawingArrows: false,
                   showNotation,
+                  squareStyles,
+                  onPieceDrop,
+                  onSquareClick: handleSquareClick,
                 }}
               />
             )}
           </div>
           {!parsed.error && (
-            <div className="px-1 text-[11px] text-muted-foreground/70">
-              {parsed.streaming ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-border border-t-foreground" />
-                  Streaming…
-                </span>
-              ) : (
-                parsed.label
-              )}
+            <div className="flex items-center justify-between gap-2 px-1 text-[11px] text-muted-foreground/70">
+              <span>
+                {parsed.streaming ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-border border-t-foreground" />
+                    Streaming…
+                  </span>
+                ) : (
+                  liveLabel
+                )}
+              </span>
+              {playable && <span className="hidden sm:inline">Drag or click to move</span>}
             </div>
           )}
         </div>

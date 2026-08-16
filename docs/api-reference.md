@@ -27,6 +27,8 @@ import { Markify } from "@glitchoff/markify";
 | `fontFamily` | `string` | — | Root font family for rendered content. |
 | `codeFontFamily` | `string` | — | Font family for code blocks. |
 | `mermaidConfig` | `MermaidConfig` | — | Mermaid rendering configuration. |
+| `chessEnabled` | `boolean` | `false` | Enable chess (PGN/FEN) block rendering. |
+| `renderers` | `Renderers` | — | Override built-in block renderers (mermaid, chess, fen, code). See [Customization → Renderers](/docs/customization). |
 | `components` | `Partial<Components>` | — | Override any markdown element (react-markdown). |
 
 ## `TableOptions`
@@ -53,12 +55,24 @@ import { Markify } from "@glitchoff/markify";
 | `ATOM_DARK_CSS` / `ATOM_LIGHT_CSS` | string | Built-in highlight themes as raw CSS. |
 | `getThemeCss(theme)` | fn | Returns theme CSS for `"dark"` / `"light"`. |
 
+### `@glitchoff/markify/chess`
+
+| Export | Kind | Description |
+|---|---|---|
+| `ChessGame` | component | Standalone PGN viewer (see [Chess](/docs/chess)). |
+| `ChessBlock` | component | Fence-style PGN wrapper around `ChessGame`. |
+| `FenBoard` | component | Standalone FEN viewer (playable, with reset). |
+| `ChessGameProps` / `ChessBlockProps` / `FenBoardProps` | type | Props for the chess components. |
+
 ## Types
 
 - `MarkifyProps` — props of `<Markify>`.
 - `Components` — react-markdown component map (re-exported).
 - `HljsTheme` — `"dark" | "light"`.
 - `MermaidBlockProps` — props of `MermaidBlock`.
+- `Renderers` — `{ mermaid?, chess?, fen?, code? }` custom block renderers.
+- `BlockRendererArgs` — `{ code, isStreaming }` passed to `mermaid`/`chess`/`fen` renderers.
+- `CodeRendererProps` — `{ children, className, language }` passed to the `code` renderer.
 
 ## `<MermaidBlock>` Props
 

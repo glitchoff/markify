@@ -108,3 +108,39 @@ When `true`, Markify applies the selected `hljsTheme` background to the `.hljs` 
   {markdown}
 </Markify>
 ```
+
+## 7. Custom Block Renderers (`renderers`)
+
+Use the `renderers` prop to swap out any built-in block renderer — mermaid, chess (PGN), FEN, or the default code block — while keeping Markify's streaming, block-splitting, and parsing intact. Each renderer is optional; pass only the ones you want to override.
+
+```tsx
+import { Markify, type Renderers } from "@glitchoff/markify";
+
+const renderers: Renderers = {
+  // Replace the PGN viewer with your own
+  chess: ({ code, isStreaming }) => <MyChessViewer pgn={code} loading={isStreaming} />,
+  // Replace the FEN viewer
+  fen: ({ code, isStreaming }) => <MyFenBoard fen={code} />,
+  // Replace the mermaid diagram renderer
+  mermaid: ({ code }) => <MyMermaid diagram={code} />,
+  // Replace the default code block for all other languages
+  code: ({ children, language }) => <MyCodeBlock lang={language}>{children}</MyCodeBlock>,
+};
+
+<Markify chessEnabled renderers={renderers}>
+  {markdown}
+</Markify>
+```
+
+### Renderer signatures
+
+| Renderer   | Args                                          | When it's called                          |
+| ---------- | --------------------------------------------- | ---------------------------------------- |
+| `mermaid`  | `{ code, isStreaming }`                       | A ` ```mermaid ` fence.                  |
+| `chess`    | `{ code, isStreaming }`                        | A ` ```pgn ` or ` ```chess ` fence (requires `chessEnabled`). |
+| `fen`      | `{ code, isStreaming }`                        | A ` ```fen ` fence (requires `chessEnabled`).               |
+| `code`     | `{ children, className, language }`           | Any other fenced code block.             |
+
+`code` is the raw text inside the fence. `isStreaming` is `true` while the block is still being revealed (so you can show a loading state). The `code` renderer receives the original `children` (the `<code>` element) plus the parsed `language`.
+
+> **Note:** `renderers` is granular — overriding `chess` doesn't affect `fen`, `mermaid`, or regular code blocks. To override an entire markdown element (e.g. all `<pre>`), use the `components` prop instead.

@@ -209,7 +209,7 @@ export function Docs({ isDark }) {
 
       {/* Centered content — 80% width, scrolls independently */}
       <div className="min-w-0 flex-1 md:pt-0 pt-24">
-        <div className="mx-auto max-h-[calc(100vh-6rem)] w-[80%] max-w-5xl overflow-y-auto pr-1">
+        <div className="mx-auto max-h-[calc(100vh-6rem)] w-[80%] max-w-5xl overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
           <div className="mb-4 hidden md:flex items-center justify-between text-xs text-muted-foreground border-b border-border pb-3">
             <span className="font-mono">docs/{selectedDoc.file}</span>
             <span className="text-[11px]">Rendered with Markify</span>

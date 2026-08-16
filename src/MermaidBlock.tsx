@@ -102,27 +102,47 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
   const isPanning = useRef(false);
   const panStart = useRef({ x: 0, y: 0 });
   const posStart = useRef({ x: 0, y: 0 });
+  const bodyRef = useRef<HTMLDivElement>(null);
 
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    setScale((s) => Math.max(0.3, Math.min(5, s - e.deltaY * 0.002)));
+  // Native, non-passive wheel listener so we can preventDefault() and stop
+  // the parent container from scrolling while zooming.
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setScale((s) => Math.max(0.3, Math.min(5, s - e.deltaY * 0.002)));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Only left button starts a pan.
+    if (e.button !== 0) return;
+    e.preventDefault();
     isPanning.current = true;
     panStart.current = { x: e.clientX, y: e.clientY };
-    posStart.current = { ...position };
+    posStart.current = position;
   }, [position]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isPanning.current) return;
-    const dx = e.clientX - panStart.current.x;
-    const dy = e.clientY - panStart.current.y;
-    setPosition({ x: posStart.current.x + dx, y: posStart.current.y + dy });
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    isPanning.current = false;
+  // Window-level move/up so panning keeps working even when the cursor
+  // leaves the diagram body (and doesn't get stuck "grabbing").
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!isPanning.current) return;
+      e.preventDefault();
+      const dx = e.clientX - panStart.current.x;
+      const dy = e.clientY - panStart.current.y;
+      setPosition({ x: posStart.current.x + dx, y: posStart.current.y + dy });
+    };
+    const onUp = () => { isPanning.current = false; };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
   }, []);
 
   const handleDoubleClick = useCallback(() => {
@@ -224,16 +244,13 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
 
       {/* Body */}
       <div
+        ref={bodyRef}
         className={cn(
-          "flex items-center justify-center overflow-hidden p-4 flex-1",
+          "flex items-center justify-center overflow-hidden p-4 flex-1 select-none",
           (state === "success" || svg) && "min-h-[120px]",
           fullscreen && "h-full w-full",
         )}
-        onWheel={handleWheel}
         onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
         onDoubleClick={handleDoubleClick}
         style={{ cursor: isPanning.current ? "grabbing" : "grab" }}
       >

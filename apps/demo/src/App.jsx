@@ -42,7 +42,7 @@ function App() {
                 width={512}
                 height={512}
               />
-              <span className="text-lg font-semibold tracking-tight">Markify</span>
+              <span className="text-lg font-semibold italic tracking-tight">Markify</span>
             </NavLink>
 
             {/* Navigation Tabs & Actions */}

@@ -10,7 +10,7 @@ export { parseCallout, getText } from "./callout";
 export { cn, injectHljsTheme } from "./utils";
 
 export { TableOptionsContext, useTableOptions } from "./markdown-components";
-export type { TableOptions } from "./markdown-components";
+export type { TableOptions, Renderers, BlockRendererArgs, CodeRendererProps } from "./markdown-components";
 
 // Re-export mermaid utilities
 export { MermaidBlock } from "./MermaidBlock";
