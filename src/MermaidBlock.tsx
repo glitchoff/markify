@@ -2,15 +2,17 @@
 
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import mermaid from "mermaid";
+import type { MermaidConfig } from "mermaid";
 import { Copy, Check, Download, Maximize, Minimize, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { cn } from "./utils";
 
-interface MermaidBlockProps {
+export interface MermaidBlockProps {
   code: string;
   className?: string;
+  config?: MermaidConfig;
 }
 
-const DEFAULT_CONFIG: any = {
+const DEFAULT_CONFIG: MermaidConfig = {
   startOnLoad: false,
   theme: "default",
   securityLevel: "loose",
@@ -18,17 +20,7 @@ const DEFAULT_CONFIG: any = {
   suppressErrorRendering: true,
 };
 
-let initialized = false;
-
-function getInstance() {
-  if (!initialized) {
-    mermaid.initialize(DEFAULT_CONFIG);
-    initialized = true;
-  }
-  return mermaid;
-}
-
-function MermaidBlockInner({ code, className }: MermaidBlockProps) {
+function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lastValidSvgRef = useRef("");
   const [state, setState] = useState<"idle" | "loading" | "error" | "success">("idle");
@@ -67,12 +59,12 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
         setState("loading");
       }
       try {
-        const instance = getInstance();
+        mermaid.initialize(config ? { ...DEFAULT_CONFIG, ...config } : DEFAULT_CONFIG);
         const id = `mermaid-${Math.abs(
           code.split("").reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0),
         )}-${Date.now()}`;
 
-        const { svg: result } = await instance.render(id, code);
+        const { svg: result } = await mermaid.render(id, code);
         if (!cancelled) {
           setSvg(result);
           lastValidSvgRef.current = result;
@@ -96,7 +88,7 @@ function MermaidBlockInner({ code, className }: MermaidBlockProps) {
     return () => {
       cancelled = true;
     };
-  }, [code, visible]);
+  }, [code, visible, config]);
 
   const handleRetry = useCallback(() => {
     setState("idle");

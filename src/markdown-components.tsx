@@ -13,6 +13,7 @@ import { CodeBlock } from "./CodeBlock";
 import { MermaidBlock } from "./MermaidBlock";
 import type { Components } from "react-markdown";
 import type { HljsTheme } from "./themes";
+import type { MermaidConfig } from "mermaid";
 
 const katexOptions = {
   strict: false,
@@ -369,13 +370,13 @@ function Hr() {
   return <hr className="mb-3 border-border" />;
 }
 
-function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; children?: React.ReactNode; className?: string }) {
+function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, mermaidConfig, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; mermaidConfig?: MermaidConfig; children?: React.ReactNode; className?: string }) {
   const lang = extractLanguage(props.children, props.className);
 
   if (lang === "mermaid") {
     const rawCode = getCodeChildren(props.children);
     const codeText = typeof rawCode === "string" ? rawCode : getText(rawCode);
-    return <MermaidBlock code={codeText} />;
+    return <MermaidBlock code={codeText} config={mermaidConfig} />;
   }
 
   return (
@@ -394,6 +395,7 @@ export interface MarkdownComponentOptions {
   hljsThemeBg?: boolean;
   codeBlockClassName?: string;
   codeFontFamily?: string;
+  mermaidConfig?: MermaidConfig;
 }
 
 export function createMarkdownComponents(opts?: MarkdownComponentOptions): Components {
@@ -404,6 +406,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
   const hljsThemeBg = opts?.hljsThemeBg ?? false;
   const codeBlockClassName = opts?.codeBlockClassName;
   const codeFontFamily = opts?.codeFontFamily;
+  const mermaidConfig = opts?.mermaidConfig;
   return {
     style: () => null as any,
     script: () => null as any,
@@ -424,7 +427,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     tr: TR as any,
     th: TH as any,
     td: TD as any,
-    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeUrl={hljsThemeUrl} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} codeFontFamily={codeFontFamily} {...props} />,
+    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeUrl={hljsThemeUrl} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} codeFontFamily={codeFontFamily} mermaidConfig={mermaidConfig} {...props} />,
     ol: (props) => <List ordered {...props} />,
     ul: (props) => <List {...props} />,
     li: ListItem as any,

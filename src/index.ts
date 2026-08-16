@@ -14,6 +14,7 @@ export type { TableOptions } from "./markdown-components";
 
 // Re-export mermaid utilities
 export { MermaidBlock } from "./MermaidBlock";
+export type { MermaidBlockProps } from "./MermaidBlock";
 
 // Theme
 export type { HljsTheme } from "./themes";

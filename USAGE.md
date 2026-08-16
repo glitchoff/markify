@@ -4,10 +4,10 @@ A complete guide on the proper real-world setup for **Markify**, covering parent
 
 ---
 
-## 1. Core Rule: Controlling Parent Container Width
+## 1. Parent Container Width Recommendation
 
 > [!IMPORTANT]
-> **You MUST control the width of the parent container wrapping `<Markify>`!**  
+> **We recommend wrapping `<Markify>` in a container with a defined width constraint.**  
 > Markify renders complex Markdown elements—including wide tables with export controls, code blocks with horizontal scrolling, and zoomable/pannable Mermaid diagrams.  
 > Without an explicit parent container width, these elements can overflow bounds, break page layouts, or stretch infinitely.
 
@@ -57,14 +57,13 @@ export function ContentViewer({ content }: { content: string }) {
 
 ---
 
-## 2. Choosing the Right CSS Import
+## 2. Tailwind CSS & Theme Setup
 
-Markify provides two distinct CSS themes depending on your project stack:
+Markify requires **Tailwind CSS** installed in your project. Import `markify.css` in your application root:
 
-| Scenario | Import Statement | What it Contains |
-| :--- | :--- | :--- |
-| **No Tailwind** (or standalone Vite/React) | `import "@glitchoff/markify/themes/markify.css";` | Defines CSS tokens + standalone utility classes scoped under `.markify-root`. |
-| **With Tailwind / shadcn** | `import "@glitchoff/markify/themes/shadcn.css";` | Defines CSS variables only; uses your app's Tailwind utilities. |
+```tsx
+import "@glitchoff/markify/themes/markify.css";
+```
 
 ---
 
@@ -72,7 +71,7 @@ Markify provides two distinct CSS themes depending on your project stack:
 
 To deliver a seamless dark/light mode experience with Markify:
 
-1. **HTML Class Toggle**: Toggle both `.dark` and `.light` classes on `document.documentElement` (`<html>` element).
+1. **HTML Class Toggle**: Ensure exactly one of `.dark` or `.light` is present on `document.documentElement` (`<html>` element).
 2. **Code Block Syntax Sync**: Pass `hljsTheme={isDark ? "dark" : "light"}` to `<Markify>` so code blocks switch between Atom One Dark and Atom One Light.
 
 > [!WARNING]
@@ -116,8 +115,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const activeTheme = isDark ? "dark" : "light";
     setResolvedTheme(activeTheme);
 
-    if (isDark) root.classList.add("dark");
-    else root.classList.remove("dark");
+    root.classList.toggle("dark", isDark);
+    root.classList.toggle("light", !isDark);
     root.setAttribute("data-theme", activeTheme);
   }, [theme]);
 
@@ -164,11 +163,29 @@ import "katex/dist/katex.min.css";
 
 ---
 
-## 5. What Was Lacking in Official README (`README.md`)
+## 5. Mermaid Diagram Customization (`mermaidConfig`)
+
+You can pass custom Mermaid settings directly via the `mermaidConfig` prop on `<Markify>` or `<MermaidBlock>`:
+
+```tsx
+<Markify
+  mermaidConfig={{
+    theme: "dark",
+    fontFamily: "Inter, sans-serif",
+    flowchart: { curve: "basis" },
+  }}
+>
+  {content}
+</Markify>
+```
+
+---
+
+## 6. What Was Lacking in Official README (`README.md`)
 
 | Gap / Missing Detail | Impact on Developer | Correct Approach / Solution |
 | :--- | :--- | :--- |
 | **No Parent Container Width Guidelines** | Code blocks, tables, and Mermaid diagrams overflow page width or break flex/grid layouts. | Explicitly instruct wrapping `<Markify>` in a container div with controlled width (`max-width: 1000px` / `max-w-4xl`). |
 | **Incomplete Theme Switcher Pattern** | Docs mention `isDark ? "/rose-pine.css" : ...` for custom URLs, but omit basic `hljsTheme` prop sync with React theme state. | Use `hljsTheme={isDark ? "dark" : "light"}` connected to `.dark` class toggle on `document.documentElement`. |
 | **KaTeX CSS Requirement Buried** | Math equations render broken unstyled text if developer misses section 4.1. | Clearly highlight `import "katex/dist/katex.min.css";` as a setup requirement when math rendering is enabled. |
-| **Standalone vs Tailwind Clarification** | Developers confused on whether to use `markify.css` vs `shadcn.css`. | Clearly document that `markify.css` is required if the consuming app does not run Tailwind CSS. |
+| **Tailwind & Theme Import Requirement** | Confusion on theme setup. | Document that Tailwind CSS is required and recommend importing `@glitchoff/markify/themes/markify.css`. |

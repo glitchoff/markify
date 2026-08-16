@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Markify } from '@glitchoff/markify';
+import { Docs } from './Docs';
 import 'katex/dist/katex.min.css';
 
 const PAGE = `# Markify — Markdown for AI Streaming
@@ -13,7 +14,7 @@ A high-performance markdown renderer designed for **streaming content** from AI 
 - **Math support** — LaTeX equations via KaTeX: $E = mc^2$
 - **Mermaid diagrams** — Flowcharts and sequence diagrams
 - **Tables** — Copy-as-markdown and CSV/TSV/MD download
-- **Callouts** — GitHub-style \[!NOTE\], \[!WARNING\], and \[!TIP\] alerts
+- **Callouts** — GitHub-style [!NOTE], [!WARNING], and [!TIP] alerts
 - **GFM** — Task lists, strikethrough, autolinks, and more
 
 ## Usage
@@ -38,12 +39,12 @@ npm install @glitchoff/markify
 
 ## Math
 
-Inline math: $\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$
+Inline math: $\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$
 
 Block math:
 
 $$
-f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!}(x-a)^n
+f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!}(x-a)^n
 $$
 
 ## Feature Comparison
@@ -104,12 +105,23 @@ Built for AI-powered applications. Open source and free to use.
 `;
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('demo');
+  const [isDark, setIsDark] = useState(false);
   const [content, setContent] = useState('');
   const [isStreaming, setIsStreaming] = useState(true);
   const [showCursor, setShowCursor] = useState(true);
   const [replayKey, setReplayKey] = useState(0);
 
+  // Toggle dark/light class on document.documentElement
   useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('dark', isDark);
+    root.classList.toggle('light', !isDark);
+    root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
+  useEffect(() => {
+    if (activeTab !== 'demo') return;
     let i = 0;
     setContent('');
     setIsStreaming(true);
@@ -126,49 +138,100 @@ export default function App() {
     }, 20);
 
     return () => clearInterval(interval);
-  }, [replayKey]);
+  }, [replayKey, activeTab]);
 
   useEffect(() => {
-    if (!isStreaming) return;
+    if (!isStreaming || activeTab !== 'demo') return;
     const interval = setInterval(() => setShowCursor(c => !c), 500);
     return () => clearInterval(interval);
-  }, [isStreaming]);
+  }, [isStreaming, activeTab]);
 
   const displayedContent = isStreaming && showCursor ? `${content}▌` : content;
   const replay = () => setReplayKey(k => k + 1);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
+          {/* Logo & Brand */}
+          <div
+            onClick={() => setActiveTab('demo')}
+            className="flex items-center gap-3 cursor-pointer"
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary font-bold text-primary-foreground">
               M
             </div>
-            <span className="text-lg font-semibold">Markify</span>
+            <span className="text-lg font-semibold tracking-tight">Markify</span>
           </div>
-          <div className="flex items-center gap-4">
+
+          {/* Navigation Tabs & Actions */}
+          <div className="flex items-center gap-3">
+            {/* Tab switch buttons */}
+            <div className="flex items-center rounded-lg border border-border bg-muted p-1 text-xs">
+              <button
+                onClick={() => setActiveTab('demo')}
+                className={`rounded px-3 py-1 font-medium transition-all ${
+                  activeTab === 'demo'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                type="button"
+              >
+                Demo
+              </button>
+              <button
+                onClick={() => setActiveTab('docs')}
+                className={`rounded px-3 py-1 font-medium transition-all ${
+                  activeTab === 'docs'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                type="button"
+              >
+                Docs
+              </button>
+            </div>
+
+            {/* Theme toggle */}
+            <button
+              onClick={() => setIsDark(d => !d)}
+              className="rounded-md border border-border bg-secondary px-2.5 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+              type="button"
+              title="Toggle dark / light mode"
+            >
+              {isDark ? '☀️ Light' : '🌙 Dark'}
+            </button>
+
+            {activeTab === 'demo' && (
+              <button
+                onClick={replay}
+                className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                type="button"
+              >
+                Replay
+              </button>
+            )}
+
             <a
               href="https://github.com/glitchoff/markify"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
             >
               GitHub
             </a>
-            <button
-              onClick={replay}
-              className="rounded-md bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
-              type="button"
-            >
-              Replay
-            </button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-12">
-        <Markify isStreaming={isStreaming}>{displayedContent}</Markify>
+      <main className="mx-auto max-w-4xl px-6 py-10">
+        {activeTab === 'demo' ? (
+          <Markify isStreaming={isStreaming} hljsTheme={isDark ? 'dark' : 'light'}>
+            {displayedContent}
+          </Markify>
+        ) : (
+          <Docs hljsTheme={isDark ? 'dark' : 'light'} />
+        )}
       </main>
     </div>
   );

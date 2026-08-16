@@ -27,31 +27,22 @@ pnpm add @glitchoff/markify
 
 Peer dependencies: `react ^18 || ^19`, `react-dom ^18 || ^19`
 
-## Zero-config styling
+## Styling Requirements
 
-Markify's built-in components are styled with Tailwind utility classes bound to shadcn design tokens.
+Markify requires **Tailwind CSS** installed and configured in your application.
 
-**If your app already runs Tailwind** (with or without shadcn variables defined), import just the tokens:
-
-```tsx
-import "@glitchoff/markify/themes/shadcn.css";
-import { Markify } from "@glitchoff/markify";
-```
-
-The theme includes light tokens by default, dark tokens under `.dark`, and a `prefers-color-scheme: dark` fallback. If your project already has shadcn variables, you don't need this import at all.
-
-> [!NOTE]
-> **Important for Light/Dark mode toggles:**  
-> When switching to Light Mode, your theme provider should add `.light` to `document.documentElement` (`<html class="light">`) or remove `.dark`. The CSS fallback uses `:root:not(.light)` for system dark mode support, so explicitly adding `.light` prevents system dark mode from forcing dark text variables onto light backgrounds.
-
-**If your app does NOT run Tailwind**, `shadcn.css` alone isn't enough — it only defines CSS variables, not the utility classes that consume them, so headings/code blocks/tables will render unstyled. Import `markify.css` instead, which includes the tokens plus a pre-compiled, standalone utility layer scoped under `.markify-root`:
+Import `markify.css` in your root file:
 
 ```tsx
 import "@glitchoff/markify/themes/markify.css";
 import { Markify } from "@glitchoff/markify";
 ```
 
-This works correctly with zero Tailwind setup in the consuming app, and won't collide with your app's own styles since every rule is scoped under `.markify-root`.
+The theme includes light tokens by default, dark tokens under `.dark`, and a `prefers-color-scheme: dark` fallback.
+
+> [!NOTE]
+> **Important for Light/Dark mode toggles:**  
+> When switching to Light Mode, your theme provider should add `.light` to `document.documentElement` (`<html class="light">`) or remove `.dark`. The CSS fallback uses `:root:not(.light)` for system dark mode support, so explicitly adding `.light` prevents system dark mode from forcing dark text variables onto light backgrounds.
 
 ## Parent Container Width
 
@@ -157,6 +148,22 @@ When `hljsThemeUrl` is provided, it injects a `<link>` element and skips the bui
 </Markify>
 ```
 
+### Mermaid Custom Configuration
+
+Pass custom Mermaid settings directly via the `mermaidConfig` prop:
+
+```tsx
+<Markify
+  mermaidConfig={{
+    theme: "dark",
+    fontFamily: "Inter, sans-serif",
+    flowchart: { curve: "basis" },
+  }}
+>
+  {contentWithMermaid}
+</Markify>
+```
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -171,6 +178,7 @@ When `hljsThemeUrl` is provided, it injects a `<link>` element and skips the bui
 | `codeBlockClassName` | `string` | — | Additional CSS classes for the code block wrapper |
 | `fontFamily` | `string` | — | Content font-family |
 | `codeFontFamily` | `string` | — | Code block font-family |
+| `mermaidConfig` | `MermaidConfig` | — | Custom configuration for Mermaid diagrams |
 | `table` | `TableOptions` | — | Table display config |
 
 ## Exports
