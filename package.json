@@ -25,7 +25,8 @@
   "scripts": {
     "build": "tsup && node -e \"require('fs').cpSync('src/themes', 'dist/themes', {recursive: true})\"",
     "dev": "tsup --watch",
-    "demo": "pnpm --filter demo dev"
+    "demo": "pnpm --filter demo dev",
+    "build:css": "node scripts/build-css.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -50,6 +51,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "hast": "^1.0.0",
+    "lightningcss": "^1.33.0",
     "tailwindcss": "^4.3.3",
     "tsup": "^8.5.1",
     "typescript": "^5"
