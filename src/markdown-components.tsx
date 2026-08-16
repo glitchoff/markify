@@ -125,7 +125,7 @@ function hasElements(node: React.ReactNode): boolean {
 function Paragraph({ children }: { children?: React.ReactNode }) {
   const content = children ? getText(children).trim() : "";
   if (!content && !hasElements(children)) return null;
-  return <p className="mb-3 last:mb-0 leading-relaxed text-base text-foreground/90">{children}</p>;
+  return <p className="mb-3 last:mb-0 leading-relaxed text-base text-foreground/90 whitespace-pre-wrap">{children}</p>;
 }
 
 function Link({ href, children, ...props }: { href?: string; children: React.ReactNode }) {

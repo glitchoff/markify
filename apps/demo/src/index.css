@@ -1,4 +1,5 @@
-@import '../../../src/themes/shadcn.css';
+@import '../../../src/themes/markify.css';
+
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -15,6 +16,11 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Preserve multiple spaces and newlines inside rendered markdown paragraphs. */
+.markify-root p {
+  white-space: pre-wrap;
 }
 
 ::selection {
