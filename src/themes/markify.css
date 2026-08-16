@@ -7,6 +7,11 @@
  * Import this file if your app does not already provide shadcn variables.
  */
 
+.markify-root {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
 @font-face {
   font-family: "Inter";
   src: local("Inter"), local("Inter-Regular");
@@ -746,32 +751,32 @@
     font-family: var(--font-mono);
   }
   .markify-root .text-2xl {
-    font-size: 1.5rem;
-    line-height: var(--tw-leading, 2rem);
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
   }
   .markify-root .text-3xl {
-    font-size: 1.875rem;
-    line-height: var(--tw-leading, 2.25rem);
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
   }
   .markify-root .text-base {
-    font-size: 1rem;
-    line-height: var(--tw-leading, 1.5rem);
+    font-size: var(--text-base);
+    line-height: var(--tw-leading, var(--text-base--line-height));
   }
   .markify-root .text-lg {
-    font-size: 1.125rem;
-    line-height: var(--tw-leading, 1.75rem);
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
   }
   .markify-root .text-sm {
-    font-size: 0.875rem;
-    line-height: var(--tw-leading, 1.25rem);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
   }
   .markify-root .text-xl {
-    font-size: 1.25rem;
-    line-height: var(--tw-leading, 1.75rem);
+    font-size: var(--text-xl);
+    line-height: var(--tw-leading, var(--text-xl--line-height));
   }
   .markify-root .text-xs {
-    font-size: 0.75rem;
-    line-height: var(--tw-leading, 1rem);
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
   }
   .markify-root .text-\[0\.8rem\] {
     font-size: 0.8rem;
