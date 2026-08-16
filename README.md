@@ -56,7 +56,7 @@ This works correctly with zero Tailwind setup in the consuming app, and won't co
 ## Parent Container Width
 
 > [!IMPORTANT]
-> **Always wrap `<Markify>` in a container div with an explicit width constraint!**  
+>We recommend wrapping <Markify> in a container with a defined width constraint.
 > Markify renders complex Markdown elements (wide data tables, scrollable code blocks, zoomable Mermaid diagrams). Without a parent width limit (e.g. `max-w-4xl` or `max-width: 1000px`), tables and diagrams may overflow the viewport.
 
 ```tsx
