@@ -16,6 +16,19 @@ Markify relies on `.dark` and `.light` CSS classes on `document.documentElement`
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark" | "system";
+type ThemeContextValue = {
+  theme: Theme;
+  resolvedTheme: "light" | "dark";
+  setTheme: (theme: Theme) => void;
+};
+
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+
+export const useTheme = () => {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error("useTheme must be used within a ThemeProvider");
+  return ctx;
+};
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>("system");
@@ -27,7 +40,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ? window.matchMedia("(prefers-color-scheme: dark)").matches
       : theme === "dark";
 
-    const activeTheme = isDark ? "dark" : "light";
+    const activeTheme: "light" | "dark" = isDark ? "dark" : "light";
     setResolvedTheme(activeTheme);
 
     // Toggle both classes cleanly
@@ -36,8 +49,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.setAttribute("data-theme", activeTheme);
   }, [theme]);
 
+  const value = useMemo<ThemeContextValue>(
+    () => ({ theme, resolvedTheme, setTheme }),
+    [theme, resolvedTheme],
+  );
+
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
