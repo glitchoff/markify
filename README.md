@@ -40,6 +40,10 @@ import { Markify } from "@glitchoff/markify";
 
 The theme includes light tokens by default, dark tokens under `.dark`, and a `prefers-color-scheme: dark` fallback. If your project already has shadcn variables, you don't need this import at all.
 
+> [!NOTE]
+> **Important for Light/Dark mode toggles:**  
+> When switching to Light Mode, your theme provider should add `.light` to `document.documentElement` (`<html class="light">`) or remove `.dark`. The CSS fallback uses `:root:not(.light)` for system dark mode support, so explicitly adding `.light` prevents system dark mode from forcing dark text variables onto light backgrounds.
+
 **If your app does NOT run Tailwind**, `shadcn.css` alone isn't enough — it only defines CSS variables, not the utility classes that consume them, so headings/code blocks/tables will render unstyled. Import `markify.css` instead, which includes the tokens plus a pre-compiled, standalone utility layer scoped under `.markify-root`:
 
 ```tsx
@@ -48,6 +52,21 @@ import { Markify } from "@glitchoff/markify";
 ```
 
 This works correctly with zero Tailwind setup in the consuming app, and won't collide with your app's own styles since every rule is scoped under `.markify-root`.
+
+## Parent Container Width
+
+> [!IMPORTANT]
+> **Always wrap `<Markify>` in a container div with an explicit width constraint!**  
+> Markify renders complex Markdown elements (wide data tables, scrollable code blocks, zoomable Mermaid diagrams). Without a parent width limit (e.g. `max-w-4xl` or `max-width: 1000px`), tables and diagrams may overflow the viewport.
+
+```tsx
+// Tailwind CSS Example
+<main className="w-full max-w-4xl mx-auto px-4 py-8">
+  <Markify isStreaming={isLoading}>{markdownContent}</Markify>
+</main>
+```
+
+For full setup guidelines including dark mode theme switching, see [USAGE.md](./USAGE.md).
 
 ## Usage
 
@@ -98,9 +117,15 @@ Or load an external CSS file via URL:
 
 When `hljsThemeUrl` is provided, it injects a `<link>` element and skips the built-in Atom One injection.
 
-### Theme switching with next-themes
+### Theme switching with React theme state / next-themes
 
 ```tsx
+// Using built-in Atom One light & dark themes
+<Markify hljsTheme={isDark ? "dark" : "light"}>
+  {content}
+</Markify>
+
+// Or using custom external hljs CSS themes
 <Markify hljsThemeUrl={isDark ? "/rose-pine.css" : "/rose-pine-dawn.css"}>
   {content}
 </Markify>
@@ -172,4 +197,5 @@ import { ATOM_DARK_CSS, ATOM_LIGHT_CSS, getThemeCss } from "@glitchoff/markify";
 
 ## License
 
-Apache-2.0
+MIT
+

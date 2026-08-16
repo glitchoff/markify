@@ -2,6 +2,7 @@
   "name": "@glitchoff/markify",
   "version": "1.1.7",
   "private": false,
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -23,7 +24,7 @@
     "dist/themes"
   ],
   "scripts": {
-    "build": "tsup && node -e \"require('fs').cpSync('src/themes', 'dist/themes', {recursive: true})\"",
+    "build": "tsup && pnpm build:css && node -e \"require('fs').cpSync('src/themes', 'dist/themes', {recursive: true})\"",
     "dev": "tsup --watch",
     "demo": "pnpm --filter demo dev",
     "build:css": "node scripts/build-css.mjs"
