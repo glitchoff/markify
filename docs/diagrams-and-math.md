@@ -17,6 +17,16 @@ graph TD
 ```
 ```
 
+### Live Mermaid diagram
+
+```mermaid
+graph LR
+    A[Markdown] --> B[remark-gfm]
+    B --> C[remark-math]
+    C --> D[rehype-katex]
+    D --> E[Mermaid]
+```
+
 ### Custom Configuration (`mermaidConfig`)
 
 Pass custom Mermaid settings directly via the `mermaidConfig` prop:
@@ -53,6 +63,8 @@ Write inline equations wrapped in single dollar signs `$`:
 Einstein's formula: $E = mc^2$
 ```
 
+Rendered inline: Einstein's formula: $E = mc^2$
+
 ### Block Math
 Write standalone math blocks wrapped in double dollar signs `$$`:
 
@@ -61,3 +73,9 @@ $$
 f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2\pi i \xi x} d\xi
 $$
 ```
+
+Rendered block:
+
+$$
+f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2\pi i \xi x} d\xi
+$$

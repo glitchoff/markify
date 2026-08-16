@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, memo, useContext, useState, useRef, useCallback, useMemo, isValidElement } from "react";
+import { createContext, memo, useContext, useState, useRef, useCallback, useMemo, isValidElement, lazy, Suspense } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -14,6 +14,25 @@ import { MermaidBlock } from "./MermaidBlock";
 import type { Components } from "react-markdown";
 import type { HljsTheme } from "./themes";
 import type { MermaidConfig } from "mermaid";
+
+// Lazy-loaded so chess.js + react-chessboard are only fetched when a
+// pgn/chess code block is actually rendered, keeping the core bundle lean.
+const LazyChessBlock = lazy(() =>
+  import("./chess/ChessBlock").then((m) => ({ default: m.ChessBlock })),
+);
+
+const LazyFenBoard = lazy(() =>
+  import("./chess/FenBoard").then((m) => ({ default: m.FenBoard })),
+);
+
+function ChessFallback() {
+  return (
+    <div className="mb-3 flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
+      Loading chess viewer…
+    </div>
+  );
+}
 
 const katexOptions = {
   strict: false,
@@ -370,13 +389,33 @@ function Hr() {
   return <hr className="mb-3 border-border" />;
 }
 
-function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, mermaidConfig, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; mermaidConfig?: MermaidConfig; children?: React.ReactNode; className?: string }) {
+function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, mermaidConfig, chessEnabled = false, isStreaming = false, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; mermaidConfig?: MermaidConfig; chessEnabled?: boolean; isStreaming?: boolean; children?: React.ReactNode; className?: string }) {
   const lang = extractLanguage(props.children, props.className);
 
   if (lang === "mermaid") {
     const rawCode = getCodeChildren(props.children);
     const codeText = typeof rawCode === "string" ? rawCode : getText(rawCode);
     return <MermaidBlock code={codeText} config={mermaidConfig} />;
+  }
+
+  if (chessEnabled && (lang === "pgn" || lang === "chess")) {
+    const rawCode = getCodeChildren(props.children);
+    const codeText = typeof rawCode === "string" ? rawCode : getText(rawCode);
+    return (
+      <Suspense fallback={<ChessFallback />}>
+        <LazyChessBlock code={codeText} isStreaming={isStreaming} />
+      </Suspense>
+    );
+  }
+
+  if (chessEnabled && lang === "fen") {
+    const rawCode = getCodeChildren(props.children);
+    const codeText = typeof rawCode === "string" ? rawCode : getText(rawCode);
+    return (
+      <Suspense fallback={<ChessFallback />}>
+        <LazyFenBoard fen={codeText} isStreaming={isStreaming} />
+      </Suspense>
+    );
   }
 
   return (
@@ -396,6 +435,8 @@ export interface MarkdownComponentOptions {
   codeBlockClassName?: string;
   codeFontFamily?: string;
   mermaidConfig?: MermaidConfig;
+  chessEnabled?: boolean;
+  isStreaming?: boolean;
 }
 
 export function createMarkdownComponents(opts?: MarkdownComponentOptions): Components {
@@ -407,6 +448,8 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
   const codeBlockClassName = opts?.codeBlockClassName;
   const codeFontFamily = opts?.codeFontFamily;
   const mermaidConfig = opts?.mermaidConfig;
+  const chessEnabled = opts?.chessEnabled ?? false;
+  const isStreaming = opts?.isStreaming ?? false;
   return {
     style: () => null as any,
     script: () => null as any,
@@ -427,7 +470,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     tr: TR as any,
     th: TH as any,
     td: TD as any,
-    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeUrl={hljsThemeUrl} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} codeFontFamily={codeFontFamily} mermaidConfig={mermaidConfig} {...props} />,
+    pre: (props) => <PreWithWorker worker={worker} hljsTheme={hljsTheme} hljsCustomCss={hljsCustomCss} hljsThemeUrl={hljsThemeUrl} hljsThemeBg={hljsThemeBg} codeBlockClassName={codeBlockClassName} codeFontFamily={codeFontFamily} mermaidConfig={mermaidConfig} chessEnabled={chessEnabled} isStreaming={isStreaming} {...props} />,
     ol: (props) => <List ordered {...props} />,
     ul: (props) => <List {...props} />,
     li: ListItem as any,

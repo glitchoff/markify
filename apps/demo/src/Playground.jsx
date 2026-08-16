@@ -24,6 +24,16 @@ graph LR
     B --> C[Output]
 \`\`\`
 
+\`\`\`pgn
+[Event "Italian Game"]
+[White "White"]
+[Black "Black"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Be7 5. O-O O-O
+6. Re1 d6 7. c3 Na5 8. Bb5 c6 9. Ba4 Nc4 10. b3 Nb6
+\`\`\`
+
 | Feature | Works |
 |---|---|
 | Tables | ✅ |
@@ -47,6 +57,7 @@ export function Playground({ isDark }) {
       if (i >= source.length) {
         setDisplay(source);
         clearInterval(id);
+        setStreaming(false);
       } else {
         setDisplay(source.slice(0, i));
       }
@@ -111,7 +122,7 @@ export function Playground({ isDark }) {
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-6xl px-4">
+    <div className="relative mx-auto w-full max-w-7xl px-4">
       {/* Header + toolbar */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -125,46 +136,46 @@ export function Playground({ isDark }) {
           {streaming ? (
             <button
               onClick={stopStream}
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              title="Stop"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted"
               type="button"
             >
               <Square className="size-4" />
-              Stop
             </button>
           ) : (
             <button
               onClick={startStream}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+              title="Start streaming"
+              className="inline-flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
               type="button"
             >
               <Play className="size-4" />
-              Start streaming
             </button>
           )}
 
           <button
             onClick={startStream}
             disabled={!streaming}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+            title="Replay"
+            className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
             type="button"
           >
             <RotateCcw className="size-4" />
-            Replay
           </button>
 
           <button
             onClick={resetSample}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title="Reset sample"
+            className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             type="button"
           >
             <Sparkles className="size-4" />
-            Reset sample
           </button>
         </div>
       </div>
 
       {/* Editor + Preview */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-[2fr_3fr]">
         {/* Editor */}
         <div className="flex min-h-[28rem] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
@@ -194,7 +205,7 @@ export function Playground({ isDark }) {
             </span>
           </div>
           <div className="min-h-[26rem] overflow-auto p-4">
-            <Markify isStreaming={streaming} hljsTheme={isDark ? 'dark' : 'light'}>
+            <Markify isStreaming={streaming} hljsTheme={isDark ? 'dark' : 'light'} chessEnabled>
               {display}
             </Markify>
           </div>

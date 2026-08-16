@@ -16,6 +16,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./chess": {
+      "types": "./dist/chess/index.d.ts",
+      "import": "./dist/chess/index.js"
+    },
     "./themes/*": "./dist/themes/*",
     "./themes/shadcn.css": "./dist/themes/shadcn.css"
   },
@@ -30,11 +34,13 @@
     "build:css": "node scripts/build-css.mjs"
   },
   "dependencies": {
+    "chess.js": "^1.4.0",
     "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
     "katex": "^0.16.28",
     "lucide-react": "^1.17.0",
     "mermaid": "^11.12.2",
+    "react-chessboard": "^5.12.1",
     "react-markdown": "^10.1.0",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",

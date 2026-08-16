@@ -23,21 +23,28 @@ export interface MarkifyProps {
   fontFamily?: string;
   codeFontFamily?: string;
   mermaidConfig?: MermaidConfig;
+  chessEnabled?: boolean;
   components?: Partial<Components>;
 }
 
 function parseBlocks(content: string): string[] {
   const blocks: string[] = [];
   let current = "";
-  let inCodeFence = false;
+  let fenceMarker: string | null = null;
 
   for (const line of content.split("\n")) {
-    if (line.startsWith("```")) {
+    const fence = /^(\s*)(`{3,}|~{3,})/.exec(line);
+    if (fence && !fence[1].includes("`") && !fence[1].includes("~")) {
+      const marker = fence[2];
+      if (fenceMarker === null) {
+        fenceMarker = marker;
+      } else if (marker[0] === fenceMarker[0] && marker.length >= fenceMarker.length) {
+        fenceMarker = null;
+      }
       current += (current ? "\n" : "") + line;
-      inCodeFence = !inCodeFence;
       continue;
     }
-    if (!inCodeFence && line === "" && current) {
+    if (fenceMarker === null && line === "" && current) {
       blocks.push(current);
       current = "";
       continue;
@@ -51,7 +58,7 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, components: overrides }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, components: overrides }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
 
   const tableOptions = useMemo(() => ({
@@ -61,8 +68,8 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
   }), [tableOpts]);
 
   const components = useMemo(
-    () => ({ ...createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig }), ...overrides }),
-    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, overrides],
+    () => ({ ...createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, isStreaming }), ...overrides }),
+    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, isStreaming, overrides],
   );
 
   const blocks = useMemo(() => parseBlocks(content), [content]);

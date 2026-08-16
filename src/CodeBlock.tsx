@@ -56,6 +56,9 @@ const LANG_META: Record<string, { label: string; color: string }> = {
   latex: { label: "LaTeX", color: "#008080" },
   tex: { label: "LaTeX", color: "#008080" },
   mermaid: { label: "Mermaid", color: "#ff3670" },
+  chess: { label: "Chess", color: "#b58863" },
+  pgn: { label: "Chess (PGN)", color: "#b58863" },
+  fen: { label: "Chess (FEN)", color: "#b58863" },
   plaintext: { label: "Plain Text", color: "#6b7280" },
   text: { label: "Plain Text", color: "#6b7280" },
 };
@@ -198,7 +201,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
     if (worker) return null;
     if (!displayCode) return "";
     try {
-      if (language && language !== "plaintext" && language !== "text" && language !== "mermaid" && hljs.getLanguage(language)) {
+      if (language && language !== "plaintext" && language !== "text" && language !== "mermaid" && language !== "chess" && language !== "pgn" && language !== "fen" && hljs.getLanguage(language)) {
         return hljs.highlight(displayCode, { language, ignoreIllegals: true }).value;
       }
       return hljs.highlightAuto(displayCode).value;
