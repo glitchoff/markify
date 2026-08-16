@@ -751,32 +751,32 @@
     font-family: var(--font-mono);
   }
   .markify-root .text-2xl {
-    font-size: var(--text-2xl);
-    line-height: var(--tw-leading, var(--text-2xl--line-height));
+    font-size: 1.5rem;
+    line-height: var(--tw-leading, 2rem);
   }
   .markify-root .text-3xl {
-    font-size: var(--text-3xl);
-    line-height: var(--tw-leading, var(--text-3xl--line-height));
+    font-size: 1.875rem;
+    line-height: var(--tw-leading, 2.25rem);
   }
   .markify-root .text-base {
-    font-size: var(--text-base);
-    line-height: var(--tw-leading, var(--text-base--line-height));
+    font-size: 1rem;
+    line-height: var(--tw-leading, 1.5rem);
   }
   .markify-root .text-lg {
-    font-size: var(--text-lg);
-    line-height: var(--tw-leading, var(--text-lg--line-height));
+    font-size: 1.125rem;
+    line-height: var(--tw-leading, 1.75rem);
   }
   .markify-root .text-sm {
-    font-size: var(--text-sm);
-    line-height: var(--tw-leading, var(--text-sm--line-height));
+    font-size: 0.875rem;
+    line-height: var(--tw-leading, 1.25rem);
   }
   .markify-root .text-xl {
-    font-size: var(--text-xl);
-    line-height: var(--tw-leading, var(--text-xl--line-height));
+    font-size: 1.25rem;
+    line-height: var(--tw-leading, 1.75rem);
   }
   .markify-root .text-xs {
-    font-size: var(--text-xs);
-    line-height: var(--tw-leading, var(--text-xs--line-height));
+    font-size: 0.75rem;
+    line-height: var(--tw-leading, 1rem);
   }
   .markify-root .text-\[0\.8rem\] {
     font-size: 0.8rem;
