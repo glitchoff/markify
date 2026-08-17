@@ -30,11 +30,20 @@ Markify requires React 18 or 19:
 > Markify components rely on Tailwind CSS utility classes. Ensure Tailwind CSS is installed and configured in your host project.
 
 
-Import `markify.css` once at your application root (e.g. `main.tsx`, `App.tsx`, or `layout.tsx`):
+Import Markify's CSS once at your application root (e.g. `main.tsx`, `App.tsx`, or `layout.tsx`):
 
 ```tsx
-import "@glitchoff/markify/themes/markify.css";
+import "@glitchoff/markify/themes/core.css";
 ```
+
+Pick the file that matches your app:
+
+| File | When to use |
+| --- | --- |
+| `@glitchoff/markify/themes/core.css` | **Recommended.** Scoped base + utility layer + theme aliases. Your app provides its own design tokens (shadcn, daisyUI, Radix, Bootstrap, custom). |
+| `@glitchoff/markify/themes/markify.css` | Only if your app has **no theme system** and you want Markify's bundled shadcn defaults. |
+
+See [Theming](/docs/theming) for the full token reference and the `themeType` / `theme` props.
 
 ---
 

@@ -33,18 +33,23 @@ Peer dependencies: `react ^18 || ^19`, `react-dom ^18 || ^19`
 
 Markify requires **Tailwind CSS** installed and configured in your application.
 
-Import `markify.css` in your root file:
+Import Markify's CSS in your root file — `core.css` is scoped and carries **no global design tokens**, so it never fights your theme:
 
 ```tsx
-import "@glitchoff/markify/themes/markify.css";
+import "@glitchoff/markify/themes/core.css";
 import { Markify } from "@glitchoff/markify";
 ```
 
-The theme includes light tokens by default, dark tokens under `.dark`, and a `prefers-color-scheme: dark` fallback.
+Markify reads your app's design tokens through scoped `--markify-*` aliases. It supports **shadcn** (default), **daisyUI**, **Radix Themes**, and **Bootstrap** token vocabularies via the `themeType` prop, plus per-instance overrides via the `theme` prop:
 
-> [!NOTE]
-> **Important for Light/Dark mode toggles:**  
-> When switching to Light Mode, your theme provider should add `.light` to `document.documentElement` (`<html class="light">`) or remove `.dark`. The CSS fallback uses `:root:not(.light)` for system dark mode support, so explicitly adding `.light` prevents system dark mode from forcing dark text variables onto light backgrounds.
+```tsx
+<Markify themeType="daisyui">…</Markify>
+<Markify theme={{ card: "#1e1e2e", border: "oklch(1 0 0 / 11%)" }}>…</Markify>
+```
+
+Dark mode is handled entirely by your app's theme provider (toggle `.dark`, etc.) — Markify follows automatically, no special classes required.
+
+Only import the legacy `@glitchoff/markify/themes/markify.css` (which bundles default shadcn tokens on `:root`/`.dark`) if your app has **no theme system at all**. See [docs/theming.md](./docs/theming.md) for the full token reference.
 
 ## Parent Container Width
 

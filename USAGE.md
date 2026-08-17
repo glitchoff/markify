@@ -31,7 +31,7 @@ html.dark .markify-container {
 ```
 ```tsx
 import { Markify } from "@glitchoff/markify";
-import "@glitchoff/markify/themes/markify.css";
+import "@glitchoff/markify/themes/core.css";
 
 export function ContentViewer({ content }: { content: string }) {
   return (
@@ -57,27 +57,35 @@ export function ContentViewer({ content }: { content: string }) {
 
 ---
 
-## 2. Tailwind CSS & Theme Setup
+## 2. Tailwind CSS & CSS Import
 
-Markify requires **Tailwind CSS** installed in your project. Import `markify.css` in your application root:
+Markify requires **Tailwind CSS** installed in your project. Import Markify's CSS in your application root:
 
 ```tsx
-import "@glitchoff/markify/themes/markify.css";
+import "@glitchoff/markify/themes/core.css";
 ```
+
+`core.css` ships the scoped base styles, the pre-compiled utility layer, and the `--markify-*` theme aliases — **without** any global design tokens, so it never overrides your app's theme. Only import `@glitchoff/markify/themes/markify.css` (which bundles default shadcn tokens on `:root`/`.dark`) if your app has no theme system at all.
 
 ---
 
 ## 3. Theme Switcher & Dark Mode Integration
 
-To deliver a seamless dark/light mode experience with Markify:
+Markify reads your app's design tokens through the `--markify-*` aliases (see [docs/theming.md](docs/theming.md)). Dark mode is handled entirely by your app:
 
-1. **HTML Class Toggle**: Ensure exactly one of `.dark` or `.light` is present on `document.documentElement` (`<html>` element).
-2. **Code Block Syntax Sync**: Pass `hljsTheme={isDark ? "dark" : "light"}` to `<Markify>` so code blocks switch between Atom One Dark and Atom One Light.
+1. **Toggle your theme as usual** (`.dark` class, `[data-bs-theme="dark"]`, Radix dark variant, daisyUI dark theme, …). Markify follows automatically.
+2. **Pick a preset** with `themeType` when your tokens aren't shadcn-named: `"shadcn"` (default), `"daisyui"`, `"radix"`, `"bootstrap"`, or `"none"`.
+3. **Code block syntax sync**: pass `hljsTheme={isDark ? "dark" : "light"}` (or `hljsThemeUrl` for external themes) so code blocks follow the active theme.
 
-> [!WARNING]
-> **Avoid White-on-White Text in Light Mode:**  
-> Markify's CSS uses `@media (prefers-color-scheme: dark) { :root:not(.light) { ... } }` as a system dark mode fallback.  
-> When switching your app to Light Mode, your theme provider **MUST add `.light`** to `document.documentElement` (`<html class="light">`) or remove `.dark`. If `.light` is missing on a system running OS Dark Mode, `:root:not(.light)` will still match, forcing white text onto your light background!
+```tsx
+<Markify
+  isStreaming
+  themeType="shadcn"                       // matches next-themes / shadcn apps by default
+  hljsTheme={resolvedTheme === "dark" ? "dark" : "light"}
+>
+  {markdown}
+</Markify>
+```
 
 ### Complete React Theme Context & Switcher Example
 
@@ -96,7 +104,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(() => 
+  const [theme, setThemeState] = useState<Theme>(() =>
     (localStorage.getItem("theme") as Theme) || "system"
   );
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
@@ -108,8 +116,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     const root = document.documentElement;
-    const isDark = theme === "system" 
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches 
+    const isDark = theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
       : theme === "dark";
 
     const activeTheme = isDark ? "dark" : "light";
@@ -140,7 +148,7 @@ export function MarkdownViewer({ markdown }: { markdown: string }) {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8">
-      <Markify 
+      <Markify
         isStreaming
         hljsTheme={resolvedTheme === "dark" ? "dark" : "light"}
       >
@@ -149,6 +157,16 @@ export function MarkdownViewer({ markdown }: { markdown: string }) {
     </div>
   );
 }
+```
+
+### Per-instance theme overrides
+
+Customize any token for a single render — highest priority, no CSS:
+
+```tsx
+<Markify theme={{ card: "oklch(0.2 0.01 260)", border: "oklch(1 0 0 / 11%)" }}>
+  {markdown}
+</Markify>
 ```
 
 ---
@@ -188,4 +206,4 @@ You can pass custom Mermaid settings directly via the `mermaidConfig` prop on `<
 | **No Parent Container Width Guidelines** | Code blocks, tables, and Mermaid diagrams overflow page width or break flex/grid layouts. | Explicitly instruct wrapping `<Markify>` in a container div with controlled width (`max-width: 1000px` / `max-w-4xl`). |
 | **Incomplete Theme Switcher Pattern** | Docs mention `isDark ? "/rose-pine.css" : ...` for custom URLs, but omit basic `hljsTheme` prop sync with React theme state. | Use `hljsTheme={isDark ? "dark" : "light"}` connected to `.dark` class toggle on `document.documentElement`. |
 | **KaTeX CSS Requirement Buried** | Math equations render broken unstyled text if developer misses section 4.1. | Clearly highlight `import "katex/dist/katex.min.css";` as a setup requirement when math rendering is enabled. |
-| **Tailwind & Theme Import Requirement** | Confusion on theme setup. | Document that Tailwind CSS is required and recommend importing `@glitchoff/markify/themes/markify.css`. |
+| **Tailwind & Theme Import Requirement** | Confusion on theme setup. | Document that Tailwind CSS is required, recommend importing `@glitchoff/markify/themes/core.css` (scoped, no global tokens), and point to `themeType`/`theme` for token mapping. |

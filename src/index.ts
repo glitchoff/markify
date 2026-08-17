@@ -1,5 +1,9 @@
 export { Markify } from "./Markify";
-export type { MarkifyProps, MarkifySpacing } from "./Markify";
+export type { MarkifyProps, MarkifySpacing, MarkifyTheme, MarkifyThemePreset } from "./Markify";
+
+// Theme helpers & var mapping for advanced / standalone usage
+export { toMarkifyVars, markifyThemeProps, MARKIFY_VAR_MAP } from "./theme";
+export type { MarkifyTheme as MarkifyThemeVars } from "./theme";
 
 // Re-export react-markdown types for custom components
 export type { Components } from "react-markdown";

@@ -14,12 +14,19 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { cn } from "../utils";
+import { markifyThemeProps, type MarkifyTheme, type MarkifyThemePreset } from "../theme";
 
 export interface ChessGameProps {
   pgn: string;
   className?: string;
   showNotation?: boolean;
   isStreaming?: boolean;
+  /** Which host-app token vocabulary the `--markify-*` aliases resolve to. Defaults to `"shadcn"`. */
+  themeType?: MarkifyThemePreset;
+  /** Per-instance token overrides. */
+  theme?: Partial<MarkifyTheme>;
+  /** Escape hatch for setting raw `--markify-*` custom properties directly. */
+  cssVars?: Record<string, string>;
 }
 
 type PlyInfo = {
@@ -83,7 +90,8 @@ function fenAt(plies: PlyInfo[], upTo: number): string {
   return g.fen();
 }
 
-function ChessGameInner({ pgn, className, showNotation = true, isStreaming = false }: ChessGameProps) {
+function ChessGameInner({ pgn, className, showNotation = true, isStreaming = false, themeType, theme, cssVars }: ChessGameProps) {
+  const themeAttrs = markifyThemeProps(themeType, theme);
   const { plies, headers, error, loading } = useMemo(() => parsePgn(pgn, isStreaming), [pgn, isStreaming]);
 
   const [currentPly, setCurrentPly] = useState(0);
@@ -189,7 +197,7 @@ function ChessGameInner({ pgn, className, showNotation = true, isStreaming = fal
         : `${sideToMove === "w" ? "White" : "Black"} to move`);
 
   return (
-    <div className={cn("relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col", className)}>
+    <div {...themeAttrs} className={cn("markify-root relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col", className)} style={{ ...themeAttrs.style, ...cssVars }}>
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted px-3 py-2 sm:px-4">
         <div className="flex min-w-0 items-center gap-2">

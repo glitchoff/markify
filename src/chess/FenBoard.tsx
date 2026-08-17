@@ -5,6 +5,7 @@ import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { Copy, Check, Eye, Code2, RotateCcw } from "lucide-react";
 import { cn } from "../utils";
+import { markifyThemeProps, type MarkifyTheme, type MarkifyThemePreset } from "../theme";
 
 export interface FenBoardProps {
   fen: string;
@@ -13,9 +14,16 @@ export interface FenBoardProps {
   isStreaming?: boolean;
   /** Max board width in px. The card shrinks to fit. */
   maxWidth?: number;
+  /** Which host-app token vocabulary the `--markify-*` aliases resolve to. Defaults to `"shadcn"`. */
+  themeType?: MarkifyThemePreset;
+  /** Per-instance token overrides. */
+  theme?: Partial<MarkifyTheme>;
+  /** Escape hatch for setting raw `--markify-*` custom properties directly. */
+  cssVars?: Record<string, string>;
 }
 
-function FenBoardInner({ fen, className, showNotation = true, isStreaming = false, maxWidth = 420 }: FenBoardProps) {
+function FenBoardInner({ fen, className, showNotation = true, isStreaming = false, maxWidth = 420, themeType, theme, cssVars }: FenBoardProps) {
+  const themeAttrs = markifyThemeProps(themeType, theme);
   const [preview, setPreview] = useState(true);
   const [orientation, setOrientation] = useState<"white" | "black">("white");
   const [copied, setCopied] = useState(false);
@@ -133,7 +141,7 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
   }, [fen]);
 
   return (
-    <div className={cn("relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col w-full min-w-0", className)} style={{ maxWidth }}>
+    <div {...themeAttrs} className={cn("markify-root relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col w-full min-w-0", className)} style={{ ...themeAttrs.style, ...cssVars, maxWidth }}>
       {/* Header */}
       <div className="flex items-center justify-between gap-1.5 border-b border-border bg-muted px-2.5 py-1.5 sm:px-3">
         <span className="font-mono text-xs font-medium text-muted-foreground">fen</span>

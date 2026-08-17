@@ -30,6 +30,9 @@ import { Markify } from "@glitchoff/markify";
 | `chessEnabled` | `boolean` | `false` | Enable chess (PGN/FEN) block rendering. |
 | `renderers` | `Renderers` | - | Override built-in block renderers (mermaid, chess, fen, code). See [Customization → Renderers](/docs/customization). |
 | `components` | `Partial<Components>` | - | Override any markdown element (react-markdown). |
+| `themeType` | `MarkifyThemePreset` | `"shadcn"` | Which host-app token vocabulary the `--markify-*` aliases resolve to. One of `"shadcn"`, `"daisyui"`, `"radix"`, `"bootstrap"`, `"none"`. |
+| `theme` | `Partial<MarkifyTheme>` | - | Per-instance token overrides, applied as inline `--markify-*` vars (highest priority). |
+| `cssVars` | `Record<string, string>` | - | Escape hatch for setting raw `--markify-*` custom properties directly. |
 | `hljsLanguages` | `string[] \| "all"` | 20 common languages | Which highlight.js languages to preload on mount. Pass `"all"` to preload every supported language, an array of language names, or `[]` to disable preloading (languages load on-demand when encountered). |
 
 ## `TableOptions`
@@ -78,6 +81,8 @@ import { Markify } from "@glitchoff/markify";
 - `MarkifyProps`: props of `<Markify>`.
 - `Components`: react-markdown component map (re-exported).
 - `HljsTheme`: `"dark" | "light"`.
+- `MarkifyThemePreset`: `"shadcn" | "daisyui" | "radix" | "bootstrap" | "none"` — host-app token vocabulary for the `--markify-*` aliases.
+- `MarkifyTheme`: per-instance token overrides (`background`, `card`, `muted`, `border`, `primary`, `radius`, `fontSans`, …).
 - `MermaidBlockProps`: props of `MermaidBlock`.
 - `MarkifyMermaidConfig`: extended Mermaid config with UI options (`showHeader`, `showBackground`, `fit`).
 - `Renderers`: `{ mermaid?, chess?, fen?, code? }` custom block renderers.

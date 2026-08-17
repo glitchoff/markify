@@ -25,6 +25,7 @@
       "import": "./dist/mermaid/index.js"
     },
     "./themes/*": "./dist/themes/*",
+    "./themes/core.css": "./dist/themes/core.css",
     "./themes/shadcn.css": "./dist/themes/shadcn.css"
   },
   "files": [

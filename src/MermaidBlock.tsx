@@ -5,6 +5,7 @@ import mermaid from "mermaid";
 import type { MermaidConfig } from "mermaid";
 import { Copy, Check, Download, Maximize, Minimize, ZoomIn, ZoomOut, RotateCcw, Expand } from "lucide-react";
 import { cn } from "./utils";
+import { markifyThemeProps, type MarkifyTheme, type MarkifyThemePreset } from "./theme";
 
 /** Extended Mermaid config with Markify UI options. */
 export interface MarkifyMermaidConfig extends MermaidConfig {
@@ -20,6 +21,12 @@ export interface MermaidBlockProps {
   code: string;
   className?: string;
   config?: MarkifyMermaidConfig;
+  /** Which host-app token vocabulary the `--markify-*` aliases resolve to. Defaults to `"shadcn"`. */
+  themeType?: MarkifyThemePreset;
+  /** Per-instance token overrides. */
+  theme?: Partial<MarkifyTheme>;
+  /** Escape hatch for setting raw `--markify-*` custom properties directly. */
+  cssVars?: Record<string, string>;
 }
 
 const DEFAULT_CONFIG: MermaidConfig = {
@@ -30,11 +37,12 @@ const DEFAULT_CONFIG: MermaidConfig = {
   suppressErrorRendering: true,
 };
 
-function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
+function MermaidBlockInner({ code, className, config, themeType, theme, cssVars }: MermaidBlockProps) {
   const showHeader = config?.showHeader ?? true;
   const showBackground = config?.showBackground ?? true;
   const fit = config?.fit ?? false;
   const containerRef = useRef<HTMLDivElement>(null);
+  const themeAttrs = markifyThemeProps(themeType, theme);
   const lastValidSvgRef = useRef("");
   const [state, setState] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [svg, setSvg] = useState("");
@@ -336,12 +344,14 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
   return (
     <div
       ref={containerRef}
+      {...themeAttrs}
       className={cn(
-        "relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden flex flex-col",
+        "markify-root relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden flex flex-col",
         showBackground && "rounded-lg border border-border bg-card",
         fullscreen && "fixed inset-0 z-50 m-0 rounded-none h-screen w-screen",
         className,
       )}
+      style={{ ...themeAttrs.style, ...cssVars }}
     >
       {/* Header */}
       {showHeader && (

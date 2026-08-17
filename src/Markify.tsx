@@ -9,6 +9,9 @@ import { createMarkdownComponents, baseRemarkPlugins, baseRehypePlugins, TableOp
 import { DEFAULT_LANGUAGES, ALL_LANGUAGES, preloadLanguages } from "./hljs-languages";
 import type { HljsTheme } from "./themes";
 import type { MarkifyMermaidConfig } from "./MermaidBlock";
+import { toMarkifyVars, type MarkifyTheme, type MarkifyThemePreset } from "./theme";
+
+export type { MarkifyTheme, MarkifyThemePreset } from "./theme";
 
 export interface MarkifyProps {
   children: string;
@@ -28,6 +31,12 @@ export interface MarkifyProps {
   youtubeEnabled?: boolean;
   renderers?: Renderers;
   components?: Partial<Components>;
+  /** Which host-app token vocabulary the `--markify-*` aliases resolve to. Defaults to `"shadcn"`. */
+  themeType?: MarkifyThemePreset;
+  /** Per-instance token overrides, applied as inline `--markify-*` vars (highest priority). */
+  theme?: Partial<MarkifyTheme>;
+  /** Escape hatch for setting raw `--markify-*` custom properties directly. */
+  cssVars?: Record<string, string>;
   /** Vertical rhythm between blocks. A named preset ("compact" | "normal" | "relaxed") or granular per-part overrides. Defaults to "normal". */
   spacing?: MarkifySpacing;
   /** Languages to preload on mount. Defaults to 20 common languages. Pass "all" to preload every supported language, or an array of language names. Pass an empty array to disable preloading. */
@@ -100,10 +109,15 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, youtubeEnabled = false, renderers, components: overrides, spacing, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, youtubeEnabled = false, renderers, components: overrides, themeType = "shadcn", theme, cssVars, spacing, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
 
   const spacingVars = useMemo(() => resolveSpacingVars(spacing), [spacing]);
+
+  const themeVars = useMemo(
+    () => ({ ...toMarkifyVars(theme), ...cssVars }),
+    [theme, cssVars],
+  );
 
   useEffect(() => {
     const langs = hljsLanguages === "all" ? ALL_LANGUAGES : hljsLanguages;
@@ -129,11 +143,12 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
     <TableOptionsContext.Provider value={tableOptions}>
     <div
       data-streaming={isStreaming || undefined}
+      data-theme-type={themeType}
       className={cn(
         "markify-root text-foreground [&_table]:w-full [&_img]:max-w-full",
         className,
       )}
-      style={{ fontFamily: fontFamily ?? undefined, willChange: "contents", ...spacingVars }}
+      style={{ fontFamily: fontFamily ?? undefined, willChange: "contents", ...spacingVars, ...themeVars }}
     >
       {blocks.map((block, i) => {
         const isLast = i === blocks.length - 1;
