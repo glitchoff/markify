@@ -19,7 +19,7 @@ function ScrollToTop() {
 }
 
 const navLinkClass = ({ isActive }) =>
-  `rounded px-3 py-1 font-medium transition-all ${
+  `rounded px-2 py-1 font-medium transition-all sm:px-3 ${
     isActive
       ? 'bg-background text-foreground shadow-sm'
       : 'text-muted-foreground hover:text-foreground'
@@ -33,22 +33,22 @@ function App() {
       <ScrollToTop />
       <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
         <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-6 py-3">
+          <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3">
             {/* Logo & Brand */}
-            <NavLink to="/" className="flex items-center gap-3">
+            <NavLink to="/" className="flex shrink-0 items-center gap-2 sm:gap-3">
               <img
                 src={isDark ? logoDarkUrl : logoLightUrl}
                 alt="Markify logo"
-                className="h-9 w-9 rounded-lg"
+                className="h-8 w-8 rounded-lg sm:h-9 sm:w-9"
                 width={512}
                 height={512}
               />
-              <span className="text-lg font-semibold italic tracking-tight">Markify</span>
+              <span className="hidden text-lg font-semibold italic tracking-tight sm:block">Markify</span>
             </NavLink>
 
             {/* Navigation Tabs & Actions */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center rounded-lg border border-border bg-muted p-1 text-xs">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center rounded-lg border border-border bg-muted p-0.5 text-xs sm:p-1">
                 <NavLink to="/" end className={navLinkClass}>
                   Demo
                 </NavLink>
@@ -63,19 +63,19 @@ function App() {
               {/* Theme toggle */}
               <button
                 onClick={toggle}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-2.5 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-secondary px-2 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors sm:px-2.5"
                 type="button"
                 title="Toggle dark / light mode"
               >
                 {isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
-                <span>{isDark ? 'Light' : 'Dark'}</span>
+                <span className="hidden sm:block">{isDark ? 'Light' : 'Dark'}</span>
               </button>
 
               <a
                 href="https://github.com/glitchoff/markify"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
+                className="hidden text-xs font-medium text-muted-foreground hover:text-foreground transition-colors md:block"
               >
                 GitHub
               </a>

@@ -201,7 +201,7 @@ export function Docs({ isDark }) {
   const nextDoc = FLAT_ITEMS[selectedIndex + 1];
 
   return (
-    <div className="flex w-full h-[calc(100vh-140px)] overflow-hidden">
+    <div className="flex w-full h-[calc(100dvh-80px)] overflow-hidden md:h-[calc(100vh-140px)]">
       {/* Mobile navigation header */}
       <div className="fixed inset-x-0 top-16 z-30 px-4 md:hidden">
         <button
@@ -233,11 +233,11 @@ export function Docs({ isDark }) {
       </aside>
 
       {/* Centered content: fills remaining space, only this scrolls */}
-      <div className="min-w-0 flex-1 md:pt-0 pt-24 overflow-hidden" style={{ paddingLeft: collapsed ? '4.5rem' : '17rem' }}>
-        <div className="mx-auto h-full w-[80%] max-w-5xl overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
-          <div className="mb-4 hidden md:flex items-center justify-between text-xs text-muted-foreground border-b border-border pb-3">
-            <span className="font-mono">docs/{selectedDoc.file}</span>
-            <div className="flex items-center gap-3">
+      <div className={`min-w-0 flex-1 md:pt-0 pt-6 overflow-hidden ${collapsed ? 'md:pl-[4.5rem]' : 'md:pl-[17rem]'}`}>
+        <div className="mx-auto h-full w-full max-w-5xl overflow-y-auto px-4 md:w-[80%] md:px-0 md:pr-1 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
+          <div className="mb-4 flex items-center justify-between gap-3 border-b border-border pb-3 text-xs text-muted-foreground">
+            <span className="min-w-0 truncate font-mono">docs/{selectedDoc.file}</span>
+            <div className="flex shrink-0 items-center gap-3">
               <div className="relative">
                 <button
                   onClick={() => setDocMenuOpen(o => !o)}
