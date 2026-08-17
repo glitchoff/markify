@@ -171,9 +171,6 @@
   .markify-root .top-1\/3 {
     top: calc(1 / 3 * 100%);
   }
-  .markify-root .top-2 {
-    top: calc(var(--spacing) * 2);
-  }
   .markify-root .top-16 {
     top: calc(var(--spacing) * 16);
   }
@@ -194,9 +191,6 @@
   }
   .markify-root .right-1 {
     right: var(--spacing);
-  }
-  .markify-root .right-2 {
-    right: calc(var(--spacing) * 2);
   }
   .markify-root .right-4 {
     right: calc(var(--spacing) * 4);
@@ -252,38 +246,20 @@
   .markify-root .mx-auto {
     margin-inline: auto;
   }
-  .markify-root .\!my-0 {
-    margin-block: 0px !important;
-  }
-  .markify-root .my-2 {
-    margin-block: calc(var(--spacing) * 2);
-  }
-  .markify-root .my-3 {
-    margin-block: calc(var(--spacing) * 3);
-  }
   .markify-root .my-4 {
     margin-block: calc(var(--spacing) * 4);
   }
   .markify-root .my-6 {
     margin-block: calc(var(--spacing) * 6);
   }
-  .markify-root .\!mt-0\.5 {
-    margin-top: calc(var(--spacing) * 0.5) !important;
-  }
-  .markify-root .\!mt-1 {
-    margin-top: var(--spacing) !important;
-  }
-  .markify-root .\!mt-1\.5 {
-    margin-top: calc(var(--spacing) * 1.5) !important;
-  }
-  .markify-root .\!mt-2 {
-    margin-top: calc(var(--spacing) * 2) !important;
-  }
   .markify-root .mt-1 {
     margin-top: var(--spacing);
   }
   .markify-root .mt-2 {
     margin-top: calc(var(--spacing) * 2);
+  }
+  .markify-root .mt-2\.5 {
+    margin-top: calc(var(--spacing) * 2.5);
   }
   .markify-root .mt-3 {
     margin-top: calc(var(--spacing) * 3);
@@ -305,15 +281,6 @@
   }
   .markify-root .mt-10 {
     margin-top: calc(var(--spacing) * 10);
-  }
-  .markify-root .\!mb-0 {
-    margin-bottom: 0px !important;
-  }
-  .markify-root .\!mb-0\.5 {
-    margin-bottom: calc(var(--spacing) * 0.5) !important;
-  }
-  .markify-root .\!mb-1 {
-    margin-bottom: var(--spacing) !important;
   }
   .markify-root .mb-1 {
     margin-bottom: var(--spacing);
@@ -436,9 +403,6 @@
   .markify-root .min-h-8 {
     min-height: calc(var(--spacing) * 8);
   }
-  .markify-root .min-h-\[1px\] {
-    min-height: 1px;
-  }
   .markify-root .min-h-\[26rem\] {
     min-height: 26rem;
   }
@@ -517,9 +481,6 @@
   .markify-root .max-w-md {
     max-width: var(--container-md);
   }
-  .markify-root .max-w-none {
-    max-width: none;
-  }
   .markify-root .min-w-0 {
     min-width: 0px;
   }
@@ -559,15 +520,6 @@
     --tw-translate-y: 0px;
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
-  .markify-root .scale-100 {
-    --tw-scale-x: 100%;
-    --tw-scale-y: 100%;
-    --tw-scale-z: 100%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .markify-root .scale-\[0\.98\] {
-    scale: 0.98;
-  }
   .markify-root .-rotate-90 {
     rotate: calc(90deg * -1);
   }
@@ -597,12 +549,6 @@
   }
   .markify-root .list-disc {
     list-style-type: disc;
-  }
-  .markify-root .columns-2 {
-    columns: 2;
-  }
-  .markify-root .break-inside-avoid {
-    break-inside: avoid;
   }
   .markify-root .grid-cols-\[auto_1fr_1fr\] {
     grid-template-columns: auto 1fr 1fr;
@@ -645,16 +591,6 @@
   }
   .markify-root .gap-5 {
     gap: calc(var(--spacing) * 5);
-  }
-  :where(.\!space-y-0 > :not(:last-child)) {
-    --tw-space-y-reverse: 0 !important;
-    margin-block-start: 0 !important;
-    margin-block-end: 0 !important;
-  }
-  :where(.space-y-2 > :not(:last-child)) {
-    --tw-space-y-reverse: 0;
-    margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
-    margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
   }
   .markify-root .gap-x-2 {
     column-gap: calc(var(--spacing) * 2);
@@ -740,12 +676,6 @@
     border-left-style: var(--tw-border-style);
     border-left-width: 4px;
   }
-  .markify-root .border-blue-500\/30 {
-    border-color: color-mix(in srgb, oklch(62.3% 0.214 259.815) 30%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      border-color: color-mix(in oklab, var(--color-blue-500) 30%, transparent);
-    }
-  }
   .markify-root .border-border {
     border-color: var(--border);
   }
@@ -755,16 +685,16 @@
       border-color: color-mix(in oklab, var(--destructive) 30%, transparent);
     }
   }
-  .markify-root .border-green-500\/30 {
-    border-color: color-mix(in srgb, oklch(72.3% 0.219 149.579) 30%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      border-color: color-mix(in oklab, var(--color-green-500) 30%, transparent);
-    }
-  }
   .markify-root .border-muted-foreground\/30 {
     border-color: var(--muted-foreground);
     @supports (color: color-mix(in lab, red, red)) {
       border-color: color-mix(in oklab, var(--muted-foreground) 30%, transparent);
+    }
+  }
+  .markify-root .border-neutral-800\/20 {
+    border-color: color-mix(in srgb, oklch(26.9% 0 none) 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-neutral-800) 20%, transparent);
     }
   }
   .markify-root .border-primary\/20 {
@@ -775,24 +705,6 @@
   }
   .markify-root .border-slate-200 {
     border-color: var(--color-slate-200);
-  }
-  .markify-root .border-white\/10 {
-    border-color: color-mix(in srgb, #fff 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      border-color: color-mix(in oklab, var(--color-white) 10%, transparent);
-    }
-  }
-  .markify-root .border-yellow-500\/30 {
-    border-color: color-mix(in srgb, oklch(79.5% 0.184 86.047) 30%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      border-color: color-mix(in oklab, var(--color-yellow-500) 30%, transparent);
-    }
-  }
-  .markify-root .border-zinc-300 {
-    border-color: var(--color-zinc-300);
-  }
-  .markify-root .border-zinc-600 {
-    border-color: var(--color-zinc-600);
   }
   .markify-root .border-t-foreground {
     border-top-color: var(--foreground);
@@ -805,9 +717,6 @@
   }
   .markify-root .border-l-emerald-500 {
     border-left-color: var(--color-emerald-500);
-  }
-  .markify-root .bg-\[\#0d1117\] {
-    background-color: #0d1117;
   }
   .markify-root .bg-amber-500\/5 {
     background-color: color-mix(in srgb, oklch(76.9% 0.188 70.08) 5%, transparent);
@@ -836,12 +745,6 @@
       background-color: color-mix(in oklab, var(--color-blue-500) 5%, transparent);
     }
   }
-  .markify-root .bg-blue-500\/10 {
-    background-color: color-mix(in srgb, oklch(62.3% 0.214 259.815) 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-blue-500) 10%, transparent);
-    }
-  }
   .markify-root .bg-card {
     background-color: var(--card);
   }
@@ -867,12 +770,6 @@
     background-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 20%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-emerald-500) 20%, transparent);
-    }
-  }
-  .markify-root .bg-green-500\/10 {
-    background-color: color-mix(in srgb, oklch(72.3% 0.219 149.579) 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-green-500) 10%, transparent);
     }
   }
   .markify-root .bg-muted {
@@ -931,27 +828,6 @@
   }
   .markify-root .bg-white {
     background-color: var(--color-white);
-  }
-  .markify-root .bg-white\/10 {
-    background-color: color-mix(in srgb, #fff 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
-    }
-  }
-  .markify-root .bg-yellow-500\/10 {
-    background-color: color-mix(in srgb, oklch(79.5% 0.184 86.047) 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-yellow-500) 10%, transparent);
-    }
-  }
-  .markify-root .bg-zinc-800 {
-    background-color: var(--color-zinc-800);
-  }
-  .markify-root .bg-zinc-800\/50 {
-    background-color: color-mix(in srgb, oklch(27.4% 0.006 286.033) 50%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-zinc-800) 50%, transparent);
-    }
   }
   .markify-root .bg-gradient-to-r {
     --tw-gradient-position: to right in oklab;
@@ -1114,18 +990,11 @@
   .markify-root .text-\[0\.8rem\] {
     font-size: 0.8rem;
   }
-  .markify-root .text-\[0\.9em\] {
-    font-size: 0.9em;
-  }
   .markify-root .text-\[10px\] {
     font-size: 10px;
   }
   .markify-root .text-\[11px\] {
     font-size: 11px;
-  }
-  .markify-root .\!leading-snug {
-    --tw-leading: var(--leading-snug) !important;
-    line-height: var(--leading-snug) !important;
   }
   .markify-root .leading-\[1\.7\] {
     --tw-leading: 1.7;
@@ -1134,10 +1003,6 @@
   .markify-root .leading-none {
     --tw-leading: 1;
     line-height: 1;
-  }
-  .markify-root .leading-normal {
-    --tw-leading: var(--leading-normal);
-    line-height: var(--leading-normal);
   }
   .markify-root .leading-relaxed {
     --tw-leading: var(--leading-relaxed);
@@ -1186,9 +1051,6 @@
   .markify-root .whitespace-pre-wrap {
     white-space: pre-wrap;
   }
-  .markify-root .text-blue-200 {
-    color: var(--color-blue-200);
-  }
   .markify-root .text-destructive {
     color: var(--destructive);
   }
@@ -1216,9 +1078,6 @@
       color: color-mix(in oklab, var(--foreground) 90%, transparent);
     }
   }
-  .markify-root .text-green-200 {
-    color: var(--color-green-200);
-  }
   .markify-root .text-muted-foreground {
     color: var(--muted-foreground);
   }
@@ -1233,6 +1092,9 @@
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
     }
+  }
+  .markify-root .text-neutral-500 {
+    color: var(--color-neutral-500);
   }
   .markify-root .text-popover-foreground {
     color: var(--popover-foreground);
@@ -1254,33 +1116,6 @@
   }
   .markify-root .text-white {
     color: var(--color-white);
-  }
-  .markify-root .text-white\/70 {
-    color: color-mix(in srgb, #fff 70%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      color: color-mix(in oklab, var(--color-white) 70%, transparent);
-    }
-  }
-  .markify-root .text-white\/90 {
-    color: color-mix(in srgb, #fff 90%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      color: color-mix(in oklab, var(--color-white) 90%, transparent);
-    }
-  }
-  .markify-root .text-yellow-200 {
-    color: var(--color-yellow-200);
-  }
-  .markify-root .text-zinc-100 {
-    color: var(--color-zinc-100);
-  }
-  .markify-root .text-zinc-300 {
-    color: var(--color-zinc-300);
-  }
-  .markify-root .text-zinc-400 {
-    color: var(--color-zinc-400);
-  }
-  .markify-root .text-zinc-500 {
-    color: var(--color-zinc-500);
   }
   .markify-root .uppercase {
     text-transform: uppercase;
@@ -1336,10 +1171,6 @@
     --tw-blur: blur(var(--blur-3xl));
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
-  .markify-root .blur-sm {
-    --tw-blur: blur(var(--blur-sm));
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
-  }
   .markify-root .backdrop-blur {
     --tw-backdrop-blur: blur(8px);
     -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
@@ -1382,10 +1213,6 @@
     --tw-duration: 200ms;
     transition-duration: 200ms;
   }
-  .markify-root .duration-700 {
-    --tw-duration: 700ms;
-    transition-duration: 700ms;
-  }
   .markify-root .ease-out {
     --tw-ease: var(--ease-out);
     transition-timing-function: var(--ease-out);
@@ -1409,9 +1236,6 @@
       color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
     }
   }
-  .markify-root .last\:\!mb-0:last-child {
-    margin-bottom: 0px !important;
-  }
   .markify-root .last\:mb-0:last-child {
     margin-bottom: 0px;
   }
@@ -1420,6 +1244,9 @@
     border-right-width: 0px;
   }
   @media (hover: hover) {
+    .markify-root .hover\:scale-\[1\.02\]:hover {
+      scale: 1.02;
+    }
     .markify-root .hover\:border-primary\/50:hover {
       border-color: var(--primary);
     }
@@ -1474,17 +1301,6 @@
         background-color: color-mix(in oklab, var(--secondary) 80%, transparent);
       }
     }
-    .markify-root .hover\:bg-white\/20:hover {
-      background-color: color-mix(in srgb, #fff 20%, transparent);
-    }
-    @supports (color: color-mix(in lab, red, red)) {
-      .markify-root .hover\:bg-white\/20:hover {
-        background-color: color-mix(in oklab, var(--color-white) 20%, transparent);
-      }
-    }
-    .markify-root .hover\:text-emerald-300:hover {
-      color: var(--color-emerald-300);
-    }
     .markify-root .hover\:text-foreground:hover {
       color: var(--foreground);
     }
@@ -1495,12 +1311,6 @@
       .markify-root .hover\:text-foreground\/80:hover {
         color: color-mix(in oklab, var(--foreground) 80%, transparent);
       }
-    }
-    .markify-root .hover\:text-white:hover {
-      color: var(--color-white);
-    }
-    .markify-root .hover\:text-zinc-300:hover {
-      color: var(--color-zinc-300);
     }
     .markify-root .hover\:decoration-primary:hover {
       text-decoration-color: var(--primary);
@@ -1548,9 +1358,6 @@
     }
     .markify-root .sm\:w-10 {
       width: calc(var(--spacing) * 10);
-    }
-    .markify-root .sm\:w-auto {
-      width: auto;
     }
     .markify-root .sm\:min-w-8 {
       min-width: calc(var(--spacing) * 8);
@@ -1613,9 +1420,6 @@
     .markify-root .md\:hidden {
       display: none;
     }
-    .markify-root .md\:columns-3 {
-      columns: 3;
-    }
     .markify-root .md\:grid-cols-\[2fr_3fr\] {
       grid-template-columns: 2fr 3fr;
     }
@@ -1633,12 +1437,6 @@
   }
   .markify-root .\[\&_img\]\:max-w-full img {
     max-width: 100%;
-  }
-  .markify-root .\[\&_li\]\:\!my-0 li {
-    margin-block: 0px !important;
-  }
-  .markify-root .\[\&_p\]\:\!my-0 p {
-    margin-block: 0px !important;
   }
   .markify-root .\[\&_table\]\:w-full table {
     width: 100%;
