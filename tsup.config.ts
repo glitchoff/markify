@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/highlight.worker.ts", "src/chess/index.ts"],
+  entry: ["src/index.ts", "src/highlight.worker.ts", "src/chess/index.ts", "src/mermaid/index.ts"],
   format: ["esm"],
   dts: true,
   clean: true,

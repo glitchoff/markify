@@ -20,6 +20,10 @@
       "types": "./dist/chess/index.d.ts",
       "import": "./dist/chess/index.js"
     },
+    "./mermaid": {
+      "types": "./dist/mermaid/index.d.ts",
+      "import": "./dist/mermaid/index.js"
+    },
     "./themes/*": "./dist/themes/*",
     "./themes/shadcn.css": "./dist/themes/shadcn.css"
   },

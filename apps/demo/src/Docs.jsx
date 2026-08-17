@@ -12,6 +12,10 @@ import {
   ArrowRight,
   Menu,
   X,
+  Copy,
+  Check,
+  ChevronDown,
+  ExternalLink,
 } from 'lucide-react';
 import { Markify } from '@glitchoff/markify';
 import gettingStarted from '../../../docs/getting-started.md?raw';
@@ -130,7 +134,7 @@ function SidebarNav({ collapsed, onNavigate }) {
 function SidebarCard({ collapsed, setCollapsed, children }) {
   return (
     <div
-      className={`sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-border bg-card p-3 shadow-sm transition-[width] duration-200 ${
+      className={`fixed top-20 left-4 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-border bg-card p-3 shadow-sm transition-[width] duration-200 z-20 ${
         collapsed ? 'w-14' : 'w-64'
       }`}
     >
@@ -166,6 +170,8 @@ export function Docs({ isDark }) {
   const { docId } = useParams();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [copiedDoc, setCopiedDoc] = useState(false);
+  const [docMenuOpen, setDocMenuOpen] = useState(false);
 
   const selectedIndex = useMemo(
     () => Math.max(0, FLAT_ITEMS.findIndex(d => d.id === docId)),
@@ -176,7 +182,7 @@ export function Docs({ isDark }) {
   const nextDoc = FLAT_ITEMS[selectedIndex + 1];
 
   return (
-    <div className="flex w-full items-start gap-6">
+    <div className="flex w-full h-[calc(100vh-140px)] overflow-hidden">
       {/* Mobile navigation header */}
       <div className="fixed inset-x-0 top-16 z-30 px-4 md:hidden">
         <button
@@ -200,19 +206,75 @@ export function Docs({ isDark }) {
         )}
       </div>
 
-      {/* Left sidebar (desktop) — flush left */}
-      <aside className="hidden md:block pl-4">
+      {/* Left sidebar (desktop) — fixed position */}
+      <aside className="hidden md:block">
         <SidebarCard collapsed={collapsed} setCollapsed={setCollapsed}>
           <SidebarNav collapsed={collapsed} />
         </SidebarCard>
       </aside>
 
-      {/* Centered content — 80% width, scrolls independently */}
-      <div className="min-w-0 flex-1 md:pt-0 pt-24">
-        <div className="mx-auto max-h-[calc(100vh-6rem)] w-[80%] max-w-5xl overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
+      {/* Centered content — fills remaining space, only this scrolls */}
+      <div className="min-w-0 flex-1 md:pt-0 pt-24 overflow-hidden" style={{ paddingLeft: collapsed ? '4.5rem' : '17rem' }}>
+        <div className="mx-auto h-full w-[80%] max-w-5xl overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
           <div className="mb-4 hidden md:flex items-center justify-between text-xs text-muted-foreground border-b border-border pb-3">
             <span className="font-mono">docs/{selectedDoc.file}</span>
-            <span className="text-[11px]">Rendered with Markify</span>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <button
+                  onClick={() => setDocMenuOpen(o => !o)}
+                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  type="button"
+                >
+                  {copiedDoc ? <Check className="size-3" /> : <Copy className="size-3" />}
+                  {copiedDoc ? 'Copied!' : 'Copy'}
+                  <ChevronDown className="size-3" />
+                </button>
+                {docMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setDocMenuOpen(false)} />
+                    <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-lg border border-border bg-card shadow-lg overflow-hidden">
+                      <button
+                        onClick={() => {
+                          const content = DOC_CONTENT[selectedDoc.id] || gettingStarted;
+                          navigator.clipboard.writeText(content).then(() => {
+                            setCopiedDoc(true);
+                            setTimeout(() => setCopiedDoc(false), 2000);
+                          });
+                          setDocMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                        type="button"
+                      >
+                        <Copy className="size-3.5" />
+                        Copy markdown
+                      </button>
+                      <div className="border-t border-border" />
+                      <a
+                        href={`https://chatgpt.com/?${new URLSearchParams({ hints: 'search', prompt: DOC_CONTENT[selectedDoc.id] || gettingStarted })}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setDocMenuOpen(false)}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      >
+                        <ExternalLink className="size-3.5" />
+                        Open in ChatGPT
+                      </a>
+                      <a
+                        href={`https://claude.ai/new?${new URLSearchParams({ q: DOC_CONTENT[selectedDoc.id] || gettingStarted })}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setDocMenuOpen(false)}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      >
+                        <ExternalLink className="size-3.5" />
+                        Open in Claude
+                      </a>
+                    </div>
+                  </>
+                )}
+              </div>
+              <span className="text-[11px]">Rendered with Markify</span>
+            </div>
           </div>
 
           <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled>

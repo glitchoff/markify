@@ -2,81 +2,158 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Markify } from '@glitchoff/markify';
 
-const PAGE = `## Why Markify?
+const PAGE = `## See what Markify can render
 
-Everything below this headline is rendered by Markify — including this sentence.
+Everything on this page is rendered by Markify — including the code, diagrams, tables, math, and chess below.
 
-## Features
+---
 
-- **Streaming-first** — Progressive reveal animation that keeps complex blocks intact while tokens stream in from your LLM.
-- **Zero-config** — Built-in syntax highlighting, math (KaTeX), and interactive Mermaid diagrams out of the box.
-- **Fast by design** — Static blocks are memoized and only the active streaming block re-renders per tick.
-- **Themes built in** — Light, dark, and system modes with a single CSS import.
-- **GFM complete** — Task lists, strikethrough, autolinks, tables with CSV/TSV/MD export, and more.
+## Built for AI streaming
 
-## Get started in seconds
+**Markdown that renders while the model is still thinking.**
+
+Markify is designed around streaming content. Completed blocks stay stable while the active block updates as new tokens arrive.
+
+\`\`\`jsx
+import { Markify } from "@glitchoff/markify";
+
+<Markify isStreaming={true}>
+  {streamingContent}
+</Markify>
+\`\`\`
+
+> [!NOTE]
+> **Streaming-first** — static blocks are memoized; only the active block re-renders per token.
+
+---
+
+## Everything you need, out of the box
+
+**One renderer for the rich content AI applications actually produce.**
+
+> [!WARNING]
+> **Zero-config** — syntax highlighting, math (KaTeX), and Mermaid diagrams work out of the box.
+
+> [!TIP]
+> **GFM complete** — tables with CSV/TSV/MD export, callouts, and Chess (PGN/FEN) blocks are supported too.
+
+---
+
+## From Markdown to rich UI
+
+**A single Markdown stream can become much more than formatted text.**
+
+\`\`\`mermaid
+flowchart LR
+    A[Markdown] --> B[Markify]
+    B --> C[Code blocks]
+    B --> D[Mermaid]
+    B --> E[Math]
+    B --> F[Tables]
+    B --> G[Chess]
+
+    C & D & E & F & G --> H[Rendered output]
+\`\`\`
+
+---
+
+## Beautiful diagrams, built in
+
+**Mermaid diagrams render directly from your Markdown.**
+
+\`\`\`mermaid
+flowchart TD
+    A[User prompt] --> B[AI model]
+    B --> C[Streaming response]
+    C --> D[Markify]
+    D --> E[Interactive UI]
+\`\`\`
+
+Zoom, pan, fullscreen, and export your diagrams without leaving the page.
+
+---
+
+## Lightweight where it matters
+
+**Heavy features are lazy-loaded so the core stays focused.**
+
+\`\`\`mermaid
+pie showData
+    title Bundle composition
+    "Core" : 45
+    "Mermaid (lazy)" : 30
+    "hljs (lazy)" : 15
+    "Chess (lazy)" : 10
+\`\`\`
+
+The goal isn't to ship everything everywhere — it's to load rich functionality when you actually need it.
+
+---
+
+## Chess, rendered from PGN
+
+**Because AI applications don't only generate prose.**
+
+\`\`\`pgn
+[Event "A Night at the Opera"]
+[White "Paul Morphy"]
+[Black "Duke Karl / Count Isouard"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5
+6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5
+11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6
+15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0
+\`\`\`
+
+PGN and FEN blocks turn chess notation into an interactive board.
+
+---
+
+## Math without leaving Markdown
+
+**From inline equations to full mathematical expressions.**
+
+Inline math: $E = mc^2$
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$
+
+Powered by KaTeX and rendered directly inside your Markdown stream.
+
+---
+
+## Tables that do more
+
+**Tables become interactive instead of being the end of the road.**
+
+| Feature | Markify | react-markdown | streamdown |
+|---------|---------|----------------|-----------|
+| Streaming | ✅ | ❌ | ✅ |
+| Syntax highlighting | ✅ | ❌ | ✅ |
+| Mermaid diagrams | ✅ | ❌ | ✅ |
+| Interactive tables | ✅ | ❌ | ✅ |
+| Chess (PGN/FEN) | ✅ | ❌ | ❌ |
+| Lazy loading | ✅ | ❌ | ❌ |
+
+Hover a table to copy it as Markdown or export it as CSV, TSV, or Markdown.
+
+---
+
+## One renderer. Built for AI.
+
+**Give your AI interface a Markdown renderer that understands the output it's actually going to receive.**
 
 \`\`\`bash
 npm install @glitchoff/markify
 \`\`\`
 
-Then render streaming content in your chat UI:
+Open source. MIT licensed. Built for React.
 
-\`\`\`jsx
-import { Markify } from "@glitchoff/markify";
+[Get started →](/docs/getting-started)
 
-function Chat({ message }) {
-  return (
-    <Markify isStreaming={message.status === "streaming"}>
-      {message.content}
-    </Markify>
-  );
-}
-\`\`\`
-
-> [!TIP]
-> Try the **Playground** tab to write and render markdown live, or browse the docs to go deeper.
-
-## Feature deep-dive
-
-> [!NOTE]
-> **Interactive tables** — hover a rendered table to copy it as Markdown or download as CSV, TSV, or Markdown.
-
-> [!WARNING]
-> **Mermaid diagrams** — zoom, pan, fullscreen, and export your flowcharts to SVG, PNG, or MMD.
-
-> [!TIP]
-> **Math everywhere** — inline equations like $E = mc^2$ and full block equations render via KaTeX, e.g.
-
-$$
-f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!}(x-a)^n
-$$
-
-## Rendered from markdown
-
-\`\`\`mermaid
-graph TD
-    A[User] -->|streams tokens| B[Markify]
-    B --> C[Render incrementally]
-    C --> D[Tables]
-    C --> E[Code Blocks]
-    C --> F[Math]
-    C --> G[Mermaid]
-    D & E & F & G --> H[Beautiful output]
-\`\`\`
-
-## Feature comparison
-
-| Capability | Markify | react-markdown | streamdown |
-|------------|---------|----------------|------------|
-| Streaming | ✅ | ❌ | ✅ |
-| Syntax highlighting | ✅ | ❌ | ✅ |
-| Math (KaTeX) | ✅ | ✅ | ✅ |
-| Mermaid diagrams | ✅ | ❌ | ✅ |
-| Interactive tables | ✅ | ❌ | ✅ |
-| GitHub callouts | ✅ | ❌ | ❌ |
-
-Built for AI-powered applications. Open source, free, and MIT licensed.
+[Try the Playground →](/playground)
 `;
 
 export function Demo({ isDark }) {
@@ -124,7 +201,7 @@ export function Demo({ isDark }) {
         </div>
 
         {/* The landing page body, rendered by Markify */}
-        <Markify hljsTheme={isDark ? 'dark' : 'light'}>{PAGE}</Markify>
+        <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled mermaidConfig={{ showBackground: false }}>{PAGE}</Markify>
       </div>
     </div>
   );

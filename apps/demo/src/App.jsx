@@ -1,13 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
 import { Sun, Moon } from 'lucide-react';
-import { Demo } from './Demo';
-import { Docs } from './Docs';
-import { Playground } from './Playground';
 import { useTheme } from './hooks/useTheme';
 import logoDarkUrl from '../../../src/public/markify-icon-dark.svg?url';
 import logoLightUrl from '../../../src/public/markify-icon-light.svg?url';
 import 'katex/dist/katex.min.css';
+
+const Demo = lazy(() => import('./Demo').then(m => ({ default: m.Demo })));
+const Docs = lazy(() => import('./Docs').then(m => ({ default: m.Docs })));
+const Playground = lazy(() => import('./Playground').then(m => ({ default: m.Playground })));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -83,13 +84,22 @@ function App() {
         </header>
 
         <main className="w-full py-10">
-          <Routes>
-            <Route path="/" element={<Demo isDark={isDark} />} />
-            <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
-            <Route path="/docs/:docId" element={<Docs isDark={isDark} />} />
-            <Route path="/playground" element={<Playground isDark={isDark} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
+                Loading...
+              </div>
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<Demo isDark={isDark} />} />
+              <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
+              <Route path="/docs/:docId" element={<Docs isDark={isDark} />} />
+              <Route path="/playground" element={<Playground isDark={isDark} />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </HashRouter>

@@ -3,13 +3,23 @@
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import mermaid from "mermaid";
 import type { MermaidConfig } from "mermaid";
-import { Copy, Check, Download, Maximize, Minimize, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { Copy, Check, Download, Maximize, Minimize, ZoomIn, ZoomOut, RotateCcw, Expand } from "lucide-react";
 import { cn } from "./utils";
+
+/** Extended Mermaid config with Markify UI options. */
+export interface MarkifyMermaidConfig extends MermaidConfig {
+  /** Show the toolbar header with copy/download/fullscreen buttons. Default: true */
+  showHeader?: boolean;
+  /** Show the card border and background. Default: true */
+  showBackground?: boolean;
+  /** Auto-fit diagram to container width. Default: false */
+  fit?: boolean;
+}
 
 export interface MermaidBlockProps {
   code: string;
   className?: string;
-  config?: MermaidConfig;
+  config?: MarkifyMermaidConfig;
 }
 
 const DEFAULT_CONFIG: MermaidConfig = {
@@ -21,13 +31,15 @@ const DEFAULT_CONFIG: MermaidConfig = {
 };
 
 function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
+  const showHeader = config?.showHeader ?? true;
+  const showBackground = config?.showBackground ?? true;
+  const fit = config?.fit ?? false;
   const containerRef = useRef<HTMLDivElement>(null);
   const lastValidSvgRef = useRef("");
   const [state, setState] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [svg, setSvg] = useState("");
   const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
-
 
   // ── Lazy visibility ──────────────────────────────────────────────
   useEffect(() => {
@@ -96,47 +108,153 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
     setVisible(true);
   }, []);
 
-  // ── Zoom/Pan ─────────────────────────────────────────────────────
+  // ── Zoom/Pan state ───────────────────────────────────────────────
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const isPanning = useRef(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const [fitScale, setFitScale] = useState(1);
+  const isPanningRef = useRef(false);
   const panStart = useRef({ x: 0, y: 0 });
   const posStart = useRef({ x: 0, y: 0 });
   const bodyRef = useRef<HTMLDivElement>(null);
+  const svgWrapperRef = useRef<HTMLDivElement>(null);
 
-  // Native, non-passive wheel listener so we can preventDefault() and stop
-  // the parent container from scrolling while zooming.
+  const baseScale = fit ? fitScale : 1;
+  const effectiveScale = scale * baseScale;
+
+  // ── Fullscreen ───────────────────────────────────────────────────
+  const [fullscreen, setFullscreen] = useState(false);
+
+  // ── Fit-to-container ─────────────────────────────────────────────
+  const computeFit = useCallback(() => {
+    if (!fit || !svgWrapperRef.current || !bodyRef.current) return;
+
+    const wrapper = svgWrapperRef.current;
+    const container = bodyRef.current;
+    const svgEl = wrapper.querySelector("svg");
+    if (!svgEl) return;
+
+    const svgWidth = svgEl.getBoundingClientRect().width;
+    const svgHeight = svgEl.getBoundingClientRect().height;
+    const containerWidth = container.clientWidth - 32;
+    const containerHeight = container.clientHeight - 32;
+
+    if (svgWidth === 0) return;
+
+    const widthRatio = containerWidth / svgWidth;
+    const heightRatio = containerHeight / svgHeight;
+    const ratio = Math.min(widthRatio, heightRatio, 1);
+
+    setFitScale(ratio > 0 ? ratio : 1);
+    setPosition({ x: 0, y: 0 });
+    setScale(1);
+  }, [fit]);
+
+  // Re-compute fit when svg changes, container resizes, or fullscreen toggles
+  useEffect(() => {
+    if (!fit || !svg) return;
+    computeFit();
+
+    const ro = new ResizeObserver(() => computeFit());
+    if (bodyRef.current) ro.observe(bodyRef.current);
+    return () => ro.disconnect();
+  }, [fit, svg, computeFit, fullscreen]);
+
+  // ── Wheel zoom (zoom toward cursor) ─────────────────────────────
   useEffect(() => {
     const el = bodyRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      setScale((s) => Math.max(0.3, Math.min(5, s - e.deltaY * 0.002)));
+      const rect = el.getBoundingClientRect();
+      const cursorX = e.clientX - rect.left - rect.width / 2;
+      const cursorY = e.clientY - rect.top - rect.height / 2;
+
+      setScale((s) => {
+        const newScale = Math.max(0.3, Math.min(5, s - e.deltaY * 0.002));
+        const ratio = newScale / s;
+
+        setPosition((p) => ({
+          x: cursorX - (cursorX - p.x) * ratio,
+          y: cursorY - (cursorY - p.y) * ratio,
+        }));
+
+        return newScale;
+      });
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
+  // ── Mouse panning ────────────────────────────────────────────────
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Only left button starts a pan.
     if (e.button !== 0) return;
     e.preventDefault();
-    isPanning.current = true;
+    isPanningRef.current = true;
+    setIsPanning(true);
     panStart.current = { x: e.clientX, y: e.clientY };
     posStart.current = position;
   }, [position]);
 
-  // Window-level move/up so panning keeps working even when the cursor
-  // leaves the diagram body (and doesn't get stuck "grabbing").
+  // ── Touch panning + pinch zoom ───────────────────────────────────
+  const touchState = useRef<{ mode: "none" | "pan" | "pinch"; dist: number; centerX: number; centerY: number }>({ mode: "none", dist: 0, centerX: 0, centerY: 0 });
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchState.current = {
+        mode: "pan",
+        dist: 0,
+        centerX: e.touches[0].clientX,
+        centerY: e.touches[0].clientY,
+      };
+      panStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      posStart.current = position;
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchState.current = {
+        mode: "pinch",
+        dist: Math.hypot(dx, dy),
+        centerX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        centerY: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+      };
+    }
+  }, [position]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (touchState.current.mode === "pan" && e.touches.length === 1) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - panStart.current.x;
+      const dy = e.touches[0].clientY - panStart.current.y;
+      setPosition({ x: posStart.current.x + dx, y: posStart.current.y + dy });
+    } else if (touchState.current.mode === "pinch" && e.touches.length === 2) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const ratio = dist / touchState.current.dist;
+      setScale((s) => Math.max(0.3, Math.min(5, s * ratio)));
+      touchState.current.dist = dist;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    touchState.current.mode = "none";
+  }, []);
+
+  // ── Window-level mouse move/up ──────────────────────────────────
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      if (!isPanning.current) return;
+      if (!isPanningRef.current) return;
       e.preventDefault();
       const dx = e.clientX - panStart.current.x;
       const dy = e.clientY - panStart.current.y;
       setPosition({ x: posStart.current.x + dx, y: posStart.current.y + dy });
     };
-    const onUp = () => { isPanning.current = false; };
+    const onUp = () => {
+      isPanningRef.current = false;
+      setIsPanning(false);
+    };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
     return () => {
@@ -145,6 +263,7 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
     };
   }, []);
 
+  // ── Zoom helpers ────────────────────────────────────────────────
   const handleDoubleClick = useCallback(() => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
@@ -156,11 +275,11 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
   }, []);
 
   const zoomIn = useCallback(() => {
-    setScale((s) => Math.min(5, s + 0.1));
+    setScale((s) => Math.min(5, s + 0.15));
   }, []);
 
   const zoomOut = useCallback(() => {
-    setScale((s) => Math.max(0.3, s - 0.1));
+    setScale((s) => Math.max(0.3, s - 0.15));
   }, []);
 
   // ── Download ─────────────────────────────────────────────────────
@@ -210,37 +329,43 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
     }
   }, [code]);
 
-  // ── Fullscreen ───────────────────────────────────────────────────
-  const [fullscreen, setFullscreen] = useState(false);
-
   return (
     <div
       ref={containerRef}
       className={cn(
-        "relative mb-3 overflow-hidden rounded-lg border border-border bg-card flex flex-col",
+        "relative mb-3 overflow-hidden flex flex-col",
+        showBackground && "rounded-lg border border-border bg-card",
         fullscreen && "fixed inset-0 z-50 m-0 rounded-none h-screen w-screen",
         className,
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-muted px-4 py-1.5">
-        <span className="font-mono text-xs text-muted-foreground">mermaid</span>
-        <div className="flex gap-1">
-          <ActionButton onClick={handleCopy} copied={copied} title={copied ? "Copied" : "Copy"}>
-            {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-          </ActionButton>
+      {showHeader && (
+        <div className="flex items-center justify-between border-b border-border bg-muted px-4 py-1.5">
+          <span className="font-mono text-xs text-muted-foreground">mermaid</span>
+          <div className="flex gap-1">
+            <ActionButton onClick={handleCopy} copied={copied} title={copied ? "Copied" : "Copy"}>
+              {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+            </ActionButton>
 
-          <DownloadDropdown
-            onSVG={handleDownloadSVG}
-            onPNG={handleDownloadPNG}
-            onMMD={handleDownloadMMD}
-          />
+            <DownloadDropdown
+              onSVG={handleDownloadSVG}
+              onPNG={handleDownloadPNG}
+              onMMD={handleDownloadMMD}
+            />
 
-          <ActionButton onClick={() => setFullscreen((f) => !f)} title={fullscreen ? "Exit fullscreen" : "Fullscreen"}>
-            {fullscreen ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
-          </ActionButton>
+            {fit && (
+              <ActionButton onClick={computeFit} title="Fit to container">
+                <Expand className="size-3.5" />
+              </ActionButton>
+            )}
+
+            <ActionButton onClick={() => setFullscreen((f) => !f)} title={fullscreen ? "Exit fullscreen" : "Fullscreen"}>
+              {fullscreen ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
+            </ActionButton>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Body */}
       <div
@@ -251,8 +376,11 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
           fullscreen && "h-full w-full",
         )}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onDoubleClick={handleDoubleClick}
-        style={{ cursor: isPanning.current ? "grabbing" : "grab" }}
+        style={{ cursor: isPanning ? "grabbing" : "grab", touchAction: "none" }}
       >
         {state === "loading" && !svg && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -285,9 +413,10 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
 
         {svg && (
           <div
+            ref={svgWrapperRef}
             className="mermaid-svg transition-transform duration-75 ease-out"
             style={{
-              transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+              transform: `translate(${position.x}px, ${position.y}px) scale(${effectiveScale})`,
             }}
             dangerouslySetInnerHTML={{ __html: svg }}
           />
@@ -298,8 +427,8 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
         )}
       </div>
 
-      {/* Zoom controls panel */}
-      {svg && fullscreen && (
+      {/* Zoom controls panel — always visible when svg exists */}
+      {svg && (
         <div className={cn(
           "absolute z-10 flex flex-col gap-1 rounded-md border border-border bg-background/80 p-1 supports-[backdrop-filter]:bg-background/70 supports-[backdrop-filter]:backdrop-blur-sm shadow-sm",
           "bottom-4 left-4"
@@ -334,7 +463,7 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
       )}
 
       {/* Zoom indicator */}
-      {state === "success" && scale !== 1 && fullscreen && (
+      {state === "success" && scale !== 1 && (
         <div className="absolute bottom-4 right-4 flex items-center gap-1">
           <button
             onClick={resetZoom}
@@ -344,7 +473,7 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
             Reset zoom
           </button>
           <span className="rounded bg-background/80 px-1.5 py-0.5 text-xs text-muted-foreground backdrop-blur">
-            {Math.round(scale * 100)}%
+            {Math.round(effectiveScale * 100)}%
           </span>
         </div>
       )}

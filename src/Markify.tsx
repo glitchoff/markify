@@ -1,13 +1,14 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import { cn } from "./utils";
 import { useStreamingReveal } from "./streaming";
 import { createMarkdownComponents, baseRemarkPlugins, baseRehypePlugins, TableOptionsContext, type TableOptions, type Renderers } from "./markdown-components";
+import { DEFAULT_LANGUAGES, ALL_LANGUAGES, preloadLanguages } from "./hljs-languages";
 import type { HljsTheme } from "./themes";
-import type { MermaidConfig } from "mermaid";
+import type { MarkifyMermaidConfig } from "./MermaidBlock";
 
 export interface MarkifyProps {
   children: string;
@@ -22,10 +23,12 @@ export interface MarkifyProps {
   codeBlockClassName?: string;
   fontFamily?: string;
   codeFontFamily?: string;
-  mermaidConfig?: MermaidConfig;
+  mermaidConfig?: MarkifyMermaidConfig;
   chessEnabled?: boolean;
   renderers?: Renderers;
   components?: Partial<Components>;
+  /** Languages to preload on mount. Defaults to 20 common languages. Pass "all" to preload every supported language, or an array of language names. Pass an empty array to disable preloading. */
+  hljsLanguages?: string[] | "all";
 }
 
 function parseBlocks(content: string): string[] {
@@ -59,8 +62,15 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, renderers, components: overrides }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, renderers, components: overrides, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
+
+  useEffect(() => {
+    const langs = hljsLanguages === "all" ? ALL_LANGUAGES : hljsLanguages;
+    if (langs.length > 0) {
+      preloadLanguages(langs);
+    }
+  }, [hljsLanguages]);
 
   const tableOptions = useMemo(() => ({
     showCopyButton: tableOpts?.showCopyButton ?? true,

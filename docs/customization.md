@@ -84,7 +84,14 @@ Tune the interactive table features:
 
 ## 5. Mermaid Configuration (`mermaidConfig`)
 
-Pass a full [Mermaid config](https://mermaid.js.org/config/) to the `mermaidConfig` prop:
+Pass a full [Mermaid config](https://mermaid.js.org/config/) to the `mermaidConfig` prop. Markify extends the standard `MermaidConfig` with extra UI options:
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `theme` | `string` | Synced with `hljsTheme` | Mermaid theme (`"dark"`, `"default"`, `"forest"`, etc). |
+| `showHeader` | `boolean` | `true` | Show the toolbar with copy/download/fullscreen buttons. |
+| `showBackground` | `boolean` | `true` | Show the card border and background around diagrams. |
+| `fit` | `boolean` | `false` | Auto-fit the diagram to the container width. |
 
 ```tsx
 <Markify
@@ -93,8 +100,34 @@ Pass a full [Mermaid config](https://mermaid.js.org/config/) to the `mermaidConf
     fontFamily: "Inter, sans-serif",
     flowchart: { curve: "basis", nodeSpacing: 50, rankSpacing: 50 },
     themeVariables: { primaryColor: "#334155" },
+    fit: true,
   }}
 >
+  {markdown}
+</Markify>
+```
+
+### Remove header and background
+
+For a minimal inline look:
+
+```tsx
+<Markify
+  mermaidConfig={{
+    showHeader: false,
+    showBackground: false,
+  }}
+>
+  {markdown}
+</Markify>
+```
+
+### Auto-fit diagrams
+
+When `fit` is enabled, diagrams are scaled to fit their container. Users can still zoom and pan — the fit button in the header re-centers:
+
+```tsx
+<Markify mermaidConfig={{ fit: true }}>
   {markdown}
 </Markify>
 ```
@@ -109,7 +142,44 @@ When `true`, Markify applies the selected `hljsTheme` background to the `.hljs` 
 </Markify>
 ```
 
-## 7. Custom Block Renderers (`renderers`)
+## 7. Syntax Highlighting Language Loading (`hljsLanguages`)
+
+Markify uses `highlight.js/lib/core` and loads language definitions **on demand** — only the languages actually used in your markdown are fetched, keeping the bundle small.
+
+By default, **20 common languages** are preloaded on mount so they're available instantly:
+
+> `xml`, `css`, `javascript`, `typescript`, `python`, `bash`, `json`, `sql`, `rust`, `go`, `csharp`, `cpp`, `java`, `php`, `ruby`, `yaml`, `markdown`, `diff`, `dart`, `kotlin`
+
+Any other supported language is lazy-loaded the first time a code block with that language is encountered.
+
+### Preload specific languages
+
+```tsx
+<Markify hljsLanguages={["python", "rust", "swift", "lua"]}>
+  {markdown}
+</Markify>
+```
+
+### Preload all supported languages
+
+```tsx
+<Markify hljsLanguages="all">
+  {markdown}
+</Markify>
+```
+
+### Disable preloading (pure on-demand)
+
+```tsx
+<Markify hljsLanguages={[]}>
+  {markdown}
+</Markify>
+```
+
+> [!NOTE]
+> Languages are loaded via dynamic `import()`, so each language definition becomes a separate chunk in your bundle. Preloading fetches them on mount (non-blocking), while on-demand loading fetches them only when a code block with that language is rendered.
+
+## 8. Custom Block Renderers (`renderers`)
 
 Use the `renderers` prop to swap out any built-in block renderer — mermaid, chess (PGN), FEN, or the default code block — while keeping Markify's streaming, block-splitting, and parsing intact. Each renderer is optional; pass only the ones you want to override.
 

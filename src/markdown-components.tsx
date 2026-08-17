@@ -10,10 +10,9 @@ import { cn } from "./utils";
 import { parseCallout, getText } from "./callout";
 import { remarkFixKaTeXUnicode } from "./fix-katex-unicode";
 import { CodeBlock } from "./CodeBlock";
-import { MermaidBlock } from "./MermaidBlock";
 import type { Components } from "react-markdown";
 import type { HljsTheme } from "./themes";
-import type { MermaidConfig } from "mermaid";
+import type { MarkifyMermaidConfig } from "./MermaidBlock";
 
 // Lazy-loaded so chess.js + react-chessboard are only fetched when a
 // pgn/chess code block is actually rendered, keeping the core bundle lean.
@@ -25,11 +24,24 @@ const LazyFenBoard = lazy(() =>
   import("./chess/FenBoard").then((m) => ({ default: m.FenBoard })),
 );
 
+const LazyMermaidBlock = lazy(() =>
+  import("./MermaidBlock").then((m) => ({ default: m.MermaidBlock })),
+);
+
 function ChessFallback() {
   return (
     <div className="mb-3 flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
       <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
       Loading chess viewer…
+    </div>
+  );
+}
+
+function MermaidFallback() {
+  return (
+    <div className="mb-3 flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
+      Loading mermaid diagram…
     </div>
   );
 }
@@ -389,14 +401,21 @@ function Hr() {
   return <hr className="mb-3 border-border" />;
 }
 
-function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, mermaidConfig, chessEnabled = false, isStreaming = false, renderers, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; mermaidConfig?: MermaidConfig; chessEnabled?: boolean; isStreaming?: boolean; renderers?: Renderers; children?: React.ReactNode; className?: string }) {
+function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, mermaidConfig, chessEnabled = false, isStreaming = false, renderers, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; mermaidConfig?: MarkifyMermaidConfig; chessEnabled?: boolean; isStreaming?: boolean; renderers?: Renderers; children?: React.ReactNode; className?: string }) {
   const lang = extractLanguage(props.children, props.className);
   const rawCode = getCodeChildren(props.children);
   const codeText = typeof rawCode === "string" ? rawCode : getText(rawCode);
 
   if (lang === "mermaid") {
     if (renderers?.mermaid) return <>{renderers.mermaid({ code: codeText, isStreaming })}</>;
-    return <MermaidBlock code={codeText} config={mermaidConfig} />;
+    const resolvedConfig = mermaidConfig?.theme
+      ? mermaidConfig
+      : { ...mermaidConfig, theme: hljsTheme === "dark" ? "dark" : "default" };
+    return (
+      <Suspense fallback={<MermaidFallback />}>
+        <LazyMermaidBlock code={codeText} config={resolvedConfig} />
+      </Suspense>
+    );
   }
 
   if (chessEnabled && (lang === "pgn" || lang === "chess")) {
@@ -459,7 +478,7 @@ export interface MarkdownComponentOptions {
   hljsThemeBg?: boolean;
   codeBlockClassName?: string;
   codeFontFamily?: string;
-  mermaidConfig?: MermaidConfig;
+  mermaidConfig?: MarkifyMermaidConfig;
   chessEnabled?: boolean;
   isStreaming?: boolean;
   renderers?: Renderers;

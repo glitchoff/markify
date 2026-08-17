@@ -476,11 +476,17 @@
   .h-24 {
     height: calc(var(--spacing) * 24);
   }
+  .h-64 {
+    height: calc(var(--spacing) * 64);
+  }
   .h-80 {
     height: calc(var(--spacing) * 80);
   }
   .h-96 {
     height: calc(var(--spacing) * 96);
+  }
+  .h-\[calc\(100vh-140px\)\] {
+    height: calc(100vh - 140px);
   }
   .h-auto {
     height: auto;
@@ -656,6 +662,9 @@
   .\[scrollbar-width\:thin\] {
     scrollbar-width: thin;
   }
+  .\[scrollbar-color\:var\(--border\)_transparent\] {
+    scrollbar-color: var(--border) transparent;
+  }
   .list-decimal {
     list-style-type: decimal;
   }
@@ -683,9 +692,6 @@
   .items-end {
     align-items: flex-end;
   }
-  .items-start {
-    align-items: flex-start;
-  }
   .justify-between {
     justify-content: space-between;
   }
@@ -712,9 +718,6 @@
   }
   .gap-5 {
     gap: calc(var(--spacing) * 5);
-  }
-  .gap-6 {
-    gap: calc(var(--spacing) * 6);
   }
   :where(.\!space-y-0 > :not(:last-child)) {
     --tw-space-y-reverse: 0 !important;

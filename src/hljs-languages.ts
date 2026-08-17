@@ -1,12 +1,12 @@
 import hljs from "highlight.js/lib/core";
-
 import type { LanguageFn } from "highlight.js";
 
 type LanguageLoader = () => Promise<{ default: LanguageFn }>;
 
 const LANGUAGE_MAP: Record<string, { loader: LanguageLoader; aliases?: string[] }> = {
   xml: { loader: () => import("highlight.js/lib/languages/xml"), aliases: ["html"] },
-  css: { loader: () => import("highlight.js/lib/languages/css"), aliases: ["scss", "less"] },
+  css: { loader: () => import("highlight.js/lib/languages/css"), aliases: ["less"] },
+  scss: { loader: () => import("highlight.js/lib/languages/scss") },
   javascript: { loader: () => import("highlight.js/lib/languages/javascript"), aliases: ["js", "jsx"] },
   typescript: { loader: () => import("highlight.js/lib/languages/typescript"), aliases: ["ts", "tsx"] },
   python: { loader: () => import("highlight.js/lib/languages/python"), aliases: ["py"] },
@@ -41,7 +41,6 @@ const LANGUAGE_MAP: Record<string, { loader: LanguageLoader; aliases?: string[] 
   dockerfile: { loader: () => import("highlight.js/lib/languages/dockerfile"), aliases: ["docker"] },
   makefile: { loader: () => import("highlight.js/lib/languages/makefile") },
   ini: { loader: () => import("highlight.js/lib/languages/ini") },
-  toml: { loader: () => import("highlight.js/lib/languages/ini") },
   http: { loader: () => import("highlight.js/lib/languages/http") },
   graphql: { loader: () => import("highlight.js/lib/languages/graphql") },
   latex: { loader: () => import("highlight.js/lib/languages/latex"), aliases: ["tex"] },
@@ -103,57 +102,19 @@ async function ensureLanguage(lang: string): Promise<boolean> {
   }
 }
 
-const cache = new Map<string, string>();
-const MAX_CACHE = 200;
+const ALL_LANGUAGES = Object.keys(LANGUAGE_MAP);
 
-function cacheKey(code: string, language: string): string {
-  return `${language}::${code.length}::${code.slice(0, 100)}`;
-}
+const DEFAULT_LANGUAGES = [
+  "xml", "css", "javascript", "typescript", "python",
+  "bash", "json", "sql", "rust", "go",
+  "csharp", "cpp", "java", "php", "ruby",
+  "yaml", "markdown", "diff", "dart", "kotlin",
+];
 
-self.onmessage = async (e: MessageEvent<{ code: string; language: string; id: number }>) => {
-  const { code, language, id } = e.data;
-
-  try {
-    const key = cacheKey(code, language);
-    const cached = cache.get(key);
-    if (cached) {
-      self.postMessage({ html: cached, id });
-      return;
-    }
-
-    const plainLangs = ["plaintext", "text"];
-    const isPlain = !language || plainLangs.includes(language);
-
-    let result;
-    if (isPlain) {
-      result = { value: escapeHtml(code) };
-    } else {
-      const loaded = await ensureLanguage(language);
-      if (loaded && hljs.getLanguage(language)) {
-        result = hljs.highlight(code, { language, ignoreIllegals: true });
-      } else {
-        result = hljs.highlightAuto(code);
-      }
-    }
-
-    const html = result.value;
-
-    if (cache.size >= MAX_CACHE) {
-      const firstKey = cache.keys().next().value;
-      if (firstKey) cache.delete(firstKey);
-    }
-    cache.set(key, html);
-
-    self.postMessage({ html, id });
-  } catch {
-    self.postMessage({ html: escapeHtml(code), id });
+function preloadLanguages(langs: string[]): void {
+  for (const lang of langs) {
+    ensureLanguage(lang);
   }
-};
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
+
+export { ensureLanguage, getCanonicalName, registeredLanguages, preloadLanguages, DEFAULT_LANGUAGES, ALL_LANGUAGES };

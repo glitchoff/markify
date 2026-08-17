@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
 import { Copy, Check, WrapText, ChevronDown } from "lucide-react";
 import { cn, injectHljsTheme } from "./utils";
+import { ensureLanguage } from "./hljs-languages";
 import type { HljsTheme } from "./themes";
 
 interface CodeBlockProps {
@@ -194,20 +195,37 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
 
   // ── Highlighting (sync or worker) ──────────────────────────────────
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
+  const [syncHtml, setSyncHtml] = useState<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const pendingIdRef = useRef(0);
 
-  const syncHtml = useMemo(() => {
-    if (worker) return null;
-    if (!displayCode) return "";
-    try {
-      if (language && language !== "plaintext" && language !== "text" && language !== "mermaid" && language !== "chess" && language !== "pgn" && language !== "fen" && hljs.getLanguage(language)) {
-        return hljs.highlight(displayCode, { language, ignoreIllegals: true }).value;
-      }
-      return hljs.highlightAuto(displayCode).value;
-    } catch {
-      return displayCode;
+  // Async language loading + highlighting for sync mode
+  useEffect(() => {
+    if (worker) return;
+    if (!displayCode) { setSyncHtml(""); return; }
+
+    const plainLangs = ["plaintext", "text", "mermaid", "chess", "pgn", "fen"];
+    const isPlain = !language || plainLangs.includes(language);
+
+    if (isPlain) {
+      setSyncHtml(displayCode);
+      return;
     }
+
+    let cancelled = false;
+    ensureLanguage(language).then((ok) => {
+      if (cancelled) return;
+      try {
+        if (ok && hljs.getLanguage(language)) {
+          setSyncHtml(hljs.highlight(displayCode, { language, ignoreIllegals: true }).value);
+        } else {
+          setSyncHtml(hljs.highlightAuto(displayCode).value);
+        }
+      } catch {
+        setSyncHtml(displayCode);
+      }
+    });
+    return () => { cancelled = true; };
   }, [displayCode, language, worker]);
 
   useEffect(() => {

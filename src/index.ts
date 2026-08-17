@@ -12,9 +12,8 @@ export { cn, injectHljsTheme } from "./utils";
 export { TableOptionsContext, useTableOptions } from "./markdown-components";
 export type { TableOptions, Renderers, BlockRendererArgs, CodeRendererProps } from "./markdown-components";
 
-// Re-export mermaid utilities
-export { MermaidBlock } from "./MermaidBlock";
-export type { MermaidBlockProps } from "./MermaidBlock";
+// Mermaid types
+export type { MarkifyMermaidConfig, MermaidBlockProps } from "./MermaidBlock";
 
 // Theme
 export type { HljsTheme } from "./themes";

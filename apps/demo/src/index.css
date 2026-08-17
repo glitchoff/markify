@@ -1,5 +1,5 @@
 @import '../../../src/themes/markify.css';
-
+@import "katex/dist/katex.min.css";
 
 *, *::before, *::after {
   box-sizing: border-box;
