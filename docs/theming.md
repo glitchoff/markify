@@ -17,6 +17,9 @@ import "@glitchoff/markify/themes/core.css";
 > [!WARNING]
 > If you import `markify.css` (the legacy full file) into an app that already defines its own shadcn tokens, its bundled `:root`/`.dark`/`@media` token blocks can override your theme. Use `core.css` for themed apps.
 
+> [!NOTE]
+> **Cascade safety.** Markify's CSS is scoped under `.markify-root` and fully **unlayered** — it declares no `@layer`, so importing it never reorders your app's cascade layers (a layered import loaded before Tailwind would make `utilities` the first layer and break every utility class). Import it anywhere; order doesn't matter.
+
 ## 2. Markify token reference
 
 Markify's components only read these custom properties, all scoped under `.markify-root`:

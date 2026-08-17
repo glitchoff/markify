@@ -43,6 +43,9 @@ Pick the file that matches your app:
 | `@glitchoff/markify/themes/core.css` | **Recommended.** Scoped base + utility layer + theme aliases. Your app provides its own design tokens (shadcn, daisyUI, Radix, Bootstrap, custom). |
 | `@glitchoff/markify/themes/markify.css` | Only if your app has **no theme system** and you want Markify's bundled shadcn defaults. |
 
+> [!NOTE]
+> **Safe to import, order-independent.** Every rule Markify ships is scoped under `.markify-root` and emitted **unlayered** — it never declares a CSS `@layer` and never touches your `:root` tokens. Importing it before or after your Tailwind/`globals.css` cannot reorder your cascade or override your theme.
+
 See [Theming](/docs/theming) for the full token reference and the `themeType` / `theme` props.
 
 ---
