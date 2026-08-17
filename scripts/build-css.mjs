@@ -75,16 +75,28 @@ function scopeUtilities(css) {
 
   const inner = css.slice(start + startMarker.length, end);
 
+  // Scope every rule under `.markify-root` and emit it UNLAYERED.
+  //
+  // Emitting unlayered is important: if this CSS declared `@layer utilities`,
+  // it would become the FIRST layer in the consuming app's cascade (this file
+  // loads before the app's Tailwind). In CSS, later layers override earlier
+  // ones, so the app's base/components would then override ALL of its own
+  // utility classes -- breaking the whole app. Unlayered rules are never
+  // demoted by layers and, being scoped under `.markify-root`, they can't
+  // leak into the app either.
   const scopedLines = inner.split("\n").map((line) => {
     const trimmed = line.trim();
-    if (trimmed.startsWith(".") && line.includes("{")) {
+    if (
+      (trimmed.startsWith(".") || trimmed.startsWith(":where")) &&
+      line.includes("{")
+    ) {
       const indent = line.slice(0, line.length - line.trimStart().length);
       return `${indent}.markify-root ${trimmed}`;
     }
     return line;
   });
 
-  return `@layer utilities {\n${scopedLines.join("\n")}\n}\n`;
+  return `${scopedLines.join("\n")}\n`;
 }
 
 function main() {

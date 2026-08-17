@@ -96,8 +96,9 @@
   }
 }
 
-@layer base {
-  * {
-    border-color: var(--border);
-  }
+/* Deliberately unlayered: @layer here would claim the layer name before the
+ * consuming app's Tailwind loads, reordering the app's cascade and breaking
+ * its utilities. */
+* {
+  border-color: var(--border);
 }

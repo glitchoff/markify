@@ -96,10 +96,11 @@
   }
 }
 
-@layer base {
-  * {
-    border-color: var(--border);
-  }
+/* Deliberately unlayered: @layer here would claim the layer name before the
+ * consuming app's Tailwind loads, reordering the app's cascade and breaking
+ * its utilities. */
+* {
+  border-color: var(--border);
 }
 
 /* @glitchoff/markify: theme presets -> markify tokens.
@@ -260,7 +261,6 @@
  * src/**\/*.{ts,tsx}. See scripts/build-css.mjs.
  * ───────────────────────────────────────────────────────────────────── */
 
-@layer utilities {
 
   .markify-root .pointer-events-none {
     pointer-events: none;
@@ -764,14 +764,14 @@
   .markify-root .gap-y-1 {
     row-gap: var(--spacing);
   }
-  :where(.divide-y > :not(:last-child)) {
+  .markify-root :where(.divide-y > :not(:last-child)) {
     --tw-divide-y-reverse: 0;
     border-bottom-style: var(--tw-border-style);
     border-top-style: var(--tw-border-style);
     border-top-width: calc(1px * var(--tw-divide-y-reverse));
     border-bottom-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
   }
-  :where(.divide-border > :not(:last-child)) {
+  .markify-root :where(.divide-border > :not(:last-child)) {
     border-color: var(--markify-border);
   }
   .markify-root .truncate {
@@ -1730,4 +1730,3 @@
     margin-block: var(--spacing);
   }
 
-}
