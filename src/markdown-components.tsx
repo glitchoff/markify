@@ -241,7 +241,7 @@ function YouTubeEmbed({ src, video, streaming }: { src: string; video: YouTubeVi
   }
   const query = video.start ? `?start=${video.start}` : "";
   return (
-    <div className="relative my-2 aspect-video w-full overflow-hidden rounded-lg border border-border">
+    <span className="relative my-2 block aspect-video w-full overflow-hidden rounded-lg border border-border">
       <iframe
         src={`https://www.youtube-nocookie.com/embed/${video.id}${query}`}
         title="YouTube video player"
@@ -251,7 +251,7 @@ function YouTubeEmbed({ src, video, streaming }: { src: string; video: YouTubeVi
         referrerPolicy="strict-origin-when-cross-origin"
         className="absolute inset-0 h-full w-full border-0"
       />
-    </div>
+    </span>
   );
 }
 
