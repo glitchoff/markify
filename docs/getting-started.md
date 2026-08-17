@@ -23,9 +23,12 @@ Markify requires React 18 or 19:
 
 ## 2. Requirements & CSS Imports
 
+
+
 > [!IMPORTANT]
 > **Tailwind CSS Required:**  
 > Markify components rely on Tailwind CSS utility classes. Ensure Tailwind CSS is installed and configured in your host project.
+
 
 Import `markify.css` once at your application root (e.g. `main.tsx`, `App.tsx`, or `layout.tsx`):
 

@@ -42,7 +42,7 @@ graph LR
 
 ## Video embeds
 
-![Watch the video](https://www.youtube.com/watch?v=M7lc1UVf-VE)
+![lofi girl live stream](https://www.youtube.com/watch?v=X4VbdwhkE10)
 `;
 
 export function Playground({ isDark }) {
