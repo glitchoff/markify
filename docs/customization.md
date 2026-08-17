@@ -1,6 +1,6 @@
 # Customization
 
-Markify ships with sensible defaults but exposes several knobs for deep customization — from swapping code-block styling to overriding any rendered component.
+Markify ships with sensible defaults but exposes several knobs for deep customization, from swapping code-block styling to overriding any rendered component.
 
 ## 1. Custom Components (`components`)
 
@@ -12,7 +12,7 @@ import { Markify } from "@glitchoff/markify";
 <Markify
   components={{
     h1: ({ children }) => (
-      <h1 className="text-3xl font-bold my-6 pb-2 border-b border-border">{children}</h1>
+      <h1 className="text-[2rem] font-bold mt-8 mb-6">{children}</h1>
     ),
     a: ({ href, children }) => (
       <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline">
@@ -124,7 +124,7 @@ For a minimal inline look:
 
 ### Auto-fit diagrams
 
-When `fit` is enabled, diagrams are scaled to fit their container. Users can still zoom and pan — the fit button in the header re-centers:
+When `fit` is enabled, diagrams are scaled to fit their container. Users can still zoom and pan; the fit button in the header re-centers:
 
 ```tsx
 <Markify mermaidConfig={{ fit: true }}>
@@ -144,7 +144,7 @@ When `true`, Markify applies the selected `hljsTheme` background to the `.hljs` 
 
 ## 7. Syntax Highlighting Language Loading (`hljsLanguages`)
 
-Markify uses `highlight.js/lib/core` and loads language definitions **on demand** — only the languages actually used in your markdown are fetched, keeping the bundle small.
+Markify uses `highlight.js/lib/core` and loads language definitions **on demand**: only the languages actually used in your markdown are fetched, keeping the bundle small.
 
 By default, **20 common languages** are preloaded on mount so they're available instantly:
 
@@ -181,7 +181,7 @@ Any other supported language is lazy-loaded the first time a code block with tha
 
 ## 8. Custom Block Renderers (`renderers`)
 
-Use the `renderers` prop to swap out any built-in block renderer — mermaid, chess (PGN), FEN, or the default code block — while keeping Markify's streaming, block-splitting, and parsing intact. Each renderer is optional; pass only the ones you want to override.
+Use the `renderers` prop to swap out any built-in block renderer: mermaid, chess (PGN), FEN, or the default code block, while keeping Markify's streaming, block-splitting, and parsing intact. Each renderer is optional; pass only the ones you want to override.
 
 ```tsx
 import { Markify, type Renderers } from "@glitchoff/markify";
@@ -213,4 +213,4 @@ const renderers: Renderers = {
 
 `code` is the raw text inside the fence. `isStreaming` is `true` while the block is still being revealed (so you can show a loading state). The `code` renderer receives the original `children` (the `<code>` element) plus the parsed `language`.
 
-> **Note:** `renderers` is granular — overriding `chess` doesn't affect `fen`, `mermaid`, or regular code blocks. To override an entire markdown element (e.g. all `<pre>`), use the `components` prop instead.
+> **Note:** `renderers` is granular: overriding `chess` doesn't affect `fen`, `mermaid`, or regular code blocks. To override an entire markdown element (e.g. all `<pre>`), use the `components` prop instead.

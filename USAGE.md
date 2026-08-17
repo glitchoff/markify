@@ -8,7 +8,7 @@ A complete guide on the proper real-world setup for **Markify**, covering parent
 
 > [!IMPORTANT]
 > **We recommend wrapping `<Markify>` in a container with a defined width constraint.**  
-> Markify renders complex Markdown elements—including wide tables with export controls, code blocks with horizontal scrolling, and zoomable/pannable Mermaid diagrams.  
+> Markify renders complex Markdown elements, including wide tables with export controls, code blocks with horizontal scrolling, and zoomable/pannable Mermaid diagrams.  
 > Without an explicit parent container width, these elements can overflow bounds, break page layouts, or stretch infinitely.
 
 ### Example: CSS Approach

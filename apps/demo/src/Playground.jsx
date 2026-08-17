@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, Square, RotateCcw, Sparkles } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import { Markify } from '@glitchoff/markify';
 
 const SAMPLE = `# Play with Markify
@@ -12,7 +12,7 @@ Edit the markdown on the left and watch it render live on the right.
 - Math: $E = mc^2$
 
 > [!TIP]
-> Hit **Start streaming** to watch it reveal token-by-token, just like an AI response.
+> Hit **Start streaming** to watch it reveal progressively, just like an AI response.
 
 \`\`\`tsx
 import { Markify } from "@glitchoff/markify";
@@ -76,11 +76,6 @@ export function Playground({ isDark }) {
   const stopStream = () => {
     setStreaming(false);
     setDisplay(source);
-  };
-  const resetSample = () => {
-    setStreaming(false);
-    setSource(SAMPLE);
-    setDisplay(SAMPLE);
   };
   const onEditorChange = e => {
     const next = e.target.value;
@@ -156,25 +151,6 @@ export function Playground({ isDark }) {
               <Play className="size-4" />
             </button>
           )}
-
-          <button
-            onClick={startStream}
-            disabled={!streaming}
-            title="Replay"
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
-            type="button"
-          >
-            <RotateCcw className="size-4" />
-          </button>
-
-          <button
-            onClick={resetSample}
-            title="Reset sample"
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            type="button"
-          >
-            <Sparkles className="size-4" />
-          </button>
         </div>
       </div>
 

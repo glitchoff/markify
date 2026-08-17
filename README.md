@@ -10,16 +10,16 @@ import { Markify } from "@glitchoff/markify";
 
 ## Features
 
-- **Streaming** — token-arrival rendering via `remend`, no RAF
-- **Syntax highlighting** — highlight.js with optional Web Worker, bundled Atom One themes
-- **Collapsible code blocks** — auto-collapse >5 lines, language color dot, ChevronDown/Wrap/Copy icons
-- **Math/LaTeX** — KaTeX via `remark-math` + `rehype-katex` (add CSS separately)
-- **Mermaid diagrams** — zoom/pan, download (SVG/PNG/MMD), fullscreen
-- **Tables** — shadcn-styled with copy-as-markdown + download CSV/TSV/MD
-- **Callouts** — `> [!NOTE/WARNING/TIP]` blockquotes
-- **Video embeds** — opt-in YouTube embedding from plain links or image syntax (`youtubeEnabled`)
-- **Theming** — 100% shadcn CSS variable tokens + Atom One hljs themes
-- **Spacing** — `spacing` prop (`compact`/`normal`/`relaxed` or granular) to control the gap between blocks
+- **Streaming**: token-arrival rendering via `remend`, no RAF
+- **Syntax highlighting**: highlight.js with optional Web Worker, bundled Atom One themes
+- **Collapsible code blocks**: auto-collapse >5 lines, language color dot, ChevronDown/Wrap/Copy icons
+- **Math/LaTeX**: KaTeX via `remark-math` + `rehype-katex` (add CSS separately)
+- **Mermaid diagrams**: zoom/pan, download (SVG/PNG/MMD), fullscreen
+- **Tables**: shadcn-styled with copy-as-markdown + download CSV/TSV/MD
+- **Callouts**: 15+ Obsidian-style `> [!TYPE]` alerts (note, tip, important, warning, caution, info, success, question, abstract, todo, failure, danger, bug, example, quote) with semantic icons
+- **Video embeds**: opt-in YouTube embedding from plain links or image syntax (`youtubeEnabled`)
+- **Theming**: 100% shadcn CSS variable tokens + Atom One hljs themes
+- **Spacing**: `spacing` prop (`compact`/`normal`/`relaxed` or granular) to control the gap between blocks
 
 ## Installation
 
@@ -170,18 +170,18 @@ Pass custom Mermaid settings directly via the `mermaidConfig` prop:
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `string` | — | Markdown content |
+| `children` | `string` | - | Markdown content |
 | `isStreaming` | `boolean` | `false` | Enable animated token-arrival reveal |
-| `className` | `string` | — | Additional CSS classes |
+| `className` | `string` | - | Additional CSS classes |
 | `codeBlockWorker` | `boolean` | `false` | Offload hljs highlighting to Web Worker |
 | `hljsTheme` | `"dark" \| "light"` | `"dark"` | Atom One theme for code blocks |
-| `hljsCustomCss` | `string` | — | Custom inline hljs CSS (overrides `hljsTheme`) |
-| `hljsThemeUrl` | `string` | — | External CSS file URL for hljs (skips built-in injection) |
-| `codeBlockClassName` | `string` | — | Additional CSS classes for the code block wrapper |
-| `fontFamily` | `string` | — | Content font-family |
-| `codeFontFamily` | `string` | — | Code block font-family |
-| `mermaidConfig` | `MermaidConfig` | — | Custom configuration for Mermaid diagrams |
-| `table` | `TableOptions` | — | Table display config |
+| `hljsCustomCss` | `string` | - | Custom inline hljs CSS (overrides `hljsTheme`) |
+| `hljsThemeUrl` | `string` | - | External CSS file URL for hljs (skips built-in injection) |
+| `codeBlockClassName` | `string` | - | Additional CSS classes for the code block wrapper |
+| `fontFamily` | `string` | - | Content font-family |
+| `codeFontFamily` | `string` | - | Code block font-family |
+| `mermaidConfig` | `MermaidConfig` | - | Custom configuration for Mermaid diagrams |
+| `table` | `TableOptions` | - | Table display config |
 
 ## Exports
 

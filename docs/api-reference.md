@@ -14,22 +14,22 @@ import { Markify } from "@glitchoff/markify";
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `string` | — (required) | The Markdown source to render. |
+| `children` | `string` | - (required) | The Markdown source to render. |
 | `isStreaming` | `boolean` | `false` | Enable progressive reveal animation while content streams in. |
 | `className` | `string` | `""` | Extra class names for the root `.markify-root` wrapper. |
 | `codeBlockWorker` | `boolean` | `false` | Offload syntax highlighting to a Web Worker. |
-| `table` | `TableOptions` | — | See [Customization → Tables](/docs/customization). |
+| `table` | `TableOptions` | - | See [Customization → Tables](/docs/customization). |
 | `hljsTheme` | `"dark" \| "light"` | `"dark"` | Built-in syntax highlighting theme. |
-| `hljsCustomCss` | `string` | — | Raw CSS string overriding `.hljs` colors. |
-| `hljsThemeUrl` | `string` | — | URL of an external highlight.js stylesheet to inject. |
+| `hljsCustomCss` | `string` | - | Raw CSS string overriding `.hljs` colors. |
+| `hljsThemeUrl` | `string` | - | URL of an external highlight.js stylesheet to inject. |
 | `hljsThemeBg` | `boolean` | `false` | Apply the theme background to the `.hljs` container. |
-| `codeBlockClassName` | `string` | — | Extra classes for each code block wrapper. |
-| `fontFamily` | `string` | — | Root font family for rendered content. |
-| `codeFontFamily` | `string` | — | Font family for code blocks. |
-| `mermaidConfig` | `MermaidConfig` | — | Mermaid rendering configuration. |
+| `codeBlockClassName` | `string` | - | Extra classes for each code block wrapper. |
+| `fontFamily` | `string` | - | Root font family for rendered content. |
+| `codeFontFamily` | `string` | - | Font family for code blocks. |
+| `mermaidConfig` | `MermaidConfig` | - | Mermaid rendering configuration. |
 | `chessEnabled` | `boolean` | `false` | Enable chess (PGN/FEN) block rendering. |
-| `renderers` | `Renderers` | — | Override built-in block renderers (mermaid, chess, fen, code). See [Customization → Renderers](/docs/customization). |
-| `components` | `Partial<Components>` | — | Override any markdown element (react-markdown). |
+| `renderers` | `Renderers` | - | Override built-in block renderers (mermaid, chess, fen, code). See [Customization → Renderers](/docs/customization). |
+| `components` | `Partial<Components>` | - | Override any markdown element (react-markdown). |
 | `hljsLanguages` | `string[] \| "all"` | 20 common languages | Which highlight.js languages to preload on mount. Pass `"all"` to preload every supported language, an array of language names, or `[]` to disable preloading (languages load on-demand when encountered). |
 
 ## `TableOptions`
@@ -46,7 +46,7 @@ import { Markify } from "@glitchoff/markify";
 |---|---|---|
 | `useStreamingReveal(content, isStreaming)` | hook | Returns reveal-rendered content while streaming. |
 | `remarkFixKaTeXUnicode` | remark plugin | Normalizes Unicode in KaTeX math. |
-| `parseCallout(blockquote)` | util | Parses `[!NOTE]`-style callout blocks. |
+| `parseCallout(blockquote)` | util | Parses `[!TYPE]` Obsidian-style callout blocks (NOTE, TIP, WARNING, INFO, etc.). |
 | `getText(node)` | util | Extracts plain text from a markdown AST node. |
 | `cn(...classes)` | util | Tailwind-friendly class combiner. |
 | `injectHljsTheme(theme, customCss?)` | util | Injects built-in or custom `.hljs` CSS. |
@@ -75,14 +75,14 @@ import { Markify } from "@glitchoff/markify";
 
 ## Types
 
-- `MarkifyProps` — props of `<Markify>`.
-- `Components` — react-markdown component map (re-exported).
-- `HljsTheme` — `"dark" | "light"`.
-- `MermaidBlockProps` — props of `MermaidBlock`.
-- `MarkifyMermaidConfig` — extended Mermaid config with UI options (`showHeader`, `showBackground`, `fit`).
-- `Renderers` — `{ mermaid?, chess?, fen?, code? }` custom block renderers.
-- `BlockRendererArgs` — `{ code, isStreaming }` passed to `mermaid`/`chess`/`fen` renderers.
-- `CodeRendererProps` — `{ children, className, language }` passed to the `code` renderer.
+- `MarkifyProps`: props of `<Markify>`.
+- `Components`: react-markdown component map (re-exported).
+- `HljsTheme`: `"dark" | "light"`.
+- `MermaidBlockProps`: props of `MermaidBlock`.
+- `MarkifyMermaidConfig`: extended Mermaid config with UI options (`showHeader`, `showBackground`, `fit`).
+- `Renderers`: `{ mermaid?, chess?, fen?, code? }` custom block renderers.
+- `BlockRendererArgs`: `{ code, isStreaming }` passed to `mermaid`/`chess`/`fen` renderers.
+- `CodeRendererProps`: `{ children, className, language }` passed to the `code` renderer.
 
 ## `<MermaidBlock>` Props
 

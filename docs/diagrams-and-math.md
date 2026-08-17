@@ -1,62 +1,17 @@
-# Diagrams & Math Support
+# Math Support (KaTeX)
 
-Markify provides out-of-the-box support for **Mermaid diagrams** and **KaTeX LaTeX math equations**.
+Markify renders LaTeX math equations via KaTeX using `remark-math` and `rehype-katex`.
 
-## 1. Mermaid Diagrams
+## 1. Import KaTeX CSS
 
-Markify renders interactive Mermaid flowcharts, sequence diagrams, and class diagrams with built-in zoom, pan, fullscreen, and SVG/PNG/MMD download controls.
-
-### Usage
-
-```markdown
-```mermaid
-graph TD
-    A[User] -->|Input| B[Process]
-    B -->|Valid| C[Markify]
-    C -->|Render| D[Output]
-```
-```
-
-### Live Mermaid diagram
-
-```mermaid
-graph LR
-    A[Markdown] --> B[remark-gfm]
-    B --> C[remark-math]
-    C --> D[rehype-katex]
-    D --> E[Mermaid]
-```
-
-### Custom Configuration (`mermaidConfig`)
-
-Pass custom Mermaid settings directly via the `mermaidConfig` prop:
-
-```tsx
-<Markify
-  mermaidConfig={{
-    theme: "dark",
-    fontFamily: "Inter, sans-serif",
-    flowchart: { curve: "basis" },
-  }}
->
-  {content}
-</Markify>
-```
-
----
-
-## 2. KaTeX Math Equations
-
-Markify uses KaTeX via `remark-math` and `rehype-katex`.
-
-### Import KaTeX CSS
-Include KaTeX stylesheet in your application layout:
+Include the KaTeX stylesheet in your application layout:
 
 ```tsx
 import "katex/dist/katex.min.css";
 ```
 
-### Inline Math
+## 2. Inline Math
+
 Write inline equations wrapped in single dollar signs `$`:
 
 ```markdown
@@ -65,7 +20,8 @@ Einstein's formula: $E = mc^2$
 
 Rendered inline: Einstein's formula: $E = mc^2$
 
-### Block Math
+## 3. Block Math
+
 Write standalone math blocks wrapped in double dollar signs `$$`:
 
 ```markdown
@@ -79,3 +35,8 @@ Rendered block:
 $$
 f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2\pi i \xi x} d\xi
 $$
+
+## 4. Notes
+
+- Math is rendered with `rehype-katex`; no additional runtime is required beyond the CSS import above.
+- KaTeX output is normalized for Unicode via Markify's `remarkFixKaTeXUnicode` plugin.

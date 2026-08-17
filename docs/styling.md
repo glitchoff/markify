@@ -11,7 +11,7 @@ How Markify's root container forwards styles and how to control spacing between 
 | `className` | Merged onto the root `div` (alongside `markify-root text-foreground ...`) |
 | `fontFamily` | Applied as `style.fontFamily` on the root |
 
-There is no generic `{...rest}` spread — arbitrary HTML props and `style` are **not** forwarded. To style the container, use `className` (and Tailwind arbitrary variants) or target `.markify-root` in your own CSS.
+There is no generic `{...rest}` spread: arbitrary HTML props and `style` are **not** forwarded. To style the container, use `className` (and Tailwind arbitrary variants) or target `.markify-root` in your own CSS.
 
 ```tsx
 <Markify className="my-8 max-w-none [&_a]:text-blue-600">
@@ -59,7 +59,7 @@ Each key accepts any CSS length (`"1rem"`, `"18px"`, `"1.5em"`). Keys you omit f
 
 ### Without the `spacing` prop
 
-You can also override the variables directly in your own CSS — useful for a global default:
+You can also override the variables directly in your own CSS, useful for a global default:
 
 ```css
 .markify-root {

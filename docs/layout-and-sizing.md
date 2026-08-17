@@ -1,6 +1,6 @@
 # Layout & Container Width Recommendations
 
-Markify renders complex Markdown elements—including wide data tables with export buttons, code blocks with horizontal scrollbars, and zoomable/pannable Mermaid diagrams.
+Markify renders complex Markdown elements, including wide data tables with export buttons, code blocks with horizontal scrollbars, and zoomable/pannable Mermaid diagrams.
 
 ## 1. Parent Width Recommendation
 

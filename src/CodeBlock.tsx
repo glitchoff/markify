@@ -312,7 +312,7 @@ function CodeBlockInner({ children, className, language: langProp, worker, hljsT
   const codeBg = "text-foreground/90";
   const wrapperBorder = "border-border";
   const expandCls = "border border-border text-muted-foreground hover:text-foreground hover:bg-accent shadow-sm";
-  const wrapperCls = `rounded-md overflow-hidden border shadow-lg mb-(--markify-gap) ${wrapperBorder} ${codeBlockClassName ?? ""}`
+  const wrapperCls = `rounded-md overflow-hidden border shadow-lg mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) ${wrapperBorder} ${codeBlockClassName ?? ""}`
 
   const preClass = [
     `m-0 p-4 font-mono text-[0.8rem] leading-[1.7] ${codeBg}`,

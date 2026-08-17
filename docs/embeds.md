@@ -1,6 +1,6 @@
 # Video Embeds (YouTube)
 
-Markify can turn YouTube URLs into embedded, in-page video players — no iframe boilerplate needed.
+Markify can turn YouTube URLs into embedded, in-page video players, no iframe boilerplate needed.
 
 Embedding is **opt-in**. Enable it with the `youtubeEnabled` prop:
 
@@ -66,9 +66,9 @@ While content is streaming, embeds don't mount a player on every token. Instead 
 
 ## Privacy & Performance
 
-* **Privacy-enhanced** — players load from `youtube-nocookie.com`, not `youtube.com`.
-* **Lazy loading** — iframes use `loading="lazy"` so players load only when near the viewport.
-* **Responsive** — embeds fill the container at a 16:9 aspect ratio and scale with it.
+* **Privacy-enhanced**: players load from `youtube-nocookie.com`, not `youtube.com`.
+* **Lazy loading**: iframes use `loading="lazy"` so players load only when near the viewport.
+* **Responsive**: embeds fill the container at a 16:9 aspect ratio and scale with it.
 
 ---
 

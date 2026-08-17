@@ -1,13 +1,23 @@
 import { useMemo, useState } from 'react';
 import { NavLink, useParams, Link } from 'react-router-dom';
 import {
-  Rocket,
   Palette,
-  Sparkles,
-  BookOpen,
   PanelLeftClose,
   PanelLeftOpen,
   FileText,
+  Compass,
+  Ruler,
+  Type,
+  Sigma,
+  Workflow,
+  ChessKnight,
+  Table,
+  MessageSquareQuote,
+  Image,
+  Video,
+  Activity,
+  Settings2,
+  Code2,
   ArrowLeft,
   ArrowRight,
   Menu,
@@ -23,7 +33,9 @@ import theming from '../../../docs/theming.md?raw';
 import layoutAndSizing from '../../../docs/layout-and-sizing.md?raw';
 import styling from '../../../docs/styling.md?raw';
 import diagramsAndMath from '../../../docs/diagrams-and-math.md?raw';
+import mermaid from '../../../docs/mermaid.md?raw';
 import tablesAndCallouts from '../../../docs/tables-and-callouts.md?raw';
+import calloutsAndBlockquotes from '../../../docs/callouts-and-blockquotes.md?raw';
 import images from '../../../docs/images.md?raw';
 import embeds from '../../../docs/embeds.md?raw';
 import streaming from '../../../docs/streaming.md?raw';
@@ -37,7 +49,9 @@ const DOC_CONTENT = {
   'layout-and-sizing': layoutAndSizing,
   styling,
   'diagrams-and-math': diagramsAndMath,
+  mermaid,
   'tables-and-callouts': tablesAndCallouts,
+  'callouts-and-blockquotes': calloutsAndBlockquotes,
   images,
   embeds,
   streaming,
@@ -46,42 +60,37 @@ const DOC_CONTENT = {
   'api-reference': apiReference,
 };
 
-const GROUP_ICONS = {
-  'Getting Started': Rocket,
-  Styling: Palette,
-  Features: Sparkles,
-  Reference: BookOpen,
-};
-
 const DOC_GROUPS = [
   {
     label: 'Getting Started',
-    items: [{ id: 'getting-started', title: 'Getting Started', file: 'getting-started.md' }],
+    items: [{ id: 'getting-started', title: 'Getting Started', file: 'getting-started.md', icon: Compass }],
   },
   {
     label: 'Styling',
     items: [
-      { id: 'theming', title: 'Theming & Dark Mode', file: 'theming.md' },
-      { id: 'layout-and-sizing', title: 'Layout & Sizing', file: 'layout-and-sizing.md' },
-      { id: 'styling', title: 'Styling & Spacing', file: 'styling.md' },
+      { id: 'theming', title: 'Theming & Dark Mode', file: 'theming.md', icon: Palette },
+      { id: 'layout-and-sizing', title: 'Layout & Sizing', file: 'layout-and-sizing.md', icon: Ruler },
+      { id: 'styling', title: 'Styling & Spacing', file: 'styling.md', icon: Type },
     ],
   },
   {
     label: 'Features',
     items: [
-      { id: 'diagrams-and-math', title: 'Diagrams & Math', file: 'diagrams-and-math.md' },
-      { id: 'chess', title: 'Chess (PGN)', file: 'chess.md' },
-      { id: 'tables-and-callouts', title: 'Tables & Callouts', file: 'tables-and-callouts.md' },
-      { id: 'images', title: 'Images', file: 'images.md' },
-      { id: 'embeds', title: 'Video Embeds', file: 'embeds.md' },
+      { id: 'diagrams-and-math', title: 'Math (KaTeX)', file: 'diagrams-and-math.md', icon: Sigma },
+      { id: 'mermaid', title: 'Mermaid Diagrams', file: 'mermaid.md', icon: Workflow },
+      { id: 'chess', title: 'Chess (PGN)', file: 'chess.md', icon: ChessKnight },
+      { id: 'tables-and-callouts', title: 'Tables', file: 'tables-and-callouts.md', icon: Table },
+      { id: 'callouts-and-blockquotes', title: 'Callouts & Blockquotes', file: 'callouts-and-blockquotes.md', icon: MessageSquareQuote },
+      { id: 'images', title: 'Images', file: 'images.md', icon: Image },
+      { id: 'embeds', title: 'Video Embeds', file: 'embeds.md', icon: Video },
     ],
   },
   {
     label: 'Reference',
     items: [
-      { id: 'streaming', title: 'Streaming Guide', file: 'streaming.md' },
-      { id: 'customization', title: 'Customization', file: 'customization.md' },
-      { id: 'api-reference', title: 'API Reference', file: 'api-reference.md' },
+      { id: 'streaming', title: 'Streaming Guide', file: 'streaming.md', icon: Activity },
+      { id: 'customization', title: 'Customization', file: 'customization.md', icon: Settings2 },
+      { id: 'api-reference', title: 'API Reference', file: 'api-reference.md', icon: Code2 },
     ],
   },
 ];
@@ -92,20 +101,20 @@ function SidebarNav({ collapsed, onNavigate }) {
   return (
     <nav className="flex flex-col gap-4">
       {DOC_GROUPS.map(group => {
-        const GroupIcon = GROUP_ICONS[group.label];
         return (
           <div key={group.label}>
             <div
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 ${
-                collapsed ? 'justify-center px-0' : ''
+              className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 ${
+                collapsed ? 'text-center px-0' : ''
               }`}
               title={collapsed ? group.label : undefined}
             >
-              <GroupIcon className="size-3.5 shrink-0" />
               {!collapsed && <span>{group.label}</span>}
             </div>
             <div className="flex flex-col gap-0.5">
-              {group.items.map(doc => (
+              {group.items.map(doc => {
+                const DocIcon = doc.icon || FileText;
+                return (
                 <NavLink
                   key={doc.id}
                   to={`/docs/${doc.id}`}
@@ -123,7 +132,7 @@ function SidebarNav({ collapsed, onNavigate }) {
                 >
                   {({ isActive }) => (
                     <>
-                      <FileText className="size-4 shrink-0" />
+                      <DocIcon className="size-4 shrink-0" />
                       {!collapsed && <span className="flex-1 truncate">{doc.title}</span>}
                       {!collapsed && isActive && (
                         <span className="h-1.5 w-1.5 rounded-full bg-current shrink-0" />
@@ -131,7 +140,8 @@ function SidebarNav({ collapsed, onNavigate }) {
                     </>
                   )}
                 </NavLink>
-              ))}
+                );
+              })}
             </div>
           </div>
         );
@@ -200,7 +210,7 @@ export function Docs({ isDark }) {
           type="button"
         >
           <div className="flex items-center gap-2 truncate">
-            <FileText className="size-4 shrink-0 text-muted-foreground" />
+            {(() => { const DocIcon = selectedDoc.icon || FileText; return <DocIcon className="size-4 shrink-0 text-muted-foreground" />; })()}
             <span className="truncate">{selectedDoc.file}</span>
           </div>
           <span className="inline-flex items-center gap-1 text-muted-foreground">
@@ -215,14 +225,14 @@ export function Docs({ isDark }) {
         )}
       </div>
 
-      {/* Left sidebar (desktop) — fixed position */}
+      {/* Left sidebar (desktop): fixed position */}
       <aside className="hidden md:block">
         <SidebarCard collapsed={collapsed} setCollapsed={setCollapsed}>
           <SidebarNav collapsed={collapsed} />
         </SidebarCard>
       </aside>
 
-      {/* Centered content — fills remaining space, only this scrolls */}
+      {/* Centered content: fills remaining space, only this scrolls */}
       <div className="min-w-0 flex-1 md:pt-0 pt-24 overflow-hidden" style={{ paddingLeft: collapsed ? '4.5rem' : '17rem' }}>
         <div className="mx-auto h-full w-[80%] max-w-5xl overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
           <div className="mb-4 hidden md:flex items-center justify-between text-xs text-muted-foreground border-b border-border pb-3">

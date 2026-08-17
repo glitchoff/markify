@@ -13,7 +13,7 @@ and shipped alongside Markify. Their license texts are reproduced below.
 
 ---
 
-## chess.js — BSD-2-Clause
+## chess.js: BSD-2-Clause
 
 ```
 Copyright (c) 2025, Jeff Hlywa (jhlywa@gmail.com)
@@ -43,7 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-## react-chessboard — MIT
+## react-chessboard: MIT
 
 ```
 MIT License
@@ -71,7 +71,7 @@ SOFTWARE.
 
 ---
 
-## @dnd-kit/core — MIT
+## @dnd-kit/core: MIT
 
 ```
 MIT License
@@ -99,7 +99,7 @@ SOFTWARE.
 
 ---
 
-## @dnd-kit/modifiers — MIT
+## @dnd-kit/modifiers: MIT
 
 ```
 MIT License
@@ -127,7 +127,7 @@ SOFTWARE.
 
 ---
 
-## chessboard.js — MIT
+## chessboard.js: MIT
 
 ```
 The MIT License (MIT)

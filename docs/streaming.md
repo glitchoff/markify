@@ -51,9 +51,9 @@ function StreamingText({ content, isStreaming }) {
 
 ## 4. Performance Notes
 
-- **Static blocks are memoized** — non-streaming blocks are wrapped in `React.memo` and keyed by content hash, so unchanged blocks are not re-rendered on every token.
-- **Block splitting** — streaming content is split into logical blocks (paragraphs, code fences, math) so only the *last* active block re-renders per tick.
-- **Web Worker highlighting (optional)** — pass `codeBlockWorker` to offload syntax highlighting to a Worker and keep the UI thread responsive during heavy streams:
+- **Static blocks are memoized**: non-streaming blocks are wrapped in `React.memo` and keyed by content hash, so unchanged blocks are not re-rendered on every token.
+- **Block splitting**: streaming content is split into logical blocks (paragraphs, code fences, math) so only the *last* active block re-renders per tick.
+- **Web Worker highlighting (optional)**: pass `codeBlockWorker` to offload syntax highlighting to a Worker and keep the UI thread responsive during heavy streams:
 
 ```tsx
 <Markify isStreaming codeBlockWorker>

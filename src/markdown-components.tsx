@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { Copy, Check, Download, Play } from "lucide-react";
+import { PencilSimple, Flame, Warning, Info, CheckCircle, Question, ListChecks, CheckSquare, XCircle, WarningDiamond, Bug, Flask, Quotes } from "@phosphor-icons/react";
 import { cn } from "./utils";
 import { getText, stripCalloutMarker } from "./callout";
 import { remarkFixKaTeXUnicode } from "./fix-katex-unicode";
@@ -30,7 +31,7 @@ const LazyMermaidBlock = lazy(() =>
 
 function ChessFallback() {
   return (
-    <div className="mb-(--markify-gap) flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+    <div className="mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
       <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
       Loading chess viewer…
     </div>
@@ -39,7 +40,7 @@ function ChessFallback() {
 
 function MermaidFallback() {
   return (
-    <div className="mb-(--markify-gap) flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+    <div className="mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
       <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
       Loading mermaid diagram…
     </div>
@@ -130,12 +131,12 @@ function downloadTable(table: HTMLTableElement, format: "csv" | "tsv" | "md") {
 
 function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; children?: React.ReactNode }) {
   const styles: Record<number, string> = {
-    1: "text-3xl font-bold mt-[calc(var(--markify-gap-lg)_*_1.15)] mb-(--markify-gap) pb-2 border-b border-border",
-    2: "text-2xl font-semibold mt-[calc(var(--markify-gap-lg)_*_0.85)] mb-(--markify-gap) pb-1.5 border-b border-border",
-    3: "text-xl font-medium mt-[calc(var(--markify-gap-lg)_*_0.72)] mb-(--markify-gap) pb-1 border-b border-border",
-    4: "text-lg font-medium mt-[calc(var(--markify-gap-lg)_*_0.6)] mb-(--markify-gap) pb-1 border-b border-border",
-    5: "text-base font-medium mt-[calc(var(--markify-gap-lg)_*_0.5)] mb-(--markify-gap) pb-1 border-b border-border",
-    6: "text-sm font-medium mt-[calc(var(--markify-gap-lg)_*_0.45)] mb-(--markify-gap) pb-1 border-b border-border",
+    1: "text-[2rem] font-bold mt-[calc(var(--markify-gap-lg)_*_1.15)] mb-(--markify-gap)",
+    2: "text-2xl font-semibold mt-[calc(var(--markify-gap-lg)_*_0.85)] mb-(--markify-gap)",
+    3: "text-xl font-medium mt-[calc(var(--markify-gap-lg)_*_0.72)] mb-(--markify-gap)",
+    4: "text-lg font-medium mt-[calc(var(--markify-gap-lg)_*_0.6)] mb-(--markify-gap)",
+    5: "text-base font-medium mt-[calc(var(--markify-gap-lg)_*_0.5)] mb-(--markify-gap)",
+    6: "text-sm font-medium mt-[calc(var(--markify-gap-lg)_*_0.45)] mb-(--markify-gap)",
   };
   const Tag = `h${level}` as React.ElementType;
   return (
@@ -276,17 +277,87 @@ function Blockquote({ children, ...props }: { children?: React.ReactNode; [key: 
   if (type) {
     const styles = {
       NOTE: "border-l-blue-500 bg-blue-500/5",
-      WARNING: "border-l-amber-500 bg-amber-500/5",
       TIP: "border-l-emerald-500 bg-emerald-500/5",
+      HINT: "border-l-emerald-500 bg-emerald-500/5",
+      IMPORTANT: "border-l-violet-500 bg-violet-500/5",
+      WARNING: "border-l-amber-500 bg-amber-500/5",
+      CAUTION: "border-l-orange-500 bg-orange-500/5",
+      ATTENTION: "border-l-amber-500 bg-amber-500/5",
+      INFO: "border-l-sky-500 bg-sky-500/5",
+      SUCCESS: "border-l-green-500 bg-green-500/5",
+      QUESTION: "border-l-indigo-500 bg-indigo-500/5",
+      ABSTRACT: "border-l-slate-500 bg-slate-500/5",
+      TODO: "border-l-teal-500 bg-teal-500/5",
+      FAILURE: "border-l-red-500 bg-red-500/5",
+      DANGER: "border-l-rose-500 bg-rose-500/5",
+      BUG: "border-l-red-500 bg-red-500/5",
+      EXAMPLE: "border-l-purple-500 bg-purple-500/5",
+      QUOTE: "border-l-slate-500 bg-slate-500/5",
+    };
+    const iconColors = {
+      NOTE: "text-blue-500",
+      TIP: "text-emerald-500",
+      HINT: "text-emerald-500",
+      IMPORTANT: "text-violet-500",
+      WARNING: "text-amber-500",
+      CAUTION: "text-orange-500",
+      ATTENTION: "text-amber-500",
+      INFO: "text-sky-500",
+      SUCCESS: "text-green-500",
+      QUESTION: "text-indigo-500",
+      ABSTRACT: "text-slate-500",
+      TODO: "text-teal-500",
+      FAILURE: "text-red-500",
+      DANGER: "text-rose-500",
+      BUG: "text-red-500",
+      EXAMPLE: "text-purple-500",
+      QUOTE: "text-slate-500",
     };
     const titles = {
       NOTE: "Note",
-      WARNING: "Warning",
       TIP: "Tip",
+      HINT: "Hint",
+      IMPORTANT: "Important",
+      WARNING: "Warning",
+      CAUTION: "Caution",
+      ATTENTION: "Attention",
+      INFO: "Info",
+      SUCCESS: "Success",
+      QUESTION: "Question",
+      ABSTRACT: "Abstract",
+      TODO: "Todo",
+      FAILURE: "Failure",
+      DANGER: "Danger",
+      BUG: "Bug",
+      EXAMPLE: "Example",
+      QUOTE: "Quote",
     };
+    const icons = {
+      NOTE: PencilSimple,
+      TIP: Flame,
+      HINT: Flame,
+      IMPORTANT: Flame,
+      WARNING: Warning,
+      CAUTION: Warning,
+      ATTENTION: Warning,
+      INFO: Info,
+      SUCCESS: CheckCircle,
+      QUESTION: Question,
+      ABSTRACT: ListChecks,
+      TODO: CheckSquare,
+      FAILURE: XCircle,
+      DANGER: WarningDiamond,
+      BUG: Bug,
+      EXAMPLE: Flask,
+      QUOTE: Quotes,
+    };
+    const Icon = icons[type];
     return (
-      <div className={cn("mb-(--markify-gap) rounded-lg border-l-4 p-4", styles[type])} {...props}>
-        <strong className="mb-1 block font-semibold text-foreground">{titles[type]}</strong>
+      <div className={cn("mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) rounded-lg border-l-4 p-4", styles[type])} {...props}>
+        <strong className={cn("mb-1 flex items-center gap-2 font-bold", iconColors[type])}>
+          <Icon size={16} weight="duotone" aria-hidden />
+          {titles[type]}
+        </strong>
         {stripped}
       </div>
     );
@@ -294,7 +365,7 @@ function Blockquote({ children, ...props }: { children?: React.ReactNode; [key: 
 
   return (
     <blockquote
-      className="mb-(--markify-gap) border-l-4 border-muted-foreground/30 pl-4 text-muted-foreground italic"
+      className="mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) border-l-4 border-muted-foreground/30 pl-4 text-muted-foreground italic"
       {...props}
     >
       {children}
@@ -330,7 +401,7 @@ function Table({ children, ...props }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="group relative mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card"
+      className="group relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
@@ -447,7 +518,7 @@ function List({ children, ordered, ...props }: { children?: React.ReactNode; ord
   return (
     <Tag
       className={cn(
-        "mb-(--markify-gap) ml-6",
+        "mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) ml-6",
         ordered ? "list-decimal" : "list-disc",
       )}
       {...props}
@@ -466,7 +537,7 @@ function ListItem({ children, ...props }: { children: React.ReactNode }) {
 }
 
 function Hr() {
-  return <hr className="mb-(--markify-gap) border-border" />;
+  return <hr className="mt-(--markify-gap) mb-(--markify-gap) border-border" />;
 }
 
 function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, mermaidConfig, chessEnabled = false, isStreaming = false, renderers, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; mermaidConfig?: MarkifyMermaidConfig; chessEnabled?: boolean; isStreaming?: boolean; renderers?: Renderers; children?: React.ReactNode; className?: string }) {

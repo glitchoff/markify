@@ -25,10 +25,10 @@ Alt text is preserved for accessibility and used when the image cannot be displa
 Add a title after the image URL to provide additional context.
 
 ```markdown
-![This is the markdown library I want](https://media.giphy.com/media/L3ERvA6jWCd0qO4NdX/giphy.gif "This is the markdown library I want — it GIF points at you")
+![This is the markdown library I want](https://media.giphy.com/media/L3ERvA6jWCd0qO4NdX/giphy.gif "This is the markdown library I want: it GIF points at you")
 ```
 
-![This is the markdown library I want](https://media.giphy.com/media/L3ERvA6jWCd0qO4NdX/giphy.gif "This is the markdown library I want — it GIF points at you")
+![This is the markdown library I want](https://media.giphy.com/media/L3ERvA6jWCd0qO4NdX/giphy.gif "This is the markdown library I want: it GIF points at you")
 
 The title is passed to the underlying `<img>` element and appears as a native browser tooltip when hovering over the image.
 
@@ -124,11 +124,11 @@ Clickable images are useful for thumbnails, previews, banners, screenshots, and 
 
 Markify uses browser-native features to keep image rendering lightweight.
 
-* **Lazy loading** — images use `loading="lazy"`.
-* **Async decoding** — images use `decoding="async"`.
-* **Responsive sizing** — images stay within their container.
-* **Animated media** — GIFs work through the same Markdown image syntax.
-* **Nested rendering** — images work inside lists, callouts, and links.
+* **Lazy loading**: images use `loading="lazy"`.
+* **Async decoding**: images use `decoding="async"`.
+* **Responsive sizing**: images stay within their container.
+* **Animated media**: GIFs work through the same Markdown image syntax.
+* **Nested rendering**: images work inside lists, callouts, and links.
 
 ---
 
@@ -163,4 +163,4 @@ export const components = createMarkdownComponents({
 });
 ```
 
-The renderer receives the standard Markdown image properties — `src`, `alt`, and `title` — so you can completely control how images are rendered in your application.
+The renderer receives the standard Markdown image properties, `src`, `alt`, and `title`, so you can completely control how images are rendered in your application.

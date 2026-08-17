@@ -117,9 +117,9 @@ export function GameViewer() {
 
 | Prop            | Type      | Default | Description                               |
 | --------------- | --------- | ------- | ----------------------------------------- |
-| `pgn`           | `string`  | —       | The PGN source to render.                 |
+| `pgn`           | `string`  | -       | The PGN source to render.                 |
 | `showNotation`  | `boolean` | `true`  | Show square coordinates on the board.     |
-| `className`     | `string`  | —       | Additional classes for the container.     |
+| `className`     | `string`  | -       | Additional classes for the container.     |
 | `isStreaming`   | `boolean` | `false` | While `true`, shows a loading placeholder until the full PGN arrives. |
 
 ### FenBoard (FEN)
@@ -141,11 +141,11 @@ export function PositionViewer() {
 
 | Prop            | Type      | Default | Description                                          |
 | --------------- | --------- | ------- | ---------------------------------------------------- |
-| `fen`           | `string`  | —       | The FEN string to render.                            |
+| `fen`           | `string`  | -       | The FEN string to render.                            |
 | `showNotation`  | `boolean` | `true`  | Show square coordinates on the board.                |
 | `maxWidth`      | `number`  | `420`   | Max board width in px. The card shrinks to fit.      |
 | `isStreaming`   | `boolean` | `false` | While `true`, renders progressively as FEN streams.  |
-| `className`     | `string`  | —       | Additional classes for the container.                |
+| `className`     | `string`  | -       | Additional classes for the container.                |
 
 Both components are available from the `@glitchoff/markify/chess` entry point.
 
@@ -160,4 +160,4 @@ can import on demand.
 ## 5. Notes
 
 - Invalid PGN renders a friendly error with the raw source instead of crashing.
-- During streaming, PGN blocks wait for the full game before rendering (incomplete PGN is ambiguous). FEN blocks render **progressively** — pieces appear on the board as they stream in.
+- During streaming, PGN blocks wait for the full game before rendering (incomplete PGN is ambiguous). FEN blocks render **progressively**: pieces appear on the board as they stream in.

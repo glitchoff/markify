@@ -1,29 +1,34 @@
+export type CalloutType =
+  | "NOTE"
+  | "TIP"
+  | "HINT"
+  | "IMPORTANT"
+  | "WARNING"
+  | "CAUTION"
+  | "ATTENTION"
+  | "INFO"
+  | "SUCCESS"
+  | "QUESTION"
+  | "ABSTRACT"
+  | "TODO"
+  | "FAILURE"
+  | "DANGER"
+  | "BUG"
+  | "EXAMPLE"
+  | "QUOTE";
+
 export interface CalloutResult {
-  type: "NOTE" | "WARNING" | "TIP" | null;
+  type: CalloutType | null;
   content: string;
 }
 
 export function parseCallout(text: string): CalloutResult {
   const trimmed = text.trim();
-  const noteMatch = trimmed.match(/^>?\s*\[!NOTE\]/i);
-  if (noteMatch) {
+  const match = CALLOUT_PREFIX.exec(trimmed);
+  if (match) {
     return {
-      type: "NOTE",
-      content: trimmed.slice(noteMatch[0].length).trim(),
-    };
-  }
-  const warningMatch = trimmed.match(/^>?\s*\[!WARNING\]/i);
-  if (warningMatch) {
-    return {
-      type: "WARNING",
-      content: trimmed.slice(warningMatch[0].length).trim(),
-    };
-  }
-  const tipMatch = trimmed.match(/^>?\s*\[!TIP\]/i);
-  if (tipMatch) {
-    return {
-      type: "TIP",
-      content: trimmed.slice(tipMatch[0].length).trim(),
+      type: match[1].toUpperCase() as CalloutType,
+      content: trimmed.slice(match[0].length).trim(),
     };
   }
   return { type: null, content: text };
@@ -37,18 +42,19 @@ export function getText(node: any): string {
   return "";
 }
 
-const CALLOUT_PREFIX = /^>?\s*\[!(NOTE|WARNING|TIP)\]\s*/i;
+const CALLOUT_PREFIX =
+  /^>?\s*\[!(NOTE|TIP|HINT|IMPORTANT|WARNING|CAUTION|ATTENTION|INFO|SUCCESS|QUESTION|ABSTRACT|TODO|FAILURE|DANGER|BUG|EXAMPLE|QUOTE)\]\s*/i;
 
 /**
  * Removes a leading `> [!TYPE]` marker from a ReactNode tree while preserving
  * all rendered children (elements like images are kept intact, unlike getText).
  * Returns the type name and the remaining nodes.
  */
-export function stripCalloutMarker(node: any): { type: "NOTE" | "WARNING" | "TIP" | null; children: any } {
+export function stripCalloutMarker(node: any): { type: CalloutType | null; children: any } {
   if (typeof node === "string") {
     const match = CALLOUT_PREFIX.exec(node);
     if (match) {
-      return { type: match[1].toUpperCase() as any, children: node.slice(match[0].length) || "" };
+      return { type: match[1].toUpperCase() as CalloutType, children: node.slice(match[0].length) || "" };
     }
     return { type: null, children: node };
   }

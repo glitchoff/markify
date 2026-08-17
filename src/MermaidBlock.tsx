@@ -337,7 +337,7 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
     <div
       ref={containerRef}
       className={cn(
-        "relative mb-(--markify-gap) overflow-hidden flex flex-col",
+        "relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden flex flex-col",
         showBackground && "rounded-lg border border-border bg-card",
         fullscreen && "fixed inset-0 z-50 m-0 rounded-none h-screen w-screen",
         className,
@@ -431,7 +431,7 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
         )}
       </div>
 
-      {/* Zoom controls panel — always visible when svg exists */}
+      {/* Zoom controls panel: always visible when svg exists */}
       {svg && (
         <div className={cn(
           "absolute z-10 flex flex-col gap-1 rounded-md border border-border bg-background/80 p-1 supports-[backdrop-filter]:bg-background/70 supports-[backdrop-filter]:backdrop-blur-sm shadow-sm",

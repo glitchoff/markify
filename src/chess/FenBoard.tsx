@@ -22,7 +22,7 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
 
   const parsed = useMemo(() => parseFen(fen, isStreaming), [fen, isStreaming]);
 
-  // Live, playable game state — initialized from the parsed FEN, updated as
+  // Live, playable game state, initialized from the parsed FEN, updated as
   // the user drags pieces. Reset restores the original position.
   const [game, setGame] = useState<Chess | null>(null);
 
@@ -55,7 +55,7 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
     try {
       ng.move({ from: selected, to: square, promotion: "q" });
     } catch {
-      // Illegal — if clicking another own piece, reselect; else deselect.
+      // Illegal: if clicking another own piece, reselect; else deselect.
       if (piece) setSelected(square);
       else setSelected(null);
       return;
@@ -103,7 +103,7 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
   const liveLabel = useMemo(() => {
     if (!game) return parsed.streaming ? "" : parsed.label;
     const turn = game.turn() === "w" ? "White" : "Black";
-    if (game.isCheckmate()) return `Checkmate — ${game.turn() === "w" ? "Black" : "White"} wins`;
+    if (game.isCheckmate()) return `Checkmate: ${game.turn() === "w" ? "Black" : "White"} wins`;
     if (game.isStalemate()) return "Stalemate";
     if (game.isThreefoldRepetition()) return "Draw (repetition)";
     if (game.isInsufficientMaterial()) return "Draw (insufficient material)";
@@ -133,7 +133,7 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
   }, [fen]);
 
   return (
-    <div className={cn("relative mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col w-full min-w-0", className)} style={{ maxWidth }}>
+    <div className={cn("relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col w-full min-w-0", className)} style={{ maxWidth }}>
       {/* Header */}
       <div className="flex items-center justify-between gap-1.5 border-b border-border bg-muted px-2.5 py-1.5 sm:px-3">
         <span className="font-mono text-xs font-medium text-muted-foreground">fen</span>
@@ -243,7 +243,7 @@ function parseFen(fen: string, isStreaming: boolean): { fen: string; label: stri
     g.load(trimmed);
     const turn = g.turn() === "w" ? "White" : "Black";
     const label = g.isGameOver()
-      ? (g.isCheckmate() ? `Checkmate — ${g.turn() === "w" ? "Black" : "White"} wins` : "Game over")
+      ? (g.isCheckmate() ? `Checkmate: ${g.turn() === "w" ? "Black" : "White"} wins` : "Game over")
       : g.inCheck()
         ? `${turn} is in check`
         : `${turn} to move`;
