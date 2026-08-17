@@ -132,6 +132,9 @@
   .markify-root .pointer-events-none {
     pointer-events: none;
   }
+  .markify-root .visible {
+    visibility: visible;
+  }
   .markify-root .absolute {
     position: absolute;
   }
@@ -468,6 +471,9 @@
   }
   .markify-root .w-14 {
     width: calc(var(--spacing) * 14);
+  }
+  .markify-root .w-48 {
+    width: calc(var(--spacing) * 48);
   }
   .markify-root .w-64 {
     width: calc(var(--spacing) * 64);
@@ -1066,6 +1072,9 @@
   }
   .markify-root .text-right {
     text-align: right;
+  }
+  .markify-root .align-middle {
+    vertical-align: middle;
   }
   .markify-root .font-mono {
     font-family: var(--font-mono);

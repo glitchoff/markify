@@ -7,7 +7,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { Copy, Check, Download } from "lucide-react";
 import { cn } from "./utils";
-import { parseCallout, getText } from "./callout";
+import { getText, stripCalloutMarker } from "./callout";
 import { remarkFixKaTeXUnicode } from "./fix-katex-unicode";
 import { CodeBlock } from "./CodeBlock";
 import type { Components } from "react-markdown";
@@ -156,7 +156,8 @@ function hasElements(node: React.ReactNode): boolean {
 function Paragraph({ children }: { children?: React.ReactNode }) {
   const content = children ? getText(children).trim() : "";
   if (!content && !hasElements(children)) return null;
-  return <p className="mb-3 last:mb-0 leading-relaxed text-base text-foreground/90 whitespace-pre-wrap">{children}</p>;
+  const onlyImage = hasElements(children) && !content;
+  return <p className={cn("mb-3 last:mb-0 leading-relaxed text-base text-foreground/90 whitespace-pre-wrap", onlyImage && "text-center")}>{children}</p>;
 }
 
 function Link({ href, children, ...props }: { href?: string; children: React.ReactNode }) {
@@ -193,15 +194,14 @@ function Image({ src, alt, ...props }: { src?: string; alt?: string }) {
       src={src}
       alt={alt || ""}
       loading="lazy"
-      className="max-w-full h-auto rounded-lg shadow-md mx-auto mb-3"
+      className="inline-block max-w-full h-auto rounded-lg shadow-md align-middle"
       {...props}
     />
   );
 }
 
-function Blockquote({ children, ...props }: { children: React.ReactNode }) {
-  const text = getText(children);
-  const { type, content } = parseCallout(text);
+function Blockquote({ children, ...props }: { children?: React.ReactNode; [key: string]: any }) {
+  const { type, children: stripped } = stripCalloutMarker(children);
 
   if (type) {
     const styles = {
@@ -217,9 +217,7 @@ function Blockquote({ children, ...props }: { children: React.ReactNode }) {
     return (
       <div className={cn("mb-3 rounded-lg border-l-4 p-4", styles[type])} {...props}>
         <strong className="mb-1 block font-semibold text-foreground">{titles[type]}</strong>
-        <ReactMarkdown remarkPlugins={baseRemarkPlugins} rehypePlugins={baseRehypePlugins}>
-          {content}
-        </ReactMarkdown>
+        {stripped}
       </div>
     );
   }
@@ -410,7 +408,7 @@ function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThe
     if (renderers?.mermaid) return <>{renderers.mermaid({ code: codeText, isStreaming })}</>;
     const resolvedConfig = mermaidConfig?.theme
       ? mermaidConfig
-      : { ...mermaidConfig, theme: hljsTheme === "dark" ? "dark" : "default" };
+      : { ...mermaidConfig, theme: hljsTheme === "dark" ? ("dark" as const) : ("default" as const) };
     return (
       <Suspense fallback={<MermaidFallback />}>
         <LazyMermaidBlock code={codeText} config={resolvedConfig} />
@@ -496,7 +494,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
   const chessEnabled = opts?.chessEnabled ?? false;
   const isStreaming = opts?.isStreaming ?? false;
   const renderers = opts?.renderers;
-  return {
+  const components: Components = {
     style: () => null as any,
     script: () => null as any,
     h1: memo(({ children, ...props }) => <Heading level={1} {...props}>{children}</Heading>),
@@ -522,6 +520,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     li: ListItem as any,
     hr: Hr as any,
   };
+  return components;
 }
 
 export { Image as ImageComponent };

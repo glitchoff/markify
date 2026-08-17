@@ -6,7 +6,7 @@ export type { Components } from "react-markdown";
 
 export { useStreamingReveal } from "./streaming";
 export { remarkFixKaTeXUnicode } from "./fix-katex-unicode";
-export { parseCallout, getText } from "./callout";
+export { parseCallout, getText, stripCalloutMarker } from "./callout";
 export { cn, injectHljsTheme } from "./utils";
 
 export { TableOptionsContext, useTableOptions } from "./markdown-components";

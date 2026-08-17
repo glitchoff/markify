@@ -23,6 +23,7 @@ import theming from '../../../docs/theming.md?raw';
 import layoutAndSizing from '../../../docs/layout-and-sizing.md?raw';
 import diagramsAndMath from '../../../docs/diagrams-and-math.md?raw';
 import tablesAndCallouts from '../../../docs/tables-and-callouts.md?raw';
+import images from '../../../docs/images.md?raw';
 import streaming from '../../../docs/streaming.md?raw';
 import chess from '../../../docs/chess.md?raw';
 import customization from '../../../docs/customization.md?raw';
@@ -34,6 +35,7 @@ const DOC_CONTENT = {
   'layout-and-sizing': layoutAndSizing,
   'diagrams-and-math': diagramsAndMath,
   'tables-and-callouts': tablesAndCallouts,
+  images,
   streaming,
   chess,
   customization,
@@ -65,6 +67,7 @@ const DOC_GROUPS = [
       { id: 'diagrams-and-math', title: 'Diagrams & Math', file: 'diagrams-and-math.md' },
       { id: 'chess', title: 'Chess (PGN)', file: 'chess.md' },
       { id: 'tables-and-callouts', title: 'Tables & Callouts', file: 'tables-and-callouts.md' },
+      { id: 'images', title: 'Images', file: 'images.md' },
     ],
   },
   {
