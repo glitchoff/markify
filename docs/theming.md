@@ -39,6 +39,9 @@ import "@glitchoff/markify/themes/core.css";
 
 Markify's CSS is scoped under `.markify-root` and fully **unlayered** — import order doesn't matter and it can't break your app's cascade.
 
+> [!NOTE]
+> **Standard setup (copy-paste):** for a shadcn/Tailwind v4 app, pair `core.css` with a `@theme inline` block mapping `--color-*` → your tokens and light/dark token blocks — see [Getting Started → Standard Setup](/docs/getting-started). `themeType` defaults to `"shadcn"` and matches automatically.
+
 ## 4. Dark mode & code highlighting
 
 - **Dark mode:** your app's normal toggle (`.dark`, `[data-bs-theme="dark"]`, etc.). Markify follows automatically.
