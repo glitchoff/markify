@@ -10,7 +10,8 @@ export { parseCallout, getText, stripCalloutMarker } from "./callout";
 export { cn, injectHljsTheme } from "./utils";
 
 export { TableOptionsContext, useTableOptions } from "./markdown-components";
-export type { TableOptions, Renderers, BlockRendererArgs, CodeRendererProps } from "./markdown-components";
+export type { TableOptions, Renderers, BlockRendererArgs, CodeRendererProps, YouTubeVideo } from "./markdown-components";
+export { parseYouTubeId } from "./markdown-components";
 
 // Mermaid types
 export type { MarkifyMermaidConfig, MermaidBlockProps } from "./MermaidBlock";

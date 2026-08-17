@@ -189,7 +189,7 @@ function ChessGameInner({ pgn, className, showNotation = true, isStreaming = fal
         : `${sideToMove === "w" ? "White" : "Black"} to move`);
 
   return (
-    <div className={cn("relative mb-3 overflow-hidden rounded-lg border border-border bg-card flex flex-col", className)}>
+    <div className={cn("relative mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col", className)}>
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted px-3 py-2 sm:px-4">
         <div className="flex min-w-0 items-center gap-2">

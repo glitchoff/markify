@@ -25,6 +25,7 @@ export interface MarkifyProps {
   codeFontFamily?: string;
   mermaidConfig?: MarkifyMermaidConfig;
   chessEnabled?: boolean;
+  youtubeEnabled?: boolean;
   renderers?: Renderers;
   components?: Partial<Components>;
   /** Languages to preload on mount. Defaults to 20 common languages. Pass "all" to preload every supported language, or an array of language names. Pass an empty array to disable preloading. */
@@ -62,7 +63,7 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, renderers, components: overrides, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, youtubeEnabled = false, renderers, components: overrides, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
 
   useEffect(() => {
@@ -79,8 +80,8 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
   }), [tableOpts]);
 
   const components = useMemo(
-    () => ({ ...createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, isStreaming, renderers }), ...overrides }),
-    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, isStreaming, renderers, overrides],
+    () => ({ ...createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, youtubeEnabled, isStreaming, renderers }), ...overrides }),
+    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, youtubeEnabled, isStreaming, renderers, overrides],
   );
 
   const blocks = useMemo(() => parseBlocks(content), [content]);

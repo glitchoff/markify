@@ -133,7 +133,7 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
   }, [fen]);
 
   return (
-    <div className={cn("relative mb-3 overflow-hidden rounded-lg border border-border bg-card flex flex-col w-full min-w-0", className)} style={{ maxWidth }}>
+    <div className={cn("relative mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card flex flex-col w-full min-w-0", className)} style={{ maxWidth }}>
       {/* Header */}
       <div className="flex items-center justify-between gap-1.5 border-b border-border bg-muted px-2.5 py-1.5 sm:px-3">
         <span className="font-mono text-xs font-medium text-muted-foreground">fen</span>

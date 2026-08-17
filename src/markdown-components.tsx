@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import { Copy, Check, Download } from "lucide-react";
+import { Copy, Check, Download, Play } from "lucide-react";
 import { cn } from "./utils";
 import { getText, stripCalloutMarker } from "./callout";
 import { remarkFixKaTeXUnicode } from "./fix-katex-unicode";
@@ -130,12 +130,12 @@ function downloadTable(table: HTMLTableElement, format: "csv" | "tsv" | "md") {
 
 function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; children?: React.ReactNode }) {
   const styles: Record<number, string> = {
-    1: "text-3xl font-bold mt-8 mb-3 pb-2 border-b border-border",
-    2: "text-2xl font-semibold mt-7 mb-3 pb-1.5 border-b border-border",
-    3: "text-xl font-medium mt-6 mb-3 pb-1 border-b border-border",
-    4: "text-lg font-medium mt-5 mb-3 pb-1 border-b border-border",
-    5: "text-base font-medium mt-4 mb-3 pb-1 border-b border-border",
-    6: "text-sm font-medium mt-3 mb-3 pb-1 border-b border-border",
+    1: "text-3xl font-bold mt-8 mb-(--markify-gap) pb-2 border-b border-border",
+    2: "text-2xl font-semibold mt-7 mb-(--markify-gap) pb-1.5 border-b border-border",
+    3: "text-xl font-medium mt-6 mb-(--markify-gap) pb-1 border-b border-border",
+    4: "text-lg font-medium mt-5 mb-(--markify-gap) pb-1 border-b border-border",
+    5: "text-base font-medium mt-4 mb-(--markify-gap) pb-1 border-b border-border",
+    6: "text-sm font-medium mt-3 mb-(--markify-gap) pb-1 border-b border-border",
   };
   const Tag = `h${level}` as React.ElementType;
   return (
@@ -188,7 +188,77 @@ function InlineCode({ children, className, ...props }: { children: React.ReactNo
   );
 }
 
-function Image({ src, alt, ...props }: { src?: string; alt?: string }) {
+export interface YouTubeVideo {
+  id: string;
+  start?: number;
+}
+
+export function parseYouTubeId(src: string): YouTubeVideo | null {
+  if (!src) return null;
+  let url: URL;
+  try {
+    url = new URL(src);
+  } catch {
+    return null;
+  }
+  const host = url.hostname.replace(/^www\./, "").replace(/^m\./, "");
+  if (!/^(youtube\.com|youtu\.be|youtube-nocookie\.com)$/.test(host)) return null;
+
+  const path = url.pathname;
+  let id: string | null = null;
+  if (host === "youtu.be") {
+    id = path.replace(/^\//, "").split("/")[0];
+  } else if (path.startsWith("/shorts/") || path.startsWith("/embed/") || path.startsWith("/live/")) {
+    id = path.split("/")[2];
+  } else if (path.startsWith("/watch")) {
+    id = url.searchParams.get("v");
+  }
+  if (!id) return null;
+
+  const raw = url.searchParams.get("start") ?? url.searchParams.get("t");
+  let start: number | undefined;
+  if (raw) {
+    const seconds = parseInt(raw.replace(/[^\d]/g, ""), 10);
+    if (!Number.isNaN(seconds) && seconds > 0) start = seconds;
+  }
+  return { id, start };
+}
+
+function YouTubeEmbed({ src, video, streaming }: { src: string; video: YouTubeVideo; streaming?: boolean }) {
+  if (streaming) {
+    return (
+      <a
+        href={src}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <Play className="size-3.5" />
+        Watch on YouTube
+      </a>
+    );
+  }
+  const query = video.start ? `?start=${video.start}` : "";
+  return (
+    <div className="relative my-2 aspect-video w-full overflow-hidden rounded-lg border border-border">
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${video.id}${query}`}
+        title="YouTube video player"
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        referrerPolicy="strict-origin-when-cross-origin"
+        className="absolute inset-0 h-full w-full border-0"
+      />
+    </div>
+  );
+}
+
+function Image({ src, alt, youtubeEnabled, isStreaming, ...props }: { src?: string; alt?: string; youtubeEnabled?: boolean; isStreaming?: boolean }) {
+  const video = youtubeEnabled && src ? parseYouTubeId(src) : null;
+  if (video) {
+    return <YouTubeEmbed src={src!} video={video} streaming={isStreaming} />;
+  }
   return (
     <img
       src={src}
@@ -260,7 +330,7 @@ function Table({ children, ...props }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="group relative mb-3 overflow-hidden rounded-lg border border-border bg-card"
+      className="group relative mb-(--markify-gap) overflow-hidden rounded-lg border border-border bg-card"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
@@ -478,6 +548,7 @@ export interface MarkdownComponentOptions {
   codeFontFamily?: string;
   mermaidConfig?: MarkifyMermaidConfig;
   chessEnabled?: boolean;
+  youtubeEnabled?: boolean;
   isStreaming?: boolean;
   renderers?: Renderers;
 }
@@ -492,6 +563,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
   const codeFontFamily = opts?.codeFontFamily;
   const mermaidConfig = opts?.mermaidConfig;
   const chessEnabled = opts?.chessEnabled ?? false;
+  const youtubeEnabled = opts?.youtubeEnabled ?? false;
   const isStreaming = opts?.isStreaming ?? false;
   const renderers = opts?.renderers;
   const components: Components = {
@@ -506,7 +578,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     p: Paragraph,
     a: Link as any,
     code: InlineCode as any,
-    img: Image as any,
+    img: (props) => <Image {...props} youtubeEnabled={youtubeEnabled} isStreaming={isStreaming} />,
     blockquote: Blockquote as any,
     table: Table as any,
     thead: THead as any,

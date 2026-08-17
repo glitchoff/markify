@@ -17,6 +17,7 @@ import { Markify } from "@glitchoff/markify";
 - **Mermaid diagrams** — zoom/pan, download (SVG/PNG/MMD), fullscreen
 - **Tables** — shadcn-styled with copy-as-markdown + download CSV/TSV/MD
 - **Callouts** — `> [!NOTE/WARNING/TIP]` blockquotes
+- **Video embeds** — opt-in YouTube embedding from plain links or image syntax (`youtubeEnabled`)
 - **Theming** — 100% shadcn CSS variable tokens + Atom One hljs themes
 
 ## Installation

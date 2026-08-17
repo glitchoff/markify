@@ -110,6 +110,20 @@ PGN and FEN blocks turn chess notation into an interactive board.
 
 ---
 
+## Video embeds, built in
+
+**YouTube URLs embed as players via image syntax — plain links stay links.**
+
+\`\`\`markdown
+![Watch the video](https://www.youtube.com/watch?v=M5PbLfVGOQs)
+\`\`\`
+
+![Watch the video](https://www.youtube.com/watch?v=M5PbLfVGOQs)
+
+[This plain link stays a link.](https://www.youtube.com/watch?v=M7lc1UVf-VE)
+
+---
+
 ## Math without leaving Markdown
 
 **From inline equations to full mathematical expressions.**
@@ -201,7 +215,7 @@ export function Demo({ isDark }) {
         </div>
 
         {/* The landing page body, rendered by Markify */}
-        <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled mermaidConfig={{ showBackground: false }}>{PAGE}</Markify>
+        <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled mermaidConfig={{ showBackground: false }}>{PAGE}</Markify>
       </div>
     </div>
   );

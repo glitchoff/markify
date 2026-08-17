@@ -24,6 +24,7 @@ import layoutAndSizing from '../../../docs/layout-and-sizing.md?raw';
 import diagramsAndMath from '../../../docs/diagrams-and-math.md?raw';
 import tablesAndCallouts from '../../../docs/tables-and-callouts.md?raw';
 import images from '../../../docs/images.md?raw';
+import embeds from '../../../docs/embeds.md?raw';
 import streaming from '../../../docs/streaming.md?raw';
 import chess from '../../../docs/chess.md?raw';
 import customization from '../../../docs/customization.md?raw';
@@ -36,6 +37,7 @@ const DOC_CONTENT = {
   'diagrams-and-math': diagramsAndMath,
   'tables-and-callouts': tablesAndCallouts,
   images,
+  embeds,
   streaming,
   chess,
   customization,
@@ -68,6 +70,7 @@ const DOC_GROUPS = [
       { id: 'chess', title: 'Chess (PGN)', file: 'chess.md' },
       { id: 'tables-and-callouts', title: 'Tables & Callouts', file: 'tables-and-callouts.md' },
       { id: 'images', title: 'Images', file: 'images.md' },
+      { id: 'embeds', title: 'Video Embeds', file: 'embeds.md' },
     ],
   },
   {
@@ -280,7 +283,7 @@ export function Docs({ isDark }) {
             </div>
           </div>
 
-          <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled>
+          <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled>
             {DOC_CONTENT[selectedDoc.id] || gettingStarted}
           </Markify>
 

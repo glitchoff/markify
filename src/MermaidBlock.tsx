@@ -333,7 +333,7 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
     <div
       ref={containerRef}
       className={cn(
-        "relative mb-3 overflow-hidden flex flex-col",
+        "relative mb-(--markify-gap) overflow-hidden flex flex-col",
         showBackground && "rounded-lg border border-border bg-card",
         fullscreen && "fixed inset-0 z-50 m-0 rounded-none h-screen w-screen",
         className,

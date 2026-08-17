@@ -246,6 +246,9 @@
   .markify-root .mx-auto {
     margin-inline: auto;
   }
+  .markify-root .my-2 {
+    margin-block: calc(var(--spacing) * 2);
+  }
   .markify-root .my-4 {
     margin-block: calc(var(--spacing) * 4);
   }
@@ -329,6 +332,9 @@
   }
   .markify-root .table {
     display: table;
+  }
+  .markify-root .aspect-video {
+    aspect-ratio: var(--aspect-video);
   }
   .markify-root .size-3 {
     width: calc(var(--spacing) * 3);
@@ -655,6 +661,10 @@
   .markify-root .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
+  }
+  .markify-root .border-0 {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
   }
   .markify-root .border-2 {
     border-style: var(--tw-border-style);
