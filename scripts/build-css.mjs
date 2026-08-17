@@ -115,7 +115,7 @@ function main() {
 
 `;
 
-  const baseRule = `.markify-root {\n  font-family: var(--font-sans);\n  line-height: 1.6;\n}\n\n`;
+  const baseRule = `.markify-root {\n  font-family: var(--font-sans);\n  line-height: 1.6;\n  --markify-gap: 2rem;\n  --markify-gap-lg: 3.25rem;\n  --markify-gap-sm: 0.5rem;\n}\n\n`;
 
   const finalCss = shadcnTokens + "\n" + baseRule + banner + scopedUtilities;
 

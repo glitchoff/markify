@@ -1,5 +1,5 @@
 export { Markify } from "./Markify";
-export type { MarkifyProps } from "./Markify";
+export type { MarkifyProps, MarkifySpacing } from "./Markify";
 
 // Re-export react-markdown types for custom components
 export type { Components } from "react-markdown";

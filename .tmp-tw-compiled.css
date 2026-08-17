@@ -10,6 +10,7 @@
     --color-emerald-400: oklch(76.5% 0.177 163.223);
     --color-emerald-500: oklch(69.6% 0.17 162.48);
     --color-blue-500: oklch(62.3% 0.214 259.815);
+    --color-blue-600: oklch(54.6% 0.245 262.881);
     --color-slate-200: oklch(92.9% 0.013 255.508);
     --color-slate-800: oklch(27.9% 0.041 260.031);
     --color-slate-900: oklch(20.8% 0.042 265.755);
@@ -323,6 +324,9 @@
   .my-6 {
     margin-block: calc(var(--spacing) * 6);
   }
+  .my-8 {
+    margin-block: calc(var(--spacing) * 8);
+  }
   .mt-1 {
     margin-top: var(--spacing);
   }
@@ -332,35 +336,38 @@
   .mt-2\.5 {
     margin-top: calc(var(--spacing) * 2.5);
   }
-  .mt-3 {
-    margin-top: calc(var(--spacing) * 3);
-  }
-  .mt-4 {
-    margin-top: calc(var(--spacing) * 4);
-  }
-  .mt-5 {
-    margin-top: calc(var(--spacing) * 5);
-  }
-  .mt-6 {
-    margin-top: calc(var(--spacing) * 6);
-  }
-  .mt-7 {
-    margin-top: calc(var(--spacing) * 7);
-  }
-  .mt-8 {
-    margin-top: calc(var(--spacing) * 8);
-  }
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
+  }
+  .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.5\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.5);
+  }
+  .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.6\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.6);
+  }
+  .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.45\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.45);
+  }
+  .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.72\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.72);
+  }
+  .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.85\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.85);
+  }
+  .mt-\[calc\(var\(--markify-gap-lg\)_\*_1\.15\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 1.15);
+  }
+  .mb-\(--markify-gap\) {
+    margin-bottom: var(--markify-gap);
+  }
+  .mb-\(--markify-gap-sm\) {
+    margin-bottom: var(--markify-gap-sm);
   }
   .mb-1 {
     margin-bottom: var(--spacing);
   }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
-  }
-  .mb-3 {
-    margin-bottom: calc(var(--spacing) * 3);
   }
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
@@ -554,6 +561,9 @@
   }
   .max-w-md {
     max-width: var(--container-md);
+  }
+  .max-w-none {
+    max-width: none;
   }
   .min-w-0 {
     min-width: 0px;
@@ -1512,6 +1522,9 @@
     .dark\:bg-slate-900 {
       background-color: var(--color-slate-900);
     }
+  }
+  .\[\&_a\]\:text-blue-600 a {
+    color: var(--color-blue-600);
   }
   .\[\&_img\]\:max-w-full img {
     max-width: 100%;

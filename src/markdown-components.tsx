@@ -30,7 +30,7 @@ const LazyMermaidBlock = lazy(() =>
 
 function ChessFallback() {
   return (
-    <div className="mb-3 flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+    <div className="mb-(--markify-gap) flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
       <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
       Loading chess viewer…
     </div>
@@ -39,7 +39,7 @@ function ChessFallback() {
 
 function MermaidFallback() {
   return (
-    <div className="mb-3 flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+    <div className="mb-(--markify-gap) flex items-center gap-2 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
       <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
       Loading mermaid diagram…
     </div>
@@ -130,12 +130,12 @@ function downloadTable(table: HTMLTableElement, format: "csv" | "tsv" | "md") {
 
 function Heading({ level, children, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6; children?: React.ReactNode }) {
   const styles: Record<number, string> = {
-    1: "text-3xl font-bold mt-8 mb-(--markify-gap) pb-2 border-b border-border",
-    2: "text-2xl font-semibold mt-7 mb-(--markify-gap) pb-1.5 border-b border-border",
-    3: "text-xl font-medium mt-6 mb-(--markify-gap) pb-1 border-b border-border",
-    4: "text-lg font-medium mt-5 mb-(--markify-gap) pb-1 border-b border-border",
-    5: "text-base font-medium mt-4 mb-(--markify-gap) pb-1 border-b border-border",
-    6: "text-sm font-medium mt-3 mb-(--markify-gap) pb-1 border-b border-border",
+    1: "text-3xl font-bold mt-[calc(var(--markify-gap-lg)_*_1.15)] mb-(--markify-gap) pb-2 border-b border-border",
+    2: "text-2xl font-semibold mt-[calc(var(--markify-gap-lg)_*_0.85)] mb-(--markify-gap) pb-1.5 border-b border-border",
+    3: "text-xl font-medium mt-[calc(var(--markify-gap-lg)_*_0.72)] mb-(--markify-gap) pb-1 border-b border-border",
+    4: "text-lg font-medium mt-[calc(var(--markify-gap-lg)_*_0.6)] mb-(--markify-gap) pb-1 border-b border-border",
+    5: "text-base font-medium mt-[calc(var(--markify-gap-lg)_*_0.5)] mb-(--markify-gap) pb-1 border-b border-border",
+    6: "text-sm font-medium mt-[calc(var(--markify-gap-lg)_*_0.45)] mb-(--markify-gap) pb-1 border-b border-border",
   };
   const Tag = `h${level}` as React.ElementType;
   return (
@@ -157,7 +157,7 @@ function Paragraph({ children }: { children?: React.ReactNode }) {
   const content = children ? getText(children).trim() : "";
   if (!content && !hasElements(children)) return null;
   const onlyImage = hasElements(children) && !content;
-  return <p className={cn("mb-3 last:mb-0 leading-relaxed text-base text-foreground/90 whitespace-pre-wrap", onlyImage && "text-center")}>{children}</p>;
+  return <p className={cn("mb-(--markify-gap) last:mb-0 leading-relaxed text-base text-foreground/90 whitespace-pre-wrap", onlyImage && "text-center")}>{children}</p>;
 }
 
 function Link({ href, children, ...props }: { href?: string; children: React.ReactNode }) {
@@ -285,7 +285,7 @@ function Blockquote({ children, ...props }: { children?: React.ReactNode; [key: 
       TIP: "Tip",
     };
     return (
-      <div className={cn("mb-3 rounded-lg border-l-4 p-4", styles[type])} {...props}>
+      <div className={cn("mb-(--markify-gap) rounded-lg border-l-4 p-4", styles[type])} {...props}>
         <strong className="mb-1 block font-semibold text-foreground">{titles[type]}</strong>
         {stripped}
       </div>
@@ -294,7 +294,7 @@ function Blockquote({ children, ...props }: { children?: React.ReactNode; [key: 
 
   return (
     <blockquote
-      className="mb-3 border-l-4 border-muted-foreground/30 pl-4 text-muted-foreground italic"
+      className="mb-(--markify-gap) border-l-4 border-muted-foreground/30 pl-4 text-muted-foreground italic"
       {...props}
     >
       {children}
@@ -447,7 +447,7 @@ function List({ children, ordered, ...props }: { children?: React.ReactNode; ord
   return (
     <Tag
       className={cn(
-        "mb-3 ml-6",
+        "mb-(--markify-gap) ml-6",
         ordered ? "list-decimal" : "list-disc",
       )}
       {...props}
@@ -459,14 +459,14 @@ function List({ children, ordered, ...props }: { children?: React.ReactNode; ord
 
 function ListItem({ children, ...props }: { children: React.ReactNode }) {
   return (
-    <li className="mb-1 leading-relaxed text-foreground/90 [&>ul]:my-1 [&>ol]:my-1" {...props}>
+    <li className="mb-(--markify-gap-sm) leading-relaxed text-foreground/90 [&>ul]:my-1 [&>ol]:my-1" {...props}>
       {children}
     </li>
   );
 }
 
 function Hr() {
-  return <hr className="mb-3 border-border" />;
+  return <hr className="mb-(--markify-gap) border-border" />;
 }
 
 function PreWithWorker({ worker, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeBlockClassName, codeFontFamily, mermaidConfig, chessEnabled = false, isStreaming = false, renderers, ...props }: { worker: boolean; hljsTheme?: HljsTheme; hljsCustomCss?: string; hljsThemeUrl?: string; hljsThemeBg?: boolean; codeBlockClassName?: string; codeFontFamily?: string; mermaidConfig?: MarkifyMermaidConfig; chessEnabled?: boolean; isStreaming?: boolean; renderers?: Renderers; children?: React.ReactNode; className?: string }) {

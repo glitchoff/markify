@@ -28,8 +28,45 @@ export interface MarkifyProps {
   youtubeEnabled?: boolean;
   renderers?: Renderers;
   components?: Partial<Components>;
+  /** Vertical rhythm between blocks. A named preset ("compact" | "normal" | "relaxed") or granular per-part overrides. Defaults to "normal". */
+  spacing?: MarkifySpacing;
   /** Languages to preload on mount. Defaults to 20 common languages. Pass "all" to preload every supported language, or an array of language names. Pass an empty array to disable preloading. */
   hljsLanguages?: string[] | "all";
+}
+
+export type MarkifySpacing =
+  | "compact"
+  | "normal"
+  | "relaxed"
+  | {
+      /** Bottom margin between blocks. Any CSS length (e.g. "0.75rem", "16px"). */
+      block?: string;
+      /** Top margin above headings. */
+      headingTop?: string;
+      /** Bottom margin between list items. */
+      listItem?: string;
+    };
+
+const SPACING_BASE = {
+  compact: { block: "0.5rem", headingTop: "0.75rem", listItem: "0.25rem" },
+  normal: { block: "2rem", headingTop: "3.25rem", listItem: "0.5rem" },
+  relaxed: { block: "2.5rem", headingTop: "4rem", listItem: "0.625rem" },
+} as const;
+
+type SpacingVars = {
+  "--markify-gap": string;
+  "--markify-gap-lg": string;
+  "--markify-gap-sm": string;
+};
+
+function resolveSpacingVars(spacing: MarkifySpacing | undefined): SpacingVars {
+  const base = typeof spacing === "string" ? SPACING_BASE[spacing] : SPACING_BASE.normal;
+  const overrides = spacing && typeof spacing === "object" ? spacing : {};
+  return {
+    "--markify-gap": overrides.block ?? base.block,
+    "--markify-gap-lg": overrides.headingTop ?? base.headingTop,
+    "--markify-gap-sm": overrides.listItem ?? base.listItem,
+  };
 }
 
 function parseBlocks(content: string): string[] {
@@ -63,8 +100,10 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, youtubeEnabled = false, renderers, components: overrides, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, youtubeEnabled = false, renderers, components: overrides, spacing, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
+
+  const spacingVars = useMemo(() => resolveSpacingVars(spacing), [spacing]);
 
   useEffect(() => {
     const langs = hljsLanguages === "all" ? ALL_LANGUAGES : hljsLanguages;
@@ -94,7 +133,7 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
         "markify-root text-foreground [&_table]:w-full [&_img]:max-w-full",
         className,
       )}
-      style={{ fontFamily: fontFamily ?? undefined, willChange: "contents" }}
+      style={{ fontFamily: fontFamily ?? undefined, willChange: "contents", ...spacingVars }}
     >
       {blocks.map((block, i) => {
         const isLast = i === blocks.length - 1;

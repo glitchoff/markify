@@ -165,6 +165,10 @@ function MermaidBlockInner({ code, className, config }: MermaidBlockProps) {
     const el = bodyRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      // Only zoom on wheel when the user explicitly holds Ctrl/Cmd.
+      // Otherwise let the event scroll the page normally.
+      if (!e.ctrlKey && !e.metaKey) return;
+
       e.preventDefault();
       const rect = el.getBoundingClientRect();
       const cursorX = e.clientX - rect.left - rect.width / 2;

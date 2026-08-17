@@ -105,6 +105,9 @@
 .markify-root {
   font-family: var(--font-sans);
   line-height: 1.6;
+  --markify-gap: 2rem;
+  --markify-gap-lg: 3.25rem;
+  --markify-gap-sm: 0.5rem;
 }
 
 
@@ -255,6 +258,9 @@
   .markify-root .my-6 {
     margin-block: calc(var(--spacing) * 6);
   }
+  .markify-root .my-8 {
+    margin-block: calc(var(--spacing) * 8);
+  }
   .markify-root .mt-1 {
     margin-top: var(--spacing);
   }
@@ -264,35 +270,38 @@
   .markify-root .mt-2\.5 {
     margin-top: calc(var(--spacing) * 2.5);
   }
-  .markify-root .mt-3 {
-    margin-top: calc(var(--spacing) * 3);
-  }
-  .markify-root .mt-4 {
-    margin-top: calc(var(--spacing) * 4);
-  }
-  .markify-root .mt-5 {
-    margin-top: calc(var(--spacing) * 5);
-  }
-  .markify-root .mt-6 {
-    margin-top: calc(var(--spacing) * 6);
-  }
-  .markify-root .mt-7 {
-    margin-top: calc(var(--spacing) * 7);
-  }
-  .markify-root .mt-8 {
-    margin-top: calc(var(--spacing) * 8);
-  }
   .markify-root .mt-10 {
     margin-top: calc(var(--spacing) * 10);
+  }
+  .markify-root .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.5\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.5);
+  }
+  .markify-root .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.6\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.6);
+  }
+  .markify-root .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.45\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.45);
+  }
+  .markify-root .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.72\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.72);
+  }
+  .markify-root .mt-\[calc\(var\(--markify-gap-lg\)_\*_0\.85\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 0.85);
+  }
+  .markify-root .mt-\[calc\(var\(--markify-gap-lg\)_\*_1\.15\)\] {
+    margin-top: calc(var(--markify-gap-lg) * 1.15);
+  }
+  .markify-root .mb-\(--markify-gap\) {
+    margin-bottom: var(--markify-gap);
+  }
+  .markify-root .mb-\(--markify-gap-sm\) {
+    margin-bottom: var(--markify-gap-sm);
   }
   .markify-root .mb-1 {
     margin-bottom: var(--spacing);
   }
   .markify-root .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
-  }
-  .markify-root .mb-3 {
-    margin-bottom: calc(var(--spacing) * 3);
   }
   .markify-root .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
@@ -486,6 +495,9 @@
   }
   .markify-root .max-w-md {
     max-width: var(--container-md);
+  }
+  .markify-root .max-w-none {
+    max-width: none;
   }
   .markify-root .min-w-0 {
     min-width: 0px;
@@ -1444,6 +1456,9 @@
     .markify-root .dark\:bg-slate-900 {
       background-color: var(--color-slate-900);
     }
+  }
+  .markify-root .\[\&_a\]\:text-blue-600 a {
+    color: var(--color-blue-600);
   }
   .markify-root .\[\&_img\]\:max-w-full img {
     max-width: 100%;

@@ -19,6 +19,7 @@ import { Markify } from "@glitchoff/markify";
 - **Callouts** — `> [!NOTE/WARNING/TIP]` blockquotes
 - **Video embeds** — opt-in YouTube embedding from plain links or image syntax (`youtubeEnabled`)
 - **Theming** — 100% shadcn CSS variable tokens + Atom One hljs themes
+- **Spacing** — `spacing` prop (`compact`/`normal`/`relaxed` or granular) to control the gap between blocks
 
 ## Installation
 

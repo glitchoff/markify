@@ -21,6 +21,7 @@ import { Markify } from '@glitchoff/markify';
 import gettingStarted from '../../../docs/getting-started.md?raw';
 import theming from '../../../docs/theming.md?raw';
 import layoutAndSizing from '../../../docs/layout-and-sizing.md?raw';
+import styling from '../../../docs/styling.md?raw';
 import diagramsAndMath from '../../../docs/diagrams-and-math.md?raw';
 import tablesAndCallouts from '../../../docs/tables-and-callouts.md?raw';
 import images from '../../../docs/images.md?raw';
@@ -34,6 +35,7 @@ const DOC_CONTENT = {
   'getting-started': gettingStarted,
   theming,
   'layout-and-sizing': layoutAndSizing,
+  styling,
   'diagrams-and-math': diagramsAndMath,
   'tables-and-callouts': tablesAndCallouts,
   images,
@@ -61,6 +63,7 @@ const DOC_GROUPS = [
     items: [
       { id: 'theming', title: 'Theming & Dark Mode', file: 'theming.md' },
       { id: 'layout-and-sizing', title: 'Layout & Sizing', file: 'layout-and-sizing.md' },
+      { id: 'styling', title: 'Styling & Spacing', file: 'styling.md' },
     ],
   },
   {

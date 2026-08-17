@@ -37,7 +37,7 @@ export function getText(node: any): string {
   return "";
 }
 
-const CALLOUT_PREFIX = /^>\s*\[!(NOTE|WARNING|TIP)\]\s*/i;
+const CALLOUT_PREFIX = /^>?\s*\[!(NOTE|WARNING|TIP)\]\s*/i;
 
 /**
  * Removes a leading `> [!TYPE]` marker from a ReactNode tree while preserving
