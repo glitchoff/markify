@@ -40,6 +40,8 @@ import "@glitchoff/markify/themes/core.css";
 import { Markify } from "@glitchoff/markify";
 ```
 
+See [Getting Started → Standard Setup](./docs/getting-started.md) for the one-line copy-paste recipe (Tailwind v4 + shadcn tokens + `core.css`).
+
 Markify reads your app's design tokens through scoped `--markify-*` aliases. It supports **shadcn** (default), **daisyUI**, **Radix Themes**, and **Bootstrap** token vocabularies via the `themeType` prop, plus per-instance overrides via the `theme` prop:
 
 ```tsx

@@ -59,13 +59,13 @@ export function ContentViewer({ content }: { content: string }) {
 
 ## 2. Tailwind CSS & CSS Import
 
-Markify requires **Tailwind CSS** installed in your project. Import Markify's CSS in your application root:
+Markify requires **Tailwind CSS** installed in your project. Use the [standard setup](/docs/getting-started) — Tailwind v4 + `@theme inline` token mapping + `core.css`:
 
 ```tsx
 import "@glitchoff/markify/themes/core.css";
 ```
 
-`core.css` ships the scoped base styles, the pre-compiled utility layer, and the `--markify-*` theme aliases — **without** any global design tokens, so it never overrides your app's theme. Only import `@glitchoff/markify/themes/markify.css` (which bundles default shadcn tokens on `:root`/`.dark`) if your app has no theme system at all.
+`core.css` ships the scoped base styles, the pre-compiled utility layer, and the `--markify-*` theme aliases — **without** any global design tokens, so it never overrides your app's theme. Your app provides the tokens (shadcn, daisyUI, Radix, Bootstrap, custom). Only import `@glitchoff/markify/themes/markify.css` (which bundles default shadcn tokens on `:root`/`.dark`) if your app has no theme system at all.
 
 ---
 

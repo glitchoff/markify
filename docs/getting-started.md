@@ -50,7 +50,93 @@ See [Theming](/docs/theming) for the full token reference and the `themeType` / 
 
 ---
 
-## 3. Basic Usage
+## 3. Standard Setup (copy-paste)
+
+One standard way, minimal config — Tailwind v4 + shadcn tokens + `core.css`. This is exactly what the [demo app](/docs/getting-started) runs.
+
+**1. Install Tailwind v4** (Vite example):
+
+```bash
+pnpm add -D tailwindcss @tailwindcss/vite
+```
+
+```ts
+// vite.config.ts
+import tailwindcss from "@tailwindcss/vite";
+
+export default { plugins: [react(), tailwindcss()] };
+```
+
+**2. `globals.css`** — import Tailwind, Markify's `core.css`, map the tokens, define light/dark values:
+
+```css
+@import "tailwindcss";
+@import "@glitchoff/markify/themes/core.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+  /* …any shadcn palette… */
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --border: oklch(1 0 0 / 10%);
+  /* …any shadcn palette… */
+}
+```
+
+**3. Import `globals.css` at your app root** and render:
+
+```tsx
+import { Markify } from "@glitchoff/markify";
+
+<Markify isStreaming={generating}>{reply}</Markify>
+```
+
+That's it — no `themeType` needed for shadcn apps (it's the default), and Markify follows your `.dark` class automatically.
+
+**Zero-config alternative:** if you'd rather not define tokens at all, import the legacy `@glitchoff/markify/themes/markify.css` instead of `core.css` — it bundles a neutral shadcn palette. You lose the warm/custom look but skip step 2's token block.
+
+## 4. Basic Usage
 
 Render static or streaming Markdown content with the `<Markify>` component:
 
