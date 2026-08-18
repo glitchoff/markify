@@ -239,6 +239,7 @@
   --markify-gap: 2rem;
   --markify-gap-lg: 3.25rem;
   --markify-gap-sm: 0.5rem;
+  --aspect-video: 16 / 9;
 }
 
 
@@ -515,6 +516,9 @@
   .markify-root .h-5 {
     height: calc(var(--spacing) * 5);
   }
+  .markify-root .h-8 {
+    height: calc(var(--spacing) * 8);
+  }
   .markify-root .h-9 {
     height: calc(var(--spacing) * 9);
   }
@@ -530,8 +534,8 @@
   .markify-root .h-96 {
     height: calc(var(--spacing) * 96);
   }
-  .markify-root .h-\[calc\(100vh-140px\)\] {
-    height: calc(100vh - 140px);
+  .markify-root .h-\[calc\(100dvh-80px\)\] {
+    height: calc(100dvh - 80px);
   }
   .markify-root .h-auto {
     height: auto;
@@ -584,6 +588,9 @@
   .markify-root .w-5 {
     width: calc(var(--spacing) * 5);
   }
+  .markify-root .w-8 {
+    width: calc(var(--spacing) * 8);
+  }
   .markify-root .w-9 {
     width: calc(var(--spacing) * 9);
   }
@@ -601,9 +608,6 @@
   }
   .markify-root .w-\[42rem\] {
     width: 42rem;
-  }
-  .markify-root .w-\[80\%\] {
-    width: 80%;
   }
   .markify-root .w-full {
     width: 100%;
@@ -1083,6 +1087,9 @@
   .markify-root .bg-white {
     background-color: var(--color-white);
   }
+  .markify-root .p-0\.5 {
+    padding: calc(var(--spacing) * 0.5);
+  }
   .markify-root .p-1 {
     padding: var(--spacing);
   }
@@ -1155,11 +1162,11 @@
   .markify-root .pt-4 {
     padding-top: calc(var(--spacing) * 4);
   }
+  .markify-root .pt-6 {
+    padding-top: calc(var(--spacing) * 6);
+  }
   .markify-root .pt-10 {
     padding-top: calc(var(--spacing) * 10);
-  }
-  .markify-root .pt-24 {
-    padding-top: calc(var(--spacing) * 24);
   }
   .markify-root .pr-1 {
     padding-right: var(--spacing);
@@ -1399,9 +1406,6 @@
   .markify-root .underline-offset-2 {
     text-underline-offset: 2px;
   }
-  .markify-root .accent-foreground {
-    accent-color: var(--markify-fg);
-  }
   .markify-root .accent-primary {
     accent-color: var(--markify-primary);
   }
@@ -1611,6 +1615,9 @@
     .markify-root .sm\:inline {
       display: inline;
     }
+    .markify-root .sm\:h-9 {
+      height: calc(var(--spacing) * 9);
+    }
     .markify-root .sm\:h-10 {
       height: calc(var(--spacing) * 10);
     }
@@ -1619,6 +1626,9 @@
     }
     .markify-root .sm\:min-h-8 {
       min-height: calc(var(--spacing) * 8);
+    }
+    .markify-root .sm\:w-9 {
+      width: calc(var(--spacing) * 9);
     }
     .markify-root .sm\:w-10 {
       width: calc(var(--spacing) * 10);
@@ -1641,8 +1651,14 @@
     .markify-root .sm\:gap-1\.5 {
       gap: calc(var(--spacing) * 1.5);
     }
+    .markify-root .sm\:gap-3 {
+      gap: calc(var(--spacing) * 3);
+    }
     .markify-root .sm\:gap-5 {
       gap: calc(var(--spacing) * 5);
+    }
+    .markify-root .sm\:p-1 {
+      padding: var(--spacing);
     }
     .markify-root .sm\:p-4 {
       padding: calc(var(--spacing) * 4);
@@ -1656,6 +1672,9 @@
     .markify-root .sm\:px-2 {
       padding-inline: calc(var(--spacing) * 2);
     }
+    .markify-root .sm\:px-2\.5 {
+      padding-inline: calc(var(--spacing) * 2.5);
+    }
     .markify-root .sm\:px-3 {
       padding-inline: calc(var(--spacing) * 3);
     }
@@ -1664,6 +1683,9 @@
     }
     .markify-root .sm\:px-6 {
       padding-inline: calc(var(--spacing) * 6);
+    }
+    .markify-root .sm\:py-3 {
+      padding-block: calc(var(--spacing) * 3);
     }
     .markify-root .sm\:text-4xl {
       font-size: 2.25rem;
@@ -1678,17 +1700,32 @@
     .markify-root .md\:block {
       display: block;
     }
-    .markify-root .md\:flex {
-      display: flex;
-    }
     .markify-root .md\:hidden {
       display: none;
+    }
+    .markify-root .md\:h-\[calc\(100vh-140px\)\] {
+      height: calc(100vh - 140px);
+    }
+    .markify-root .md\:w-\[80\%\] {
+      width: 80%;
     }
     .markify-root .md\:grid-cols-\[2fr_3fr\] {
       grid-template-columns: 2fr 3fr;
     }
+    .markify-root .md\:px-0 {
+      padding-inline: 0px;
+    }
     .markify-root .md\:pt-0 {
       padding-top: 0px;
+    }
+    .markify-root .md\:pr-1 {
+      padding-right: var(--spacing);
+    }
+    .markify-root .md\:pl-\[4\.5rem\] {
+      padding-left: 4.5rem;
+    }
+    .markify-root .md\:pl-\[17rem\] {
+      padding-left: 17rem;
     }
   }
   @media (prefers-color-scheme: dark) {
