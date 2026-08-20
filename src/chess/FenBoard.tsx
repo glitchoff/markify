@@ -7,11 +7,15 @@ import { Copy, Check, Eye, Code2, RotateCcw } from "lucide-react";
 import { cn } from "../utils";
 import { markifyThemeProps, type MarkifyTheme, type MarkifyThemePreset } from "../theme";
 
+export type FenBoardHeader = "default" | "minimal" | "none";
+
 export interface FenBoardProps {
   fen: string;
   className?: string;
   showNotation?: boolean;
   isStreaming?: boolean;
+  /** Header style. `"default"` shows the "fen" label + toolbar, `"minimal"` shows only the toolbar, `"none"` removes the header entirely. Defaults to `"default"`. */
+  header?: FenBoardHeader;
   /** Max board width in px. The card shrinks to fit. */
   maxWidth?: number;
   /** Which host-app token vocabulary the `--markify-*` aliases resolve to. Defaults to `"shadcn"`. */
@@ -198,7 +202,7 @@ function FenBoardInner({ fen, className, showNotation = true, isStreaming = fals
       </div>
 
       {preview ? (
-        <div className="flex flex-col gap-3 p-4 sm:p-5">
+        <div className="flex w-full flex-col">
           <div className="w-full min-w-0">
             {parsed.error ? (
               <p className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-center text-sm text-destructive">
