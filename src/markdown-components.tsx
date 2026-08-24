@@ -268,7 +268,7 @@ function Image({ src, alt, title, youtubeEnabled, isStreaming, renderers, ...pro
       alt={alt || ""}
       title={title}
       loading="lazy"
-      className="inline-block max-w-full h-auto rounded-lg shadow-md align-middle"
+      className="inline-block max-w-full h-auto rounded-lg shadow-md align-middle my-2"
       {...props}
     />
   );
