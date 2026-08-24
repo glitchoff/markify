@@ -164,3 +164,22 @@ export const components = createMarkdownComponents({
 ```
 
 The renderer receives the standard Markdown image properties, `src`, `alt`, and `title`, so you can completely control how images are rendered in your application.
+
+### Separate image vs YouTube rendering
+
+If `youtubeEnabled` is on, YouTube URLs in image syntax render as embeds. To override plain images and YouTube embeds independently, use the granular `renderers` prop instead — overriding `image` doesn't affect the YouTube player, and vice versa:
+
+```tsx
+import { Markify, type Renderers } from "@glitchoff/markify";
+
+const renderers: Renderers = {
+  // Only regular ![alt](url) images
+  image: ({ src, alt, title }) => <MyImage src={src} alt={alt} title={title} />,
+  // Only ![alt](youtube-url) embeds (requires youtubeEnabled)
+  youtube: ({ video, isStreaming }) => (
+    <MyPlayer id={video.id} start={video.start} loading={isStreaming} />
+  ),
+};
+
+<Markify youtubeEnabled renderers={renderers}>{markdown}</Markify>
+```

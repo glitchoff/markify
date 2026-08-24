@@ -255,15 +255,18 @@ function YouTubeEmbed({ src, video, streaming }: { src: string; video: YouTubeVi
   );
 }
 
-function Image({ src, alt, youtubeEnabled, isStreaming, ...props }: { src?: string; alt?: string; youtubeEnabled?: boolean; isStreaming?: boolean }) {
+function Image({ src, alt, title, youtubeEnabled, isStreaming, renderers, ...props }: { src?: string; alt?: string; title?: string; youtubeEnabled?: boolean; isStreaming?: boolean; renderers?: Renderers }) {
   const video = youtubeEnabled && src ? parseYouTubeId(src) : null;
   if (video) {
+    if (renderers?.youtube) return renderers.youtube({ src: src!, video, isStreaming: !!isStreaming });
     return <YouTubeEmbed src={src!} video={video} streaming={isStreaming} />;
   }
+  if (renderers?.image) return renderers.image({ src, alt, title, ...props });
   return (
     <img
       src={src}
       alt={alt || ""}
+      title={title}
       loading="lazy"
       className="inline-block max-w-full h-auto rounded-lg shadow-md align-middle"
       {...props}
@@ -597,6 +600,23 @@ export interface CodeRendererProps {
   language?: string;
 }
 
+export interface ImageRendererProps {
+  src?: string;
+  alt?: string;
+  title?: string;
+  node?: unknown;
+  [key: string]: any;
+}
+
+export interface YouTubeRendererArgs {
+  /** The original URL used in the markdown image syntax. */
+  src: string;
+  /** Parsed video id and optional start timestamp. */
+  video: YouTubeVideo;
+  /** Whether the block is still streaming. */
+  isStreaming: boolean;
+}
+
 export interface Renderers {
   /** Override the mermaid block renderer. */
   mermaid?: (args: BlockRendererArgs) => React.ReactNode;
@@ -606,6 +626,10 @@ export interface Renderers {
   fen?: (args: BlockRendererArgs) => React.ReactNode;
   /** Override the default code block renderer for all other languages. */
   code?: (props: CodeRendererProps) => React.ReactNode;
+  /** Override the default image renderer (`![alt](url)` that isn't a YouTube URL). */
+  image?: (props: ImageRendererProps) => React.ReactNode;
+  /** Override the YouTube embed renderer (requires `youtubeEnabled`). */
+  youtube?: (args: YouTubeRendererArgs) => React.ReactNode;
 }
 
 export interface MarkdownComponentOptions {
@@ -649,7 +673,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     p: Paragraph,
     a: Link as any,
     code: InlineCode as any,
-    img: (props) => <Image {...props} youtubeEnabled={youtubeEnabled} isStreaming={isStreaming} />,
+    img: (props) => <Image {...props} youtubeEnabled={youtubeEnabled} isStreaming={isStreaming} renderers={renderers} />,
     blockquote: Blockquote as any,
     table: Table as any,
     thead: THead as any,

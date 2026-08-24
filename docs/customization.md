@@ -181,7 +181,7 @@ Any other supported language is lazy-loaded the first time a code block with tha
 
 ## 8. Custom Block Renderers (`renderers`)
 
-Use the `renderers` prop to swap out any built-in block renderer: mermaid, chess (PGN), FEN, or the default code block, while keeping Markify's streaming, block-splitting, and parsing intact. Each renderer is optional; pass only the ones you want to override.
+Use the `renderers` prop to swap out any built-in block renderer: mermaid, chess (PGN), FEN, code blocks, images, or YouTube embeds, while keeping Markify's streaming, block-splitting, and parsing intact. Each renderer is optional; pass only the ones you want to override.
 
 ```tsx
 import { Markify, type Renderers } from "@glitchoff/markify";
@@ -195,6 +195,10 @@ const renderers: Renderers = {
   mermaid: ({ code }) => <MyMermaid diagram={code} />,
   // Replace the default code block for all other languages
   code: ({ children, language }) => <MyCodeBlock lang={language}>{children}</MyCodeBlock>,
+  // Replace the default image renderer (non-YouTube `![alt](url)`)
+  image: ({ src, alt, title }) => <MyImage src={src} alt={alt} title={title} />,
+  // Replace the YouTube embed renderer (requires youtubeEnabled)
+  youtube: ({ src, video, isStreaming }) => <MyPlayer id={video.id} start={video.start} loading={isStreaming} />,
 };
 
 <Markify chessEnabled renderers={renderers}>
@@ -210,6 +214,8 @@ const renderers: Renderers = {
 | `chess`    | `{ code, isStreaming }`                        | A ` ```pgn ` or ` ```chess ` fence (requires `chessEnabled`). |
 | `fen`      | `{ code, isStreaming }`                        | A ` ```fen ` fence (requires `chessEnabled`).               |
 | `code`     | `{ children, className, language }`           | Any other fenced code block.             |
+| `image`    | `{ src, alt, title }` + node props            | An `![alt](url)` that isn't a YouTube URL. |
+| `youtube`  | `{ src, video: { id, start? }, isStreaming }` | A `![alt](youtube-url)` (requires `youtubeEnabled`). |
 
 `code` is the raw text inside the fence. `isStreaming` is `true` while the block is still being revealed (so you can show a loading state). The `code` renderer receives the original `children` (the `<code>` element) plus the parsed `language`.
 

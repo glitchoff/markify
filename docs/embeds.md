@@ -74,14 +74,21 @@ While content is streaming, embeds don't mount a player on every token. Instead 
 
 ## Custom Embed Rendering
 
-Prefer your own player, thumbnail link, or click-to-consent gate? Override the renderers:
+Prefer your own player, thumbnail link, or click-to-consent gate? Override the `youtube` renderer — this only affects YouTube URLs, leaving regular images untouched:
 
 ```tsx
-const components = createMarkdownComponents({
-  youtubeEnabled: true,
-  img: ({ src, alt }) => <MyEmbed url={src} />,
-});
+import { Markify, type Renderers } from "@glitchoff/markify";
+
+const renderers: Renderers = {
+  youtube: ({ src, video, isStreaming }) => (
+    <MyPlayer id={video.id} start={video.start} loading={isStreaming} />
+  ),
+};
+
+<Markify youtubeEnabled renderers={renderers}>{markdown}</Markify>
 ```
+
+You can also override all images (YouTube included) at once via the `components`/`img` renderer:
 
 `parseYouTubeId` is exported from the package so you can reuse the URL parsing logic:
 
