@@ -70,7 +70,65 @@ Here's a live PGN viewer:
 6. Re1 d6 7. c3 Na5 8. Bb5 c6 9. Ba4 Nc4 10. b3 Nb6
 ```
 
-## 2. FEN Usage
+## 2. Annotations (comments & NAGs)
+
+The PGN viewer supports standard PGN annotation syntax:
+
+- **Comments** — `{ ... }` text after a move renders as italic gray text inline in the move list.
+- **NAGs** — `$1`, `$3`, etc. render as glyphs appended to the move (`!`, `!!`, `?!`, `??`, `!?`, `±`, `∓`, `+−`…).
+
+> Variations (`( ... )`) are skipped — only the mainline is shown.
+
+````markdown
+```pgn
+[White "Adams"]
+[Black "Morphy"]
+[Result "1-0"]
+
+1. e4 { The most principled opening move. } e5 2. Nf3 Nc6
+3. Bc4 $1 Bc5 4. b4 $! { The Evans Gambit — a pawn for
+initiative. } Bxb4 5. c3 Ba5 6. d4 6... exd4 7. O-O $14 dxc3
+8. Qb3 $3 { A brilliant attacking idea. } Qe7 9. Nxc3
+```
+````
+
+### Live annotated example
+
+```pgn
+[Event "Opera Game"]
+[Site "Paris Opera House"]
+[Date "1858.11.02"]
+[White "Morphy, Paul"]
+[Black "Duke of Brunswick / Count Isouard"]
+[Result "1-0"]
+
+1. e4 { Best by test. } e5 2. Nf3 d6 3. d4 Bg4 $6 { This
+pins nothing useful. } 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 $1
+Nf6 7. Qb3 $3 { Double attack on f7 and b7. } Qe7 8. Nc3
+c6 9. Bg5 $1 { Pinning the knight. } b5 10. Nxb5 $! cxb5
+11. Bxb5+ Nbd7 12. O-O-O $16 Rd8 13. Rd7 $! Rxd7 14. Rd1
+$18 Qd6 15. Bxd7+ Nxd7 16. Qb8+ $3 Nxb8 17. Rd8# $1
+```
+
+### Keyboard navigation
+
+When a chess block is on screen you can navigate without the mouse:
+
+| Key | Action |
+| --- | ------ |
+| `←` | Previous move |
+| `→` | Next move |
+| `Home` | Jump to start |
+| `End` | Jump to last move |
+| `F` | Flip board |
+
+### Mobile
+
+On small screens the move list becomes a single horizontally-scrollable strip
+(chess.com style) that auto-scrolls to keep the current move in view, with the
+navigation controls docked below the board.
+
+## 3. FEN Usage
 
 A **FEN** (Forsyth-Edwards Notation) string describes a single board position. Wrap it in a `fen` fence to render a board-only viewer:
 

@@ -251,6 +251,9 @@
   .markify-root .z-50 {
     z-index: 50;
   }
+  .markify-root .col-span-3 {
+    grid-column: span 3 / span 3;
+  }
   .markify-root .container {
     width: 100%;
     @media (width >= 40rem) {
@@ -344,6 +347,9 @@
   .markify-root .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
   }
+  .markify-root .ml-0\.5 {
+    margin-left: calc(var(--spacing) * 0.5);
+  }
   .markify-root .ml-1 {
     margin-left: var(--spacing);
   }
@@ -414,8 +420,8 @@
   .markify-root .h-8 {
     height: calc(var(--spacing) * 8);
   }
-  .markify-root .h-9 {
-    height: calc(var(--spacing) * 9);
+  .markify-root .h-10 {
+    height: calc(var(--spacing) * 10);
   }
   .markify-root .h-24 {
     height: calc(var(--spacing) * 24);
@@ -444,11 +450,14 @@
   .markify-root .max-h-48 {
     max-height: calc(var(--spacing) * 48);
   }
-  .markify-root .max-h-\[220px\] {
-    max-height: 220px;
+  .markify-root .max-h-\[260px\] {
+    max-height: 260px;
   }
   .markify-root .max-h-\[calc\(100vh-6rem\)\] {
     max-height: calc(100vh - 6rem);
+  }
+  .markify-root .min-h-0 {
+    min-height: 0px;
   }
   .markify-root .min-h-7 {
     min-height: calc(var(--spacing) * 7);
@@ -486,8 +495,8 @@
   .markify-root .w-8 {
     width: calc(var(--spacing) * 8);
   }
-  .markify-root .w-9 {
-    width: calc(var(--spacing) * 9);
+  .markify-root .w-10 {
+    width: calc(var(--spacing) * 10);
   }
   .markify-root .w-14 {
     width: calc(var(--spacing) * 14);
@@ -507,6 +516,9 @@
   .markify-root .w-full {
     width: 100%;
   }
+  .markify-root .w-max {
+    width: max-content;
+  }
   .markify-root .w-screen {
     width: 100vw;
   }
@@ -524,9 +536,6 @@
   }
   .markify-root .max-w-7xl {
     max-width: var(--container-7xl);
-  }
-  .markify-root .max-w-\[420px\] {
-    max-width: 420px;
   }
   .markify-root .max-w-\[1400px\] {
     max-width: 1400px;
@@ -609,14 +618,14 @@
   .markify-root .list-disc {
     list-style-type: disc;
   }
-  .markify-root .grid-cols-\[auto_1fr_1fr\] {
-    grid-template-columns: auto 1fr 1fr;
-  }
   .markify-root .flex-col {
     flex-direction: column;
   }
   .markify-root .flex-wrap {
     flex-wrap: wrap;
+  }
+  .markify-root .items-baseline {
+    align-items: baseline;
   }
   .markify-root .items-center {
     align-items: center;
@@ -651,14 +660,14 @@
   .markify-root .gap-6 {
     gap: calc(var(--spacing) * 6);
   }
+  .markify-root .gap-x-1 {
+    column-gap: var(--spacing);
+  }
   .markify-root .gap-x-2 {
     column-gap: calc(var(--spacing) * 2);
   }
   .markify-root .gap-x-3 {
     column-gap: calc(var(--spacing) * 3);
-  }
-  .markify-root .gap-y-0\.5 {
-    row-gap: calc(var(--spacing) * 0.5);
   }
   .markify-root .gap-y-1 {
     row-gap: var(--spacing);
@@ -982,6 +991,9 @@
   .markify-root .bg-white {
     background-color: var(--color-white);
   }
+  .markify-root .p-0 {
+    padding: 0px;
+  }
   .markify-root .p-0\.5 {
     padding: calc(var(--spacing) * 0.5);
   }
@@ -1075,6 +1087,9 @@
   .markify-root .pl-4 {
     padding-left: calc(var(--spacing) * 4);
   }
+  .markify-root .pl-7 {
+    padding-left: calc(var(--spacing) * 7);
+  }
   .markify-root .text-center {
     text-align: center;
   }
@@ -1118,8 +1133,14 @@
     font-size: 0.75rem;
     line-height: var(--tw-leading, 1rem);
   }
+  .markify-root .text-\[0\.7em\] {
+    font-size: 0.7em;
+  }
   .markify-root .text-\[0\.8rem\] {
     font-size: 0.8rem;
+  }
+  .markify-root .text-\[0\.85em\] {
+    font-size: 0.85em;
   }
   .markify-root .text-\[2rem\] {
     font-size: 2rem;
@@ -1129,6 +1150,9 @@
   }
   .markify-root .text-\[11px\] {
     font-size: 11px;
+  }
+  .markify-root .text-\[13px\] {
+    font-size: 13px;
   }
   .markify-root .leading-\[1\.7\] {
     --tw-leading: 1.7;
@@ -1198,6 +1222,9 @@
   }
   .markify-root .text-emerald-500 {
     color: var(--color-emerald-500);
+  }
+  .markify-root .text-emerald-600 {
+    color: var(--color-emerald-600);
   }
   .markify-root .text-foreground {
     color: var(--markify-fg);
@@ -1507,17 +1534,17 @@
     .markify-root .sm\:block {
       display: block;
     }
+    .markify-root .sm\:grid {
+      display: grid;
+    }
+    .markify-root .sm\:hidden {
+      display: none;
+    }
     .markify-root .sm\:inline {
       display: inline;
     }
     .markify-root .sm\:h-9 {
       height: calc(var(--spacing) * 9);
-    }
-    .markify-root .sm\:h-10 {
-      height: calc(var(--spacing) * 10);
-    }
-    .markify-root .sm\:max-h-\[260px\] {
-      max-height: 260px;
     }
     .markify-root .sm\:min-h-8 {
       min-height: calc(var(--spacing) * 8);
@@ -1525,11 +1552,20 @@
     .markify-root .sm\:w-9 {
       width: calc(var(--spacing) * 9);
     }
-    .markify-root .sm\:w-10 {
-      width: calc(var(--spacing) * 10);
+    .markify-root .sm\:w-auto {
+      width: auto;
+    }
+    .markify-root .sm\:max-w-\[420px\] {
+      max-width: 420px;
     }
     .markify-root .sm\:min-w-8 {
       min-width: calc(var(--spacing) * 8);
+    }
+    .markify-root .sm\:flex-1 {
+      flex: 1;
+    }
+    .markify-root .sm\:grid-cols-\[auto_1fr_1fr\] {
+      grid-template-columns: auto 1fr 1fr;
     }
     .markify-root .sm\:flex-row {
       flex-direction: row;
@@ -1543,23 +1579,20 @@
     .markify-root .sm\:gap-1 {
       gap: var(--spacing);
     }
-    .markify-root .sm\:gap-1\.5 {
-      gap: calc(var(--spacing) * 1.5);
-    }
     .markify-root .sm\:gap-3 {
       gap: calc(var(--spacing) * 3);
     }
-    .markify-root .sm\:gap-5 {
-      gap: calc(var(--spacing) * 5);
+    .markify-root .sm\:gap-x-2 {
+      column-gap: calc(var(--spacing) * 2);
+    }
+    .markify-root .sm\:gap-y-0\.5 {
+      row-gap: calc(var(--spacing) * 0.5);
     }
     .markify-root .sm\:p-1 {
       padding: var(--spacing);
     }
     .markify-root .sm\:p-4 {
       padding: calc(var(--spacing) * 4);
-    }
-    .markify-root .sm\:p-5 {
-      padding: calc(var(--spacing) * 5);
     }
     .markify-root .sm\:p-8 {
       padding: calc(var(--spacing) * 8);
@@ -1582,6 +1615,9 @@
     .markify-root .sm\:py-3 {
       padding-block: calc(var(--spacing) * 3);
     }
+    .markify-root .sm\:pt-4 {
+      padding-top: calc(var(--spacing) * 4);
+    }
     .markify-root .sm\:text-4xl {
       font-size: 2.25rem;
       line-height: var(--tw-leading, 2.5rem);
@@ -1589,6 +1625,10 @@
     .markify-root .sm\:text-lg {
       font-size: 1.125rem;
       line-height: var(--tw-leading, 1.75rem);
+    }
+    .markify-root .sm\:text-sm {
+      font-size: 0.875rem;
+      line-height: var(--tw-leading, 1.25rem);
     }
   }
   @media (width >= 48rem) {
@@ -1623,12 +1663,23 @@
       padding-left: 17rem;
     }
   }
+  @media (width >= 64rem) {
+    .markify-root .lg\:flex-row {
+      flex-direction: row;
+    }
+    .markify-root .lg\:items-start {
+      align-items: flex-start;
+    }
+  }
   @media (prefers-color-scheme: dark) {
     .markify-root .dark\:border-slate-800 {
       border-color: var(--color-slate-800);
     }
     .markify-root .dark\:bg-slate-900 {
       background-color: var(--color-slate-900);
+    }
+    .markify-root .dark\:text-emerald-400 {
+      color: var(--color-emerald-400);
     }
   }
   .markify-root .\[\&_a\]\:text-blue-600 a {
