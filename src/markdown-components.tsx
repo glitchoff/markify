@@ -158,7 +158,7 @@ function Paragraph({ children }: { children?: React.ReactNode }) {
   const content = children ? getText(children).trim() : "";
   if (!content && !hasElements(children)) return null;
   const onlyImage = hasElements(children) && !content;
-  return <p className={cn("mb-(--markify-gap) last:mb-0 leading-relaxed text-base text-foreground/90 whitespace-pre-wrap", onlyImage && "text-center")}>{children}</p>;
+  return <p className={cn("mt-[calc(var(--markify-gap)_*_0.5)] mb-(--markify-gap) first:mt-0 last:mb-0 leading-relaxed text-base text-foreground/90 whitespace-pre-wrap", onlyImage && "text-center")}>{children}</p>;
 }
 
 function Link({ href, children, ...props }: { href?: string; children: React.ReactNode }) {

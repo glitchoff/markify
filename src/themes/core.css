@@ -308,6 +308,9 @@
   .markify-root .mt-10 {
     margin-top: calc(var(--spacing) * 10);
   }
+  .markify-root .mt-\[calc\(var\(--markify-gap\)_\*_0\.5\)\] {
+    margin-top: calc(var(--markify-gap) * 0.5);
+  }
   .markify-root .mt-\[calc\(var\(--markify-gap\)_\*_0\.75\)\] {
     margin-top: calc(var(--markify-gap) * 0.75);
   }
@@ -1425,6 +1428,9 @@
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--markify-muted-fg) 60%, transparent);
     }
+  }
+  .markify-root .first\:mt-0:first-child {
+    margin-top: 0px;
   }
   .markify-root .last\:mb-0:last-child {
     margin-bottom: 0px;
