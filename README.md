@@ -18,6 +18,7 @@ import { Markify } from "@glitchoff/markify";
 - **Tables**: shadcn-styled with copy-as-markdown + download CSV/TSV/MD
 - **Callouts**: 15+ Obsidian-style `> [!TYPE]` alerts (note, tip, important, warning, caution, info, success, question, abstract, todo, failure, danger, bug, example, quote) with semantic icons
 - **Video embeds**: opt-in YouTube embedding from plain links or image syntax (`youtubeEnabled`)
+- **Tweet embeds**: opt-in Twitter/X embedding from image syntax (`twitterEnabled`)
 - **Theming**: 100% shadcn CSS variable tokens + Atom One hljs themes
 - **Spacing**: `spacing` prop (`compact`/`normal`/`relaxed` or granular) to control the gap between blocks
 

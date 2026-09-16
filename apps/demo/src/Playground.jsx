@@ -185,7 +185,7 @@ export function Playground({ isDark }) {
             </span>
           </div>
           <div className="min-h-[26rem] overflow-auto p-4">
-            <Markify isStreaming={streaming} hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled>
+            <Markify isStreaming={streaming} hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled twitterEnabled>
               {display}
             </Markify>
           </div>

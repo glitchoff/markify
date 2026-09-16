@@ -125,6 +125,18 @@ A YouTube URL becomes a player when you use image syntax; left as a link, it sta
 
 ---
 
+## Tweet embeds, opt-in
+
+A tweet URL becomes an embedded tweet when you use image syntax; left as a link, it stays a link.
+
+\`\`\`markdown
+![View on X](https://x.com/glitchoff/status/1865460000000000000)
+\`\`\`
+
+![View on X](https://x.com/glitchoff/status/1865460000000000000)
+
+---
+
 ## Chess from PGN
 
 \`\`\`pgn
@@ -202,7 +214,7 @@ export function Demo({ isDark }) {
         </div>
 
         {/* The landing page body, rendered by Markify */}
-        <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled mermaidConfig={{ showBackground: false }}>{PAGE}</Markify>
+        <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled twitterEnabled mermaidConfig={{ showBackground: false }}>{PAGE}</Markify>
       </div>
     </div>
   );

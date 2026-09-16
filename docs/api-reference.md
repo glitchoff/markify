@@ -28,7 +28,9 @@ import { Markify } from "@glitchoff/markify";
 | `codeFontFamily` | `string` | - | Font family for code blocks. |
 | `mermaidConfig` | `MermaidConfig` | - | Mermaid rendering configuration. |
 | `chessEnabled` | `boolean` | `false` | Enable chess (PGN/FEN) block rendering. |
-| `renderers` | `Renderers` | - | Override built-in block renderers (mermaid, chess, fen, code). See [Customization → Renderers](/docs/customization). |
+| `youtubeEnabled` | `boolean` | `false` | Turn YouTube URLs in image syntax into embedded players. |
+| `twitterEnabled` | `boolean` | `false` | Turn Twitter/X URLs in image syntax into embedded tweets. |
+| `renderers` | `Renderers` | - | Override built-in block renderers (mermaid, chess, fen, code, youtube, twitter). See [Customization → Renderers](/docs/customization). |
 | `components` | `Partial<Components>` | - | Override any markdown element (react-markdown). |
 | `themeType` | `MarkifyThemePreset` | `"shadcn"` | Which host-app token vocabulary the `--markify-*` aliases resolve to. One of `"shadcn"`, `"daisyui"`, `"radix"`, `"bootstrap"`, `"none"`. |
 | `theme` | `Partial<MarkifyTheme>` | - | Per-instance token overrides, applied as inline `--markify-*` vars (highest priority). |
@@ -50,6 +52,8 @@ import { Markify } from "@glitchoff/markify";
 | `useStreamingReveal(content, isStreaming)` | hook | Returns reveal-rendered content while streaming. |
 | `remarkFixKaTeXUnicode` | remark plugin | Normalizes Unicode in KaTeX math. |
 | `parseCallout(blockquote)` | util | Parses `[!TYPE]` Obsidian-style callout blocks (NOTE, TIP, WARNING, INFO, etc.). |
+| `parseYouTubeId(url)` | util | Extracts video id + start timestamp from a YouTube URL. |
+| `parseTweetId(url)` | util | Extracts the numeric status id from a Twitter/X URL. |
 | `getText(node)` | util | Extracts plain text from a markdown AST node. |
 | `cn(...classes)` | util | Tailwind-friendly class combiner. |
 | `injectHljsTheme(theme, customCss?)` | util | Injects built-in or custom `.hljs` CSS. |
@@ -85,9 +89,11 @@ import { Markify } from "@glitchoff/markify";
 - `MarkifyTheme`: per-instance token overrides (`background`, `card`, `muted`, `border`, `primary`, `radius`, `fontSans`, …).
 - `MermaidBlockProps`: props of `MermaidBlock`.
 - `MarkifyMermaidConfig`: extended Mermaid config with UI options (`showHeader`, `showBackground`, `fit`).
-- `Renderers`: `{ mermaid?, chess?, fen?, code? }` custom block renderers.
+- `Renderers`: `{ mermaid?, chess?, fen?, code?, image?, youtube?, twitter? }` custom block/image renderers.
 - `BlockRendererArgs`: `{ code, isStreaming }` passed to `mermaid`/`chess`/`fen` renderers.
 - `CodeRendererProps`: `{ children, className, language }` passed to the `code` renderer.
+- `YouTubeRendererArgs`: `{ src, video, isStreaming }` passed to the `youtube` renderer.
+- `TwitterRendererArgs`: `{ src, id, isStreaming }` passed to the `twitter` renderer.
 
 ## `<MermaidBlock>` Props
 

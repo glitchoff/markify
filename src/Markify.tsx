@@ -29,6 +29,7 @@ export interface MarkifyProps {
   mermaidConfig?: MarkifyMermaidConfig;
   chessEnabled?: boolean;
   youtubeEnabled?: boolean;
+  twitterEnabled?: boolean;
   renderers?: Renderers;
   components?: Partial<Components>;
   /** Which host-app token vocabulary the `--markify-*` aliases resolve to. Defaults to `"shadcn"`. */
@@ -109,7 +110,7 @@ function parseBlocks(content: string): string[] {
 const remarkPlugins: any[] = baseRemarkPlugins;
 const rehypePlugins: any[] = baseRehypePlugins;
 
-function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, youtubeEnabled = false, renderers, components: overrides, themeType = "shadcn", theme, cssVars, spacing, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
+function MarkifyInner({ children, isStreaming = false, className, codeBlockWorker = false, table: tableOpts, hljsTheme = "dark", hljsCustomCss, hljsThemeUrl, hljsThemeBg = false, codeBlockClassName, fontFamily, codeFontFamily, mermaidConfig, chessEnabled = false, youtubeEnabled = false, twitterEnabled = false, renderers, components: overrides, themeType = "shadcn", theme, cssVars, spacing, hljsLanguages = DEFAULT_LANGUAGES }: MarkifyProps) {
   const content = useStreamingReveal(children, isStreaming);
 
   const spacingVars = useMemo(() => resolveSpacingVars(spacing), [spacing]);
@@ -133,8 +134,8 @@ function MarkifyInner({ children, isStreaming = false, className, codeBlockWorke
   }), [tableOpts]);
 
   const components = useMemo(
-    () => ({ ...createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, youtubeEnabled, isStreaming, renderers }), ...overrides }),
-    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, youtubeEnabled, isStreaming, renderers, overrides],
+    () => ({ ...createMarkdownComponents({ codeBlockWorker, table: tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, youtubeEnabled, twitterEnabled, isStreaming, renderers }), ...overrides }),
+    [codeBlockWorker, tableOptions, hljsTheme, hljsCustomCss, hljsThemeUrl, hljsThemeBg, codeFontFamily, mermaidConfig, chessEnabled, youtubeEnabled, twitterEnabled, isStreaming, renderers, overrides],
   );
 
   const blocks = useMemo(() => parseBlocks(content), [content]);

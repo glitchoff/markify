@@ -255,12 +255,60 @@ function YouTubeEmbed({ src, video, streaming }: { src: string; video: YouTubeVi
   );
 }
 
-function Image({ src, alt, title, youtubeEnabled, isStreaming, renderers, ...props }: { src?: string; alt?: string; title?: string; youtubeEnabled?: boolean; isStreaming?: boolean; renderers?: Renderers }) {
+export function parseTweetId(src: string): string | null {
+  if (!src) return null;
+  let url: URL;
+  try {
+    url = new URL(src);
+  } catch {
+    return null;
+  }
+  const host = url.hostname.replace(/^www\./, "").replace(/^m\./, "");
+  if (!/^(twitter\.com|x\.com)$/.test(host)) return null;
+  const match = /^\/[^/]+\/status\/(\d+)/.exec(url.pathname);
+  return match ? match[1] : null;
+}
+
+function TwitterEmbed({ src, id, streaming }: { src: string; id: string; streaming?: boolean }) {
+  if (streaming) {
+    return (
+      <a
+        href={src}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        View tweet on X
+      </a>
+    );
+  }
+  return (
+    <span className="relative my-2 block w-full overflow-hidden rounded-lg border border-border">
+      <iframe
+        src={`https://platform.twitter.com/embed/Tweet.html?id=${id}&dnt=true`}
+        title="Tweet"
+        loading="lazy"
+        className="block w-full border-0"
+        style={{ minHeight: 300 }}
+        allowFullScreen
+      />
+    </span>
+  );
+}
+
+function Image({ src, alt, title, youtubeEnabled, twitterEnabled, isStreaming, renderers, ...props }: { src?: string; alt?: string; title?: string; youtubeEnabled?: boolean; twitterEnabled?: boolean; isStreaming?: boolean; renderers?: Renderers }) {
   const video = youtubeEnabled && src ? parseYouTubeId(src) : null;
   if (video) {
     if (renderers?.youtube) return renderers.youtube({ src: src!, video, isStreaming: !!isStreaming });
     return <YouTubeEmbed src={src!} video={video} streaming={isStreaming} />;
   }
+
+  const tweetId = twitterEnabled && src ? parseTweetId(src) : null;
+  if (tweetId) {
+    if (renderers?.twitter) return renderers.twitter({ src: src!, id: tweetId, isStreaming: !!isStreaming });
+    return <TwitterEmbed src={src!} id={tweetId} streaming={isStreaming} />;
+  }
+
   if (renderers?.image) return renderers.image({ src, alt, title, ...props });
   return (
     <img
@@ -617,6 +665,15 @@ export interface YouTubeRendererArgs {
   isStreaming: boolean;
 }
 
+export interface TwitterRendererArgs {
+  /** The original URL used in the markdown image syntax. */
+  src: string;
+  /** Parsed numeric status id. */
+  id: string;
+  /** Whether the block is still streaming. */
+  isStreaming: boolean;
+}
+
 export interface Renderers {
   /** Override the mermaid block renderer. */
   mermaid?: (args: BlockRendererArgs) => React.ReactNode;
@@ -626,10 +683,12 @@ export interface Renderers {
   fen?: (args: BlockRendererArgs) => React.ReactNode;
   /** Override the default code block renderer for all other languages. */
   code?: (props: CodeRendererProps) => React.ReactNode;
-  /** Override the default image renderer (`![alt](url)` that isn't a YouTube URL). */
+  /** Override the default image renderer (`![alt](url)` that isn't a YouTube or Twitter URL). */
   image?: (props: ImageRendererProps) => React.ReactNode;
   /** Override the YouTube embed renderer (requires `youtubeEnabled`). */
   youtube?: (args: YouTubeRendererArgs) => React.ReactNode;
+  /** Override the Twitter/X embed renderer (requires `twitterEnabled`). */
+  twitter?: (args: TwitterRendererArgs) => React.ReactNode;
 }
 
 export interface MarkdownComponentOptions {
@@ -644,6 +703,7 @@ export interface MarkdownComponentOptions {
   mermaidConfig?: MarkifyMermaidConfig;
   chessEnabled?: boolean;
   youtubeEnabled?: boolean;
+  twitterEnabled?: boolean;
   isStreaming?: boolean;
   renderers?: Renderers;
 }
@@ -659,6 +719,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
   const mermaidConfig = opts?.mermaidConfig;
   const chessEnabled = opts?.chessEnabled ?? false;
   const youtubeEnabled = opts?.youtubeEnabled ?? false;
+  const twitterEnabled = opts?.twitterEnabled ?? false;
   const isStreaming = opts?.isStreaming ?? false;
   const renderers = opts?.renderers;
   const components: Components = {
@@ -673,7 +734,7 @@ export function createMarkdownComponents(opts?: MarkdownComponentOptions): Compo
     p: Paragraph,
     a: Link as any,
     code: InlineCode as any,
-    img: (props) => <Image {...props} youtubeEnabled={youtubeEnabled} isStreaming={isStreaming} renderers={renderers} />,
+    img: (props) => <Image {...props} youtubeEnabled={youtubeEnabled} twitterEnabled={twitterEnabled} isStreaming={isStreaming} renderers={renderers} />,
     blockquote: Blockquote as any,
     table: Table as any,
     thead: THead as any,
