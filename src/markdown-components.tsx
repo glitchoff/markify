@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, memo, useContext, useState, useRef, useCallback, useMemo, isValidElement, lazy, Suspense } from "react";
+import { createContext, memo, useContext, useState, useRef, useEffect, useCallback, useMemo, isValidElement, lazy, Suspense } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -269,30 +269,126 @@ export function parseTweetId(src: string): string | null {
   return match ? match[1] : null;
 }
 
+function useDarkMode(): boolean {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
+declare global {
+  interface Window {
+    twttr?: {
+      widgets: { load: (container?: HTMLElement | null) => void };
+    };
+  }
+}
+
+let twitterWidgetsLoaded = false;
+
+function ensureTwitterWidgets(): void {
+  if (twitterWidgetsLoaded || (typeof window !== "undefined" && document.getElementById("twitter-wjs"))) {
+    twitterWidgetsLoaded = true;
+    return;
+  }
+  twitterWidgetsLoaded = true;
+  const script = document.createElement("script");
+  script.id = "twitter-wjs";
+  script.async = true;
+  script.src = "https://platform.twitter.com/widgets.js";
+  document.head.appendChild(script);
+}
+
+const tweetEmbedCache = new Map<string, string>();
+
+function useTweetEmbed(id: string, isDark: boolean) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [html, setHtml] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const theme = isDark ? "dark" : "light";
+    const cacheKey = `${id}:${theme}`;
+    const cached = tweetEmbedCache.get(cacheKey);
+    if (cached) {
+      setHtml(cached);
+      return () => { cancelled = true; };
+    }
+
+    fetch(`https://publish.twitter.com/oembed?url=${encodeURIComponent(`https://x.com/i/status/${id}`)}&dnt=true&theme=${theme}&omit_script=true`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+      .then((o) => {
+        if (cancelled) return;
+        if (typeof o?.html === "string" && o.html) {
+          tweetEmbedCache.set(cacheKey, o.html);
+          setHtml(o.html);
+          ensureTwitterWidgets();
+        } else {
+          setFailed(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+
+    return () => { cancelled = true; };
+  }, [id, isDark]);
+
+  useEffect(() => {
+    if (!html || typeof window === "undefined") return;
+    let tries = 0;
+    const upgrade = () => {
+      if (window.twttr?.widgets?.load) {
+        window.twttr.widgets.load(ref.current);
+      } else if (tries < 30) {
+        tries += 1;
+        setTimeout(upgrade, 100);
+      }
+    };
+    upgrade();
+  }, [html]);
+
+  return { ref, html, failed };
+}
+
 function TwitterEmbed({ src, id, streaming }: { src: string; id: string; streaming?: boolean }) {
-  if (streaming) {
+  const isDark = useDarkMode();
+  const { ref, html, failed } = useTweetEmbed(id, isDark);
+
+  if (streaming || !html) {
+    if (failed) {
+      return (
+        <a
+          href={src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          View tweet on X
+        </a>
+      );
+    }
     return (
-      <a
-        href={src}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-      >
-        View tweet on X
-      </a>
+      <span className="my-2 block w-full rounded-lg border border-border bg-muted p-6 text-sm text-muted-foreground">
+        Loading tweet…
+      </span>
     );
   }
+
   return (
-    <span className="relative my-2 block w-full overflow-hidden rounded-lg border border-border">
-      <iframe
-        src={`https://platform.twitter.com/embed/Tweet.html?id=${id}&dnt=true`}
-        title="Tweet"
-        loading="lazy"
-        className="block w-full border-0"
-        style={{ minHeight: 300 }}
-        allowFullScreen
-      />
-    </span>
+    <span
+      ref={ref}
+      className="my-2 block w-full [&_.twitter-tweet]:mx-auto [&_.twitter-tweet]:my-0 [&_.twitter-tweet]:w-full [&_.twitter-tweet_reply]:hidden"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }
 

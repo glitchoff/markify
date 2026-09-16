@@ -1793,6 +1793,18 @@
       color: var(--color-emerald-400);
     }
   }
+  .markify-root .\[\&_\.twitter-tweet\]\:mx-auto .twitter-tweet {
+    margin-inline: auto;
+  }
+  .markify-root .\[\&_\.twitter-tweet\]\:my-0 .twitter-tweet {
+    margin-block: 0px;
+  }
+  .markify-root .\[\&_\.twitter-tweet\]\:w-full .twitter-tweet {
+    width: 100%;
+  }
+  .markify-root .\[\&_\.twitter-tweet_reply\]\:hidden .twitter-tweet reply {
+    display: none;
+  }
   .markify-root .\[\&_a\]\:text-blue-600 a {
     color: var(--color-blue-600);
   }

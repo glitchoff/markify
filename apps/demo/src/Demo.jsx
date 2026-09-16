@@ -130,10 +130,10 @@ A YouTube URL becomes a player when you use image syntax; left as a link, it sta
 A tweet URL becomes an embedded tweet when you use image syntax; left as a link, it stays a link.
 
 \`\`\`markdown
-![View on X](https://x.com/glitchoff/status/1865460000000000000)
+![View on X](https://x.com/abhayglitch/status/2095773025799127367)
 \`\`\`
 
-![View on X](https://x.com/glitchoff/status/1865460000000000000)
+![View on X](https://x.com/abhayglitch/status/2095773025799127367)
 
 ---
 

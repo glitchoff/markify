@@ -15,6 +15,7 @@ import {
   MessageSquareQuote,
   Image,
   Video,
+  Bird,
   Activity,
   Settings2,
   Code2,
@@ -38,6 +39,7 @@ import tablesAndCallouts from '../../../docs/tables-and-callouts.md?raw';
 import calloutsAndBlockquotes from '../../../docs/callouts-and-blockquotes.md?raw';
 import images from '../../../docs/images.md?raw';
 import embeds from '../../../docs/embeds.md?raw';
+import twitter from '../../../docs/twitter.md?raw';
 import streaming from '../../../docs/streaming.md?raw';
 import chess from '../../../docs/chess.md?raw';
 import customization from '../../../docs/customization.md?raw';
@@ -54,6 +56,7 @@ const DOC_CONTENT = {
   'callouts-and-blockquotes': calloutsAndBlockquotes,
   images,
   embeds,
+  twitter,
   streaming,
   chess,
   customization,
@@ -83,6 +86,7 @@ const DOC_GROUPS = [
       { id: 'callouts-and-blockquotes', title: 'Callouts & Blockquotes', file: 'callouts-and-blockquotes.md', icon: MessageSquareQuote },
       { id: 'images', title: 'Images', file: 'images.md', icon: Image },
       { id: 'embeds', title: 'Video Embeds', file: 'embeds.md', icon: Video },
+      { id: 'twitter', title: 'Tweet Embeds', file: 'twitter.md', icon: Bird },
     ],
   },
   {
@@ -296,7 +300,7 @@ export function Docs({ isDark }) {
             </div>
           </div>
 
-          <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled>
+          <Markify hljsTheme={isDark ? 'dark' : 'light'} chessEnabled youtubeEnabled twitterEnabled>
             {DOC_CONTENT[selectedDoc.id] || gettingStarted}
           </Markify>
 
