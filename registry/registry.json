@@ -1,0 +1,88 @@
+{
+  "$schema": "https://raw.githubusercontent.com/glitchoff/markify/main/registry/schema.json",
+  "name": "markify",
+  "version": "3.0.0",
+  "description": "Streaming-first Markdown renderer components, shadcn/ui style — copied into your project, owned by you.",
+  "install": {
+    "dependencies": [
+      "react-markdown",
+      "remark-gfm",
+      "remark-math",
+      "rehype-katex",
+      "katex",
+      "remend",
+      "highlight.js",
+      "mermaid",
+      "chess.js",
+      "react-chessboard",
+      "lucide-react",
+      "@phosphor-icons/react",
+      "clsx"
+    ]
+  },
+  "files": [
+    "config.tsx",
+    "tokens.css",
+    "comps/_lib.ts",
+    "comps/_katex-unicode.ts",
+    "comps/code-block.tsx",
+    "comps/code-block.worker.ts",
+    "comps/typography.tsx",
+    "comps/callout.tsx",
+    "comps/blockquote.tsx",
+    "comps/table.tsx",
+    "comps/embeds.tsx",
+    "comps/mermaid.tsx",
+    "comps/chess.tsx",
+    "comps/fallbacks.tsx"
+  ],
+  "components": [
+    {
+      "name": "config",
+      "description": "Settings, theming, component map and the <Markify> orchestrator",
+      "files": ["config.tsx", "tokens.css"],
+      "required": true
+    },
+    {
+      "name": "code-block",
+      "description": "Syntax-highlighted code block with copy/wrap/collapse",
+      "files": ["comps/code-block.tsx", "comps/code-block.worker.ts", "comps/_lib.ts", "comps/_katex-unicode.ts"]
+    },
+    {
+      "name": "typography",
+      "description": "Headings, paragraphs, links, inline code, lists, rules",
+      "files": ["comps/typography.tsx", "comps/_lib.ts"]
+    },
+    {
+      "name": "callout",
+      "description": "GitHub-style callouts (> [!NOTE] etc.) and blockquotes",
+      "files": ["comps/callout.tsx", "comps/blockquote.tsx", "comps/_lib.ts"]
+    },
+    {
+      "name": "table",
+      "description": "Table with copy-as-markdown and CSV/TSV/MD download",
+      "files": ["comps/table.tsx", "comps/_lib.ts"]
+    },
+    {
+      "name": "embeds",
+      "description": "Images plus ![youtube:…] and ![twitter:…] embeds",
+      "files": ["comps/embeds.tsx", "comps/_lib.ts"]
+    },
+    {
+      "name": "mermaid",
+      "description": "Mermaid diagrams with zoom, pan, fullscreen and export",
+      "files": ["comps/mermaid.tsx", "comps/_lib.ts"]
+    },
+    {
+      "name": "chess",
+      "description": "PGN game viewer and interactive FEN board",
+      "files": ["comps/chess.tsx", "comps/_lib.ts"]
+    },
+    {
+      "name": "fallbacks",
+      "description": "Spinners and lazy-loading fallback cards",
+      "files": ["comps/fallbacks.tsx", "comps/_lib.ts"]
+    }
+  ]
+}
+

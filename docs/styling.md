@@ -1,27 +1,8 @@
-# Styling & Layout
+# Styling & Spacing
 
-How Markify's root container forwards styles and how to control spacing between blocks.
+## Spacing between blocks
 
-## 1. Root Container
-
-`<Markify>` renders a single wrapper `<div class="markify-root">` around your Markdown. It forwards exactly **two** things:
-
-| Prop | Effect |
-|------|--------|
-| `className` | Merged onto the root `div` (alongside `markify-root text-foreground ...`) |
-| `fontFamily` | Applied as `style.fontFamily` on the root |
-
-There is no generic `{...rest}` spread: arbitrary HTML props and `style` are **not** forwarded. To style the container, use `className` (and Tailwind arbitrary variants) or target `.markify-root` in your own CSS.
-
-```tsx
-<Markify className="my-8 max-w-none [&_a]:text-blue-600">
-  {markdown}
-</Markify>
-```
-
-## 2. Spacing Between Blocks
-
-The vertical gap between paragraphs, headings, code blocks, tables, callouts, lists, and embeds is driven by CSS variables on `.markify-root`:
+Vertical rhythm is driven by custom properties on `.markify-root`:
 
 | Variable | Controls | Default (`normal`) |
 |----------|----------|--------------------|
@@ -31,12 +12,10 @@ The vertical gap between paragraphs, headings, code blocks, tables, callouts, li
 
 ### Named presets
 
-Pass a `spacing` prop to switch the whole layout at once:
-
 ```tsx
-<Markify spacing="compact">  {/* tight: 0.5rem / 0.75rem / 0.25rem */}
-<Markify spacing="normal">   {/* default: 2rem / 3.25rem / 0.5rem */}
-<Markify spacing="relaxed">  {/* airy: 2.5rem / 4rem / 0.625rem */}
+<Markify spacing="compact">  {/* 0.5rem / 0.75rem / 0.25rem */}
+<Markify spacing="normal">   {/* 2rem / 3.25rem / 0.5rem — default */}
+<Markify spacing="relaxed">  {/* 2.5rem / 4rem / 0.625rem */}
 ```
 
 ### Granular overrides
@@ -44,9 +23,7 @@ Pass a `spacing` prop to switch the whole layout at once:
 `spacing` also accepts an object to tune individual parts without affecting the rest:
 
 ```tsx
-<Markify spacing={{ block: "2.5rem", headingTop: "3.5rem" }}>
-  {markdown}
-</Markify>
+<Markify spacing={{ block: "2.5rem", headingTop: "3.5rem" }}>{markdown}</Markify>
 ```
 
 | Key | Meaning |
@@ -55,11 +32,11 @@ Pass a `spacing` prop to switch the whole layout at once:
 | `headingTop` | Gap above headings |
 | `listItem` | Gap between list items |
 
-Each key accepts any CSS length (`"1rem"`, `"18px"`, `"1.5em"`). Keys you omit fall back to the `normal` preset.
+Each key accepts any CSS length (`"1rem"`, `"18px"`, `"1.5em"`). Keys you omit fall back to the `normal` preset. Set defaults globally via `markifyConfig.spacing`.
 
 ### Without the `spacing` prop
 
-You can also override the variables directly in your own CSS, useful for a global default:
+Override the variables directly in your own CSS — useful for a global default:
 
 ```css
 .markify-root {
@@ -68,17 +45,16 @@ You can also override the variables directly in your own CSS, useful for a globa
 }
 ```
 
-## 3. Parent Width
+## Built-in base styles
 
-Markify renders wide tables, scrollable code blocks, and 16:9 embeds, so wrap it in a container with a defined width constraint:
+`tokens.css` ships a small scoped base layer (so Markify is correct even with no global resets), all inside `@layer base` — any utility overrides it:
 
-```tsx
-<main className="w-full max-w-4xl mx-auto px-4 py-8">
-  <Markify>{markdown}</Markify>
-</main>
-```
+- `*` → `border-color: var(--markify-border)`
+- `p` → authored whitespace preserved (`pre-wrap`) + word breaking
+- `button` → inherits font and color
+- `table` → full width, collapsed borders; `img` → max-width 100%, auto height
 
-## 4. Theme vs Styling
+## Theme vs styling
 
-- **Theming** covers colors and light/dark mode (`theming.md`).
-- **Styling** (this page) covers layout, container props, and spacing.
+- **Theming** covers colors and dark mode (`theming.md`).
+- **Styling** (this page) covers spacing, layout, and container props (`layout-and-sizing.md`).

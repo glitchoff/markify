@@ -1,164 +1,93 @@
-# Getting Started with Markify
+# Getting Started
 
-`@glitchoff/markify` is a high-performance, streaming Markdown renderer for React applications built with Tailwind CSS.
+Markify is a streaming-first Markdown renderer for React, built in the shadcn/ui spirit: you don't install a styled library — you **copy the components into your project** and they're yours.
 
-## 1. Installation
+## Requirements
 
-Install Markify using your preferred package manager:
+- **React 18 or 19**
+- **Tailwind CSS v4** — components are styled with Tailwind utilities + shadcn design tokens
+- A bundler that handles TSX and web workers (Vite, Next.js, Astro, etc.)
+
+## 1. Run init
 
 ```bash
-pnpm add @glitchoff/markify
-# or
-npm install @glitchoff/markify
-# or
-yarn add @glitchoff/markify
+npx @glitchoff/markify init
 ```
 
-### Peer Dependencies
-Markify requires React 18 or 19:
-- `react`: `^18.0.0 || ^19.0.0`
-- `react-dom`: `^18.0.0 || ^19.0.0`
+The CLI:
 
----
+1. Detects your `components.json` (shadcn) and resolves the components path — otherwise it defaults to `components/markify`
+2. Copies the **entire scaffold** in one shot
+3. Installs the required dependencies with your detected package manager (npm / pnpm / yarn / bun) — skipping anything already installed
+4. Prints the exact import to use
 
-## 2. Requirements & CSS Imports
+### What you get
 
+```
+components/markify/
+├── config.tsx        # settings + theming + component map + <Markify> export
+├── tokens.css        # shadcn token aliases + fallbacks (imported by config.tsx)
+└── comps/
+    ├── code-block.tsx        # syntax highlighting, copy/wrap/collapse
+    ├── code-block.worker.ts  # optional off-thread highlighting
+    ├── typography.tsx        # headings, paragraphs, links, inline code, lists, rules
+    ├── callout.tsx           # GitHub-style callouts
+    ├── blockquote.tsx        # plain blockquotes
+    ├── table.tsx             # tables with copy/export
+    ├── embeds.tsx            # images + YouTube/Twitter embeds
+    ├── mermaid.tsx           # diagrams
+    ├── chess.tsx             # PGN viewer + FEN board
+    ├── fallbacks.tsx         # spinners and lazy-loading cards
+    ├── _lib.ts               # tiny shared helpers (cn, copy, download…)
+    └── _katex-unicode.ts     # remark plugin for math unicode fixes
+```
 
+### Environment checks
 
-> [!IMPORTANT]
-> **Tailwind CSS Required:**  
-> Markify components rely on Tailwind CSS utility classes. Ensure Tailwind CSS is installed and configured in your host project.
+`init` warns (non-blocking) if React or Tailwind CSS can't be found in your project — it still copies the scaffold either way.
 
+## 2. Use it
 
-Import Markify's CSS once at your application root (e.g. `main.tsx`, `App.tsx`, or `layout.tsx`):
+Import `Markify` from your own config — never from the npm package:
 
 ```tsx
-import "@glitchoff/markify/themes/core.css";
+import { Markify } from "@/components/markify/config";
+
+export function Chat({ reply, generating }) {
+  return <Markify isStreaming={generating}>{reply}</Markify>;
+}
 ```
 
-Pick the file that matches your app:
+## 3. Configure it
 
-| File | When to use |
-| --- | --- |
-| `@glitchoff/markify/themes/core.css` | **Recommended.** Scoped base + utility layer + theme aliases. Your app provides its own design tokens (shadcn, daisyUI, Radix, Bootstrap, custom). |
-| `@glitchoff/markify/themes/markify.css` | Only if your app has **no theme system** and you want Markify's bundled shadcn defaults. |
-
-> [!NOTE]
-> **Safe to import, order-independent.** Every rule Markify ships is scoped under `.markify-root` and emitted **unlayered** — it never declares a CSS `@layer` and never touches your `:root` tokens. Importing it before or after your Tailwind/`globals.css` cannot reorder your cascade or override your theme.
-
-See [Theming](/docs/theming) for the full token reference and the `themeType` / `theme` props.
-
----
-
-## 3. Standard Setup (copy-paste)
-
-One standard way, minimal config — Tailwind v4 + shadcn tokens + `core.css`. This is exactly what the [demo app](/docs/getting-started) runs.
-
-**1. Install Tailwind v4** (Vite example):
-
-```bash
-pnpm add -D tailwindcss @tailwindcss/vite
-```
+Everything is configured in one file — `components/markify/config.tsx`:
 
 ```ts
-// vite.config.ts
-import tailwindcss from "@tailwindcss/vite";
+export const markifyConfig = {
+  theme: {},            // shadcn token overrides
+  cssVars: {},          // raw custom properties, e.g. { "--markify-gap": "1.5rem" }
+  spacing: "normal",    // "compact" | "normal" | "relaxed" | granular object
+  fontFamily: undefined,
 
-export default { plugins: [react(), tailwindcss()] };
+  codeBlock: { worker: false, hljsTheme: "dark", hljsLanguages: "default" },
+  table: { showCopyButton: true, downloadFormats: ["csv"], scrollable: true },
+  mermaid: { showHeader: true, showBackground: true, fit: false },
+  chess: { enabled: true, maxWidth: 420, showNotation: true },
+  embeds: { youtube: true, twitter: true },
+};
 ```
 
-**2. `globals.css`** — import Tailwind, Markify's `core.css`, map the tokens, define light/dark values:
+Every setting is a **default** — `spacing`, `theme`, `cssVars`, `fontFamily` and the component map can still be overridden per-instance as `<Markify>` props.
 
-```css
-@import "tailwindcss";
-@import "@glitchoff/markify/themes/core.css";
+## Framework notes
 
-@custom-variant dark (&:is(.dark *));
+- **Next.js / Vite / Astro**: works out of the box. In Astro, mount `<Markify>` inside a `client:*` island.
+- **Workers**: `codeBlock.worker` uses `new Worker(new URL(...), import.meta.url)` — supported by Vite, Next.js (webpack 5), and most bundlers.
+- **KaTeX**: `config.tsx` imports `katex/dist/katex.min.css` — remove that import if you load KaTeX styles globally already.
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-}
+## Next steps
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --border: oklch(0.922 0 0);
-  /* …any shadcn palette… */
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --border: oklch(1 0 0 / 10%);
-  /* …any shadcn palette… */
-}
-```
-
-**3. Import `globals.css` at your app root** and render:
-
-```tsx
-import { Markify } from "@glitchoff/markify";
-
-<Markify isStreaming={generating}>{reply}</Markify>
-```
-
-That's it — no `themeType` needed for shadcn apps (it's the default), and Markify follows your `.dark` class automatically.
-
-**Zero-config alternative:** if you'd rather not define tokens at all, import the legacy `@glitchoff/markify/themes/markify.css` instead of `core.css` — it bundles a neutral shadcn palette. You lose the warm/custom look but skip step 2's token block.
-
-## 4. Basic Usage
-
-Render static or streaming Markdown content with the `<Markify>` component:
-
-```tsx
-import { Markify } from "@glitchoff/markify";
-
-export function SimpleViewer() {
-  const content = "# Hello World\n\nThis is **Markify** rendering markdown!";
-
-  return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8">
-      <Markify>{content}</Markify>
-    </div>
-  );
-}
-```
-
-### Streaming Mode (AI Responses)
-Enable token-arrival reveal animation during LLM streaming:
-
-```tsx
-<Markify isStreaming={isLoading}>
-  {streamingTextContent}
-</Markify>
-```
+- [Theming & dark mode](/docs/theming)
+- [Styling & spacing](/docs/styling)
+- [Features](/docs/features)
+- [Customization](/docs/customization)

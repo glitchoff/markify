@@ -1,69 +1,34 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useRef } from "react";
 
-const STORAGE_KEY = 'markify-theme';
-
-function getSystemTheme() {
-  return typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
-}
-
-function resolveTheme(theme) {
-  return theme === 'system' ? getSystemTheme() : theme;
-}
-
-function getInitialTheme() {
-  if (typeof window === 'undefined') return 'system';
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === 'light' || stored === 'dark' || stored === 'system') return stored;
-  } catch {
-    /* ignore */
-  }
-  return 'system';
-}
-
-function applyClasses(theme) {
-  const root = document.documentElement;
-  root.classList.toggle('dark', theme === 'dark');
-  root.classList.toggle('light', theme === 'light');
-  root.setAttribute('data-theme', theme);
-}
+const STORAGE_KEY = "markify-theme";
 
 export function useTheme() {
-  const [theme, setThemeState] = useState(getInitialTheme);
-  const [resolvedTheme, setResolvedTheme] = useState(() => resolveTheme(getInitialTheme()));
+  const apply = (isDark) => {
+    const root = document.documentElement;
+    root.classList.toggle("dark", isDark);
+    root.style.colorScheme = isDark ? "dark" : "light";
+  };
 
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const update = () => {
-      const resolved = resolveTheme(theme);
-      setResolvedTheme(resolved);
-      applyClasses(resolved);
-    };
-
-    update();
+  const toggle = () => {
+    const isDark = !document.documentElement.classList.contains("dark");
+    apply(isDark);
     try {
-      window.localStorage.setItem(STORAGE_KEY, theme);
-    } catch {
-      /* ignore */
-    }
+      localStorage.setItem(STORAGE_KEY, isDark ? "dark" : "light");
+    } catch {}
+  };
 
-    if (theme === 'system') {
-      media.addEventListener('change', update);
-      return () => media.removeEventListener('change', update);
-    }
-  }, [theme]);
+  // Apply the stored theme as early as possible on mount.
+  const appliedRef = useRef(false);
+  useEffect(() => {
+    if (appliedRef.current) return;
+    appliedRef.current = true;
+    let stored = null;
+    try {
+      stored = localStorage.getItem(STORAGE_KEY);
+    } catch {}
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    apply(stored ? stored === "dark" : !!prefersDark);
+  }, []);
 
-  const isDark = resolvedTheme === 'dark';
-
-  const setTheme = useCallback((next) => setThemeState(next), []);
-  const toggle = useCallback(
-    () => setThemeState((prev) => (resolveTheme(prev) === 'dark' ? 'light' : 'dark')),
-    [],
-  );
-
-  return { theme, resolvedTheme, isDark, setTheme, toggle };
+  return { toggle };
 }

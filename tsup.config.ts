@@ -1,11 +1,14 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/highlight.worker.ts", "src/chess/index.ts", "src/mermaid/index.ts"],
+  entry: { cli: "cli/index.ts" },
   format: ["esm"],
-  dts: true,
+  platform: "node",
+  target: "node18",
   clean: true,
   minify: false,
   sourcemap: true,
-  external: ["react", "react-dom"],
+  banner: {
+    js: "import { createRequire as __createRequire } from 'node:module';\nconst require = __createRequire(import.meta.url);",
+  },
 });

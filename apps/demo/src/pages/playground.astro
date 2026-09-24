@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Playground from "../components/Playground";
+---
+
+<Base active="playground">
+  <Playground client:only="react" />
+</Base>

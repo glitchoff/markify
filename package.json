@@ -1,71 +1,46 @@
 {
   "name": "@glitchoff/markify",
-  "version": "2.5.0",
+  "version": "3.0.0",
   "private": false,
   "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "Streaming-first Markdown renderer components, shadcn/ui style — copied into your project, owned by you.",
+  "bin": {
+    "markify": "./dist/cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/glitchoff/markify"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./chess": {
-      "types": "./dist/chess/index.d.ts",
-      "import": "./dist/chess/index.js"
-    },
-    "./mermaid": {
-      "types": "./dist/mermaid/index.d.ts",
-      "import": "./dist/mermaid/index.js"
-    },
-    "./themes/*": "./dist/themes/*",
-    "./themes/core.css": "./dist/themes/core.css",
-    "./themes/shadcn.css": "./dist/themes/shadcn.css"
-  },
   "files": [
-    "dist",
-    "dist/themes"
+    "dist/cli.js",
+    "registry"
   ],
   "scripts": {
-    "build": "tsup && pnpm build:css && node -e \"require('fs').cpSync('src/themes', 'dist/themes', {recursive: true})\"",
+    "build": "tsup && tsc --noEmit",
     "dev": "tsup --watch",
     "demo": "pnpm --filter demo dev",
-    "build:css": "node scripts/build-css.mjs"
+    "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
+  "devDependencies": {
     "@phosphor-icons/react": "^2.1.10",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "chess.js": "^1.4.0",
     "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
     "katex": "^0.16.28",
     "lucide-react": "^1.17.0",
     "mermaid": "^11.12.2",
+    "react": "^19.0.0",
     "react-chessboard": "^5.12.1",
+    "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "remend": "^1.3.0",
-    "tailwind-merge": "^3.6.0"
-  },
-  "peerDependencies": {
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/cli": "^4.3.3",
-    "@types/hast": "^3.0.4",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "hast": "^1.0.0",
-    "lightningcss": "^1.33.0",
-    "tailwindcss": "^4.3.3",
     "tsup": "^8.5.1",
     "typescript": "^5"
   }

@@ -1,109 +1,62 @@
 # API Reference
 
-Complete reference for the `<Markify>` component and the utilities exported from `@glitchoff/markify`.
+## `<Markify>`
 
-## `<Markify>` Props
-
-```tsx
-import { Markify } from "@glitchoff/markify";
-
-<Markify isStreaming hljsTheme="dark">
-  {markdown}
-</Markify>
-```
+Imported from your own config: `import { Markify } from "@/components/markify/config"`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `string` | - (required) | The Markdown source to render. |
-| `isStreaming` | `boolean` | `false` | Enable progressive reveal animation while content streams in. |
-| `className` | `string` | `""` | Extra class names for the root `.markify-root` wrapper. |
-| `codeBlockWorker` | `boolean` | `false` | Offload syntax highlighting to a Web Worker. |
-| `table` | `TableOptions` | - | See [Customization → Tables](/docs/customization). |
-| `hljsTheme` | `"dark" \| "light"` | `"dark"` | Built-in syntax highlighting theme. |
-| `hljsCustomCss` | `string` | - | Raw CSS string overriding `.hljs` colors. |
-| `hljsThemeUrl` | `string` | - | URL of an external highlight.js stylesheet to inject. |
-| `hljsThemeBg` | `boolean` | `false` | Apply the theme background to the `.hljs` container. |
-| `codeBlockClassName` | `string` | - | Extra classes for each code block wrapper. |
-| `fontFamily` | `string` | - | Root font family for rendered content. |
-| `codeFontFamily` | `string` | - | Font family for code blocks. |
-| `mermaidConfig` | `MermaidConfig` | - | Mermaid rendering configuration. |
-| `chessEnabled` | `boolean` | `false` | Enable chess (PGN/FEN) block rendering. |
-| `youtubeEnabled` | `boolean` | `false` | Turn YouTube URLs in image syntax into embedded players. |
-| `twitterEnabled` | `boolean` | `false` | Turn Twitter/X URLs in image syntax into embedded tweets. |
-| `renderers` | `Renderers` | - | Override built-in block renderers (mermaid, chess, fen, code, youtube, twitter). See [Customization → Renderers](/docs/customization). |
-| `components` | `Partial<Components>` | - | Override any markdown element (react-markdown). |
-| `themeType` | `MarkifyThemePreset` | `"shadcn"` | Which host-app token vocabulary the `--markify-*` aliases resolve to. One of `"shadcn"`, `"daisyui"`, `"radix"`, `"bootstrap"`, `"none"`. |
-| `theme` | `Partial<MarkifyTheme>` | - | Per-instance token overrides, applied as inline `--markify-*` vars (highest priority). |
-| `cssVars` | `Record<string, string>` | - | Escape hatch for setting raw `--markify-*` custom properties directly. |
-| `hljsLanguages` | `string[] \| "all"` | 20 common languages | Which highlight.js languages to preload on mount. Pass `"all"` to preload every supported language, an array of language names, or `[]` to disable preloading (languages load on-demand when encountered). |
+| `children` | `string` | — | Markdown source to render |
+| `isStreaming` | `boolean` | `false` | Streaming repair + progressive block rendering |
+| `className` | `string` | — | Merged onto the root `.markify-root` wrapper |
+| `spacing` | `"compact" \| "normal" \| "relaxed" \| { block?, headingTop?, listItem? }` | from config | Vertical rhythm |
+| `theme` | `Partial<MarkifyTheme>` | from config | shadcn token overrides |
+| `cssVars` | `Record<string, string>` | from config | Raw custom-property overrides |
+| `fontFamily` | `string` | from config | Font family for the whole renderer |
+| `components` | `Partial<Components>` | — | react-markdown component overrides (merged over the built-in map) |
 
-## `TableOptions`
+## `markifyConfig`
 
-| Option | Type | Default |
+Global defaults in `components/markify/config.tsx`:
+
+| Key | Type | Description |
 |---|---|---|
-| `showCopyButton` | `boolean` | `true` |
-| `downloadFormats` | `("csv" \| "tsv" \| "md")[]` | `[]` |
-| `scrollable` | `boolean` | `true` |
+| `theme` | `Partial<MarkifyTheme>` | Token overrides (shadcn token names) |
+| `cssVars` | `Record<string, string>` | Raw CSS custom properties |
+| `spacing` | preset or object | Vertical rhythm |
+| `fontFamily` | `string?` | Renderer font |
+| `codeBlock` | `{ worker?, hljsTheme?, hljsCustomCss?, hljsThemeUrl?, hljsThemeBg?, codeFontFamily?, hljsLanguages? }` | Code block behavior |
+| `table` | `{ showCopyButton?, downloadFormats?, scrollable? }` | Table actions |
+| `mermaid` | `MarkifyMermaidConfig` | `showHeader`, `showBackground`, `fit` + any mermaid config option |
+| `chess` | `{ enabled?, maxWidth?, showNotation? }` | PGN/FEN blocks |
+| `embeds` | `{ youtube?, twitter? }` | Image-URL embeds |
 
-## Exported Utilities
+## `MarkifyTheme`
 
-| Export | Kind | Description |
+`background`, `foreground`, `card`, `cardForeground`, `popover`, `popoverForeground`, `primary`, `primaryForeground`, `secondary`, `secondaryForeground`, `muted`, `mutedForeground`, `accent`, `accentForeground`, `destructive`, `destructiveForeground`, `border`, `input`, `ring`, `fontSans`, `fontMono` — all optional CSS values.
+
+## Exported helpers (`config.tsx`)
+
+| Export | Signature | Description |
 |---|---|---|
-| `useStreamingReveal(content, isStreaming)` | hook | Returns reveal-rendered content while streaming. |
-| `remarkFixKaTeXUnicode` | remark plugin | Normalizes Unicode in KaTeX math. |
-| `parseCallout(blockquote)` | util | Parses `[!TYPE]` Obsidian-style callout blocks (NOTE, TIP, WARNING, INFO, etc.). |
-| `parseYouTubeId(url)` | util | Extracts video id + start timestamp from a YouTube URL. |
-| `parseTweetId(url)` | util | Extracts the numeric status id from a Twitter/X URL. |
-| `getText(node)` | util | Extracts plain text from a markdown AST node. |
-| `cn(...classes)` | util | Tailwind-friendly class combiner. |
-| `injectHljsTheme(theme, customCss?)` | util | Injects built-in or custom `.hljs` CSS. |
-| `MermaidBlock` | component | Standalone Mermaid renderer. Import from `@glitchoff/markify/mermaid` (see below). |
-| `useTableOptions()` | hook | Read current table options from context. |
-| `TableOptionsContext` | context | Context providing table options. |
-| `ATOM_DARK_CSS` / `ATOM_LIGHT_CSS` | string | Built-in highlight themes as raw CSS. |
-| `getThemeCss(theme)` | fn | Returns theme CSS for `"dark"` / `"light"`. |
+| `Markify` | component | The renderer |
+| `markifyConfig` | object | Global settings seam |
+| `toMarkifyVars` | `(theme?) => Record<string, string>` | Theme object → `--markify-*` CSS vars |
+| `parseBlocks` | `(content) => string[]` | Fence-aware top-level block splitting |
+| `normalizeDisplayMath` | `(content) => string` | Single-line `$$…$$` → centered block math |
+| `useStreamingReveal` | `(content, isStreaming) => string` | Streaming repair hook |
 
-### `@glitchoff/markify/chess`
+## Component exports (`comps/`)
 
-| Export | Kind | Description |
-|---|---|---|
-| `ChessGame` | component | Standalone PGN viewer (see [Chess](/docs/chess)). |
-| `ChessBlock` | component | Fence-style PGN wrapper around `ChessGame`. |
-| `FenBoard` | component | Standalone FEN viewer (playable, with reset). |
-| `ChessGameProps` / `ChessBlockProps` / `FenBoardProps` | type | Props for the chess components. |
-
-### `@glitchoff/markify/mermaid`
-
-| Export | Kind | Description |
-|---|---|---|
-| `MermaidBlock` | component | Standalone Mermaid renderer (see below). |
-| `MermaidBlockProps` | type | Props of `MermaidBlock`. |
-| `MarkifyMermaidConfig` | type | Extended `MermaidConfig` with `showHeader`, `showBackground`, `fit` options. |
-
-## Types
-
-- `MarkifyProps`: props of `<Markify>`.
-- `Components`: react-markdown component map (re-exported).
-- `HljsTheme`: `"dark" | "light"`.
-- `MarkifyThemePreset`: `"shadcn" | "daisyui" | "radix" | "bootstrap" | "none"` — host-app token vocabulary for the `--markify-*` aliases.
-- `MarkifyTheme`: per-instance token overrides (`background`, `card`, `muted`, `border`, `primary`, `radius`, `fontSans`, …).
-- `MermaidBlockProps`: props of `MermaidBlock`.
-- `MarkifyMermaidConfig`: extended Mermaid config with UI options (`showHeader`, `showBackground`, `fit`).
-- `Renderers`: `{ mermaid?, chess?, fen?, code?, image?, youtube?, twitter? }` custom block/image renderers.
-- `BlockRendererArgs`: `{ code, isStreaming }` passed to `mermaid`/`chess`/`fen` renderers.
-- `CodeRendererProps`: `{ children, className, language }` passed to the `code` renderer.
-- `YouTubeRendererArgs`: `{ src, video, isStreaming }` passed to the `youtube` renderer.
-- `TwitterRendererArgs`: `{ src, id, isStreaming }` passed to the `twitter` renderer.
-
-## `<MermaidBlock>` Props
-
-| Prop | Type | Description |
-|---|---|---|
-| `code` | `string` | Mermaid source code. |
-| `config` | `MermaidConfig` | Mermaid configuration. |
-| `className` | `string` | Wrapper class names. |
-
-## Peer Dependencies
-
-- `react`: `^18.0.0 || ^19.0.0`
-- `react-dom`: `^18.0.0 || ^19.0.0`
+| File | Exports |
+|---|---|
+| `code-block.tsx` | `CodeBlock`, `extractLanguage`, `getCodeText`, `preloadLanguages`, `ensureLanguage`, `DEFAULT_LANGUAGES`, `ALL_LANGUAGES`, `injectHljsTheme` |
+| `typography.tsx` | `H1`–`H6`, `Paragraph`, `Link`, `InlineCode`, `OrderedList`, `UnorderedList`, `ListItem`, `Hr` |
+| `callout.tsx` | `Callout`, `parseCallout`, `stripCalloutMarker`, `getText`, `CalloutType` |
+| `blockquote.tsx` | `Blockquote` (renders `Callout` when the marker is present) |
+| `table.tsx` | `Table`, `THead`, `TBody`, `TR`, `TH`, `TD`, `TableOptionsContext`, `defaultTableOptions` |
+| `embeds.tsx` | `Image`, `parseYouTubeId`, `parseTweetId`, `YouTubeVideo` |
+| `mermaid.tsx` | `MermaidBlock`, `MarkifyMermaidConfig` |
+| `chess.tsx` | `ChessGame`, `FenBoard` |
+| `fallbacks.tsx` | `Spinner`, `ChessFallback`, `MermaidFallback` |
+| `_lib.ts` | `cn`, `hash`, `copyToClipboard`, `downloadBlob`, `downloadText`, `getText` |

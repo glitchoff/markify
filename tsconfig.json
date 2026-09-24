@@ -1,20 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "strict": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "allowImportingTsExtensions": false,
-    "noEmit": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": ["node"]
   },
-  "include": ["src"]
+  "include": ["cli", "registry", "types.d.ts"]
 }

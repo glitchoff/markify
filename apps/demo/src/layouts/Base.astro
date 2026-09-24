@@ -1,0 +1,95 @@
+---
+import "../index.css";
+import logoDarkUrl from "../markify-icon-dark.svg?url";
+import logoLightUrl from "../markify-icon-light.svg?url";
+import ThemeToggle from "../components/ThemeToggle";
+import { withBase } from "../base";
+
+interface Props {
+  active?: "demo" | "docs" | "playground";
+}
+
+const { active = "demo" } = Astro.props;
+
+const navLink = (href: string, label: string, key: "demo" | "docs" | "playground") => {
+  const isActive = active === key;
+  return `<a href="${withBase(href)}" class="rounded px-2 py-1 font-medium transition-all sm:px-3 ${
+    isActive
+      ? "bg-background text-foreground shadow-sm"
+      : "text-muted-foreground hover:text-foreground"
+  }">${label}</a>`;
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Markify — Streaming Markdown for React</title>
+    <script is:inline>
+      // Apply the stored theme before first paint to avoid a flash.
+      try {
+        var stored = localStorage.getItem("markify-theme");
+        var dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle("dark", dark);
+        document.documentElement.style.colorScheme = dark ? "dark" : "light";
+      } catch (e) {}
+    </script>
+  </head>
+  <body class="bg-background text-foreground">
+    <header class="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+      <div class="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3">
+        <a href={withBase("/")} class="flex shrink-0 items-center gap-2 sm:gap-3">
+          <img
+            src={logoLightUrl}
+            data-dark-src={logoDarkUrl}
+            data-light-src={logoLightUrl}
+            alt="Markify logo"
+            class="markify-logo h-8 w-8 rounded-lg sm:h-9 sm:w-9"
+            width="512"
+            height="512"
+          />
+          <span class="hidden text-lg font-semibold italic tracking-tight sm:block">Markify</span>
+        </a>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="flex items-center rounded-lg border border-border bg-muted p-0.5 text-xs sm:p-1">
+            <Fragment set:html={navLink("/", "Demo", "demo")} />
+            <Fragment set:html={navLink("/docs/getting-started", "Docs", "docs")} />
+            <Fragment set:html={navLink("/playground", "Playground", "playground")} />
+          </div>
+
+          <ThemeToggle client:only="react" />
+
+          <a
+            href="https://github.com/glitchoff/markify"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden text-xs font-medium text-muted-foreground hover:text-foreground transition-colors md:block"
+          >
+            GitHub
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="w-full py-10">
+      <slot />
+    </main>
+
+    <script is:inline>
+      // Swap the logo with dark mode.
+      (function () {
+        var img = document.querySelector(".markify-logo");
+        if (!img) return;
+        var sync = function () {
+          var isDark = document.documentElement.classList.contains("dark");
+          img.src = isDark ? img.dataset.darkSrc : img.dataset.lightSrc;
+        };
+        new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        sync();
+      })();
+    </script>
+  </body>
+</html>

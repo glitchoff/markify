@@ -1,51 +1,56 @@
-# Layout & Container Width Recommendations
+# Layout & Sizing
 
-Markify renders complex Markdown elements, including wide data tables with export buttons, code blocks with horizontal scrollbars, and zoomable/pannable Mermaid diagrams.
+## Root container
 
-## 1. Parent Width Recommendation
+`<Markify>` renders a single wrapper `<div class="markify-root">`. It accepts:
 
-> [!IMPORTANT]
-> **We recommend wrapping `<Markify>` in a container with a defined width constraint.**  
-> Without a parent width limit (e.g. `max-w-4xl` or `max-width: 1000px`), wide tables and diagrams may stretch past the viewport.
+| Prop | Effect |
+|------|--------|
+| `className` | Merged onto the root `div` |
+| `fontFamily` | Applied as `style.fontFamily` on the root |
 
-### Tailwind CSS Layout Example
+There is no generic `{...rest}` spread — to style the container use `className`, or target `.markify-root` in your own CSS:
 
 ```tsx
-export function PageLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
-        {children}
-      </div>
-    </main>
-  );
-}
+<Markify className="my-8 max-w-none">{markdown}</Markify>
 ```
 
-### Standard CSS Layout Example
+## Parent width
 
-```css
-.markify-container {
-  width: 90vw;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem;
-  border-radius: 1rem;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-}
+Markify renders wide tables, scrollable code blocks, and 16:9 embeds — wrap it in a container with a defined width constraint:
 
-html.dark .markify-container {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
+```tsx
+<main className="w-full max-w-4xl mx-auto px-4 py-8">
+  <Markify>{markdown}</Markify>
+</main>
 ```
 
----
+Common container patterns:
 
-## 2. Responsive Behavior
+```tsx
+{/* full-bleed chat pane, markdown constrained inside */}
+<div className="h-screen overflow-y-auto">
+  <div className="mx-auto max-w-3xl px-4">
+    <Markify isStreaming>{tokens}</Markify>
+  </div>
+</div>
 
-Markify handles responsive scaling automatically:
-- **Code Blocks**: Auto-collapse long code snippets (>5 lines) with expand/collapse buttons.
-- **Tables**: Horizontal scroll wrapper prevents layout breakage on small mobile viewports.
-- **Mermaid Diagrams**: Fullscreen toggle, zoom in/out, and click-and-drag panning.
+{/* unconstrained — let the app own the width entirely */}
+<Markify className="max-w-none">{markdown}</Markify>
+```
+
+## Built-in sizing behavior
+
+- Tables span the full card width and scroll horizontally when `table.scrollable` is on
+- Code blocks scroll horizontally when unwrapped; wrap keeps everything inside the card
+- Images are capped at container width (`max-width: 100%`, auto height) via the base layer
+- Mermaid diagrams fit their container; enable `mermaid.fit` to auto-shrink large diagrams
+
+## Sizing knobs
+
+| Where | What |
+|---|---|
+| `spacing` prop / config | vertical rhythm between blocks (see [styling](/docs/styling)) |
+| `cssVars` prop | any `--markify-*` variable, e.g. `--markify-radius`-linked tokens from your shadcn theme |
+| `fontFamily` / `theme.fontSans` / `theme.fontMono` | typography |
+| `chess.maxWidth` | max FEN board width in px (default 420) |

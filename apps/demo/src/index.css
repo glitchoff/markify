@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "katex/dist/katex.min.css";
-@import '../../../src/themes/core.css';
+@import "./components/markify/tokens.css";
 
 @custom-variant dark (&:is(.dark *));
 

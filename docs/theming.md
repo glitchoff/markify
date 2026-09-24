@@ -1,92 +1,67 @@
-# Theming
+# Theming & Dark Mode
 
-Markify renders with your app's design tokens — no extra config needed. It works out of the box with **shadcn** (default), **daisyUI**, **Radix Themes**, and **Bootstrap**, and supports per-instance overrides.
+Markify is **shadcn-compatible by default**. The components consume standard shadcn design tokens (`--background`, `--foreground`, `--muted`, `--border`, `--primary`, `--card`, `--popover`, `--radius`, …). If your app already has a shadcn theme — including dark mode via `.dark` — Markify picks it up automatically. Zero configuration.
 
-## 1. Just pick your theme system (`themeType`)
+## How it works
 
-```tsx
-<Markify>…</Markify>                       // shadcn tokens (default)
-<Markify themeType="shadcn">…</Markify>    // --background, --card, --muted, --border, --primary, …
-<Markify themeType="daisyui">…</Markify>   // daisyUI v5 (--color-base-100, --color-primary, …)
-<Markify themeType="radix">…</Markify>     // Radix Themes v3 (--color-background, --gray-*, --accent-*)
-<Markify themeType="bootstrap">…</Markify> // Bootstrap 5 (--bs-body-bg, --bs-primary, …)
-<Markify themeType="none">…</Markify>      // Markify's built-in neutral palette
+`tokens.css` (imported once by `config.tsx`) defines `--markify-*` aliases on `.markify-root`:
+
+```css
+.markify-root {
+  --markify-bg: var(--background, oklch(1 0 0));
+  --markify-fg: var(--foreground, oklch(0.145 0 0));
+  --markify-muted: var(--muted, oklch(0.97 0 0));
+  /* … */
+}
 ```
 
-> **next-themes?** You're already on `"shadcn"` — next-themes just toggles `.dark`/`.light` over shadcn-named tokens, which the default preset reads directly.
+Three cases, all covered:
 
-## 2. Override per instance (`theme` prop)
+| Your app | Result |
+|---|---|
+| **shadcn app** (tokens on `:root` / `.dark`) | aliases resolve to your tokens — light, dark, radius, fonts all inherited |
+| **plain Tailwind app** | neutral fallbacks kick in; everything renders out of the box |
+| **`.dark`-class app without shadcn tokens** | `tokens.css` ships a dark fallback block that activates under `.dark .markify-root` |
 
-Customize any value inline — highest priority, no CSS:
+## Overriding
+
+### Globally — `markifyConfig`
+
+```ts
+export const markifyConfig = {
+  theme: { primary: "oklch(0.64 0.19 150)" },
+  cssVars: { "--markify-gap": "1.5rem" },
+};
+```
+
+### Per instance — props
 
 ```tsx
-<Markify theme={{ card: "oklch(0.2 0.01 260)", border: "oklch(1 0 0 / 11%)", radius: "0.75rem" }}>
+<Markify
+  theme={{ primary: "oklch(0.64 0.19 150)", muted: "oklch(0.95 0 0)" }}
+  cssVars={{ "--markify-gap": "1.5rem" }}
+>
   {markdown}
 </Markify>
 ```
 
-Raw `--markify-*` vars also work via `cssVars`.
+- `theme` uses **shadcn token names** — one vocabulary, no alias layer to learn
+- `cssVars` is the escape hatch for any raw custom property (spacing vars, callout accents, anything)
 
-## 3. Import one CSS file
+Overrides apply as inline custom properties on the markify root, so they cascade to every component inside — including light/dark if you swap values.
 
-```tsx
-// app root — main.tsx / App.tsx / layout.tsx
-import "@glitchoff/markify/themes/core.css";
-```
+## Supported theme keys
 
-- `core.css` — **recommended.** Scoped styles + theme aliases, no global tokens. Your app provides them.
-- `markify.css` — legacy; bundles default shadcn tokens. Only if your app has **no theme system**.
+`background`, `foreground`, `card`, `cardForeground`, `popover`, `popoverForeground`, `primary`, `primaryForeground`, `secondary`, `secondaryForeground`, `muted`, `mutedForeground`, `accent`, `accentForeground`, `destructive`, `destructiveForeground`, `border`, `input`, `ring`, `fontSans`, `fontMono`.
 
-Markify's CSS is scoped under `.markify-root` and fully **unlayered** — import order doesn't matter and it can't break your app's cascade.
+## Accent colors
 
-> [!NOTE]
-> **Standard setup (copy-paste):** for a shadcn/Tailwind v4 app, pair `core.css` with a `@theme inline` block mapping `--color-*` → your tokens and light/dark token blocks — see [Getting Started → Standard Setup](/docs/getting-started). `themeType` defaults to `"shadcn"` and matches automatically.
+A few colors have no shadcn equivalent and ship as plain custom properties in `tokens.css`:
 
-## 4. Dark mode & code highlighting
+| Variable | Used for |
+|---|---|
+| `--markify-callout-*` | the 17 callout accents: `note`, `tip`, `hint`, `important`, `warning`, `caution`, `attention`, `info`, `success`, `question`, `abstract`, `todo`, `failure`, `danger`, `bug`, `example`, `quote` |
+| `--markify-success` / `--markify-success-20` | copied confirmation states |
+| `--markify-danger` / `--markify-danger-10` | reset badges, destructive accents |
 
-- **Dark mode:** your app's normal toggle (`.dark`, `[data-bs-theme="dark"]`, etc.). Markify follows automatically.
-- **Code syntax** is separate from design tokens:
-  ```tsx
-  <Markify hljsTheme="dark" />                    // built-in Atom themes
-  <Markify hljsThemeUrl="/rose-pine.css" />       // external theme CSS
-  <Markify hljsCustomCss=".hljs { color: #fff }"/>// raw CSS
-  ```
-
-## 5. Token reference
-
-Markify's components only read these scoped `--markify-*` properties. Each alias defaults to the preset's source token with a neutral fallback.
-
-| Alias | Default | Used by |
-| --- | --- | --- |
-| `--markify-bg` / `-fg` | `--background` / `--foreground` | page backgrounds, text |
-| `--markify-card` / `-card-fg` | `--card` / `--card-foreground` | code blocks, tables, callouts, chess & mermaid cards |
-| `--markify-popover` / `-popover-fg` | `--popover` / `--popover-foreground` | menus, toolbars |
-| `--markify-primary` / `-primary-fg` | `--primary` / `--primary-foreground` | buttons, links, active tabs |
-| `--markify-secondary` / `-secondary-fg` | `--secondary` / `--secondary-foreground` | secondary buttons, code headers |
-| `--markify-muted` / `-muted-fg` | `--muted` / `--muted-foreground` | inline code, labels, table body |
-| `--markify-accent` / `-accent-fg` | `--accent` / `--accent-foreground` | hover fills, menu items |
-| `--markify-destructive` / `-destructive-fg` | `--destructive` / `--destructive-foreground` | errors, failed states |
-| `--markify-border` / `-input` / `-ring` | `--border` / `--input` / `--ring` | borders, dividers, focus |
-| `--markify-radius` | `--radius` | rounded corners |
-| `--markify-font-sans` / `-font-mono` | `--font-sans` / `--font-mono` | text / code fonts |
-
-## 6. Standalone components & custom presets
-
-`MermaidBlock`, `ChessGame`, and `FenBoard` accept the same `themeType`/`theme` props:
-
-```tsx
-<MermaidBlock code={code} themeType="daisyui" />
-<ChessGame pgn={pgn} theme={{ card: "#2a2a3c" }} />
-```
-
-Add your own preset with a CSS block, then pass `themeType`:
-
-```css
-.markify-root[data-theme-type="material"] {
-  --markify-bg: var(--md-sys-color-surface);
-  --markify-fg: var(--md-sys-color-on-surface);
-  --markify-primary: var(--md-sys-color-primary);
-}
-```
-
-> Callout accent colors, the code-block background, and highlight themes are intentionally fixed (not token-driven). Override via `components`, `codeBlockClassName`, or `hljsCustomCss`.
+Override any of them via `cssVars` or by editing `tokens.css` directly — it's your file.

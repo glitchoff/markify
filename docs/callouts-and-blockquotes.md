@@ -1,113 +1,69 @@
 # Callouts & Blockquotes
 
-Markify supports GitHub / Obsidian-style callout alerts with semantic icons, plus plain styled blockquotes.
+## Callouts
 
-## 1. Callout Alerts
-
-Write a callout by starting a blockquote with a `> [!TYPE]` marker. Types are **case-insensitive** (`[!info]` works too).
+GitHub-style blockquote callouts in 17 tones. The marker is `> [!TYPE]` on its own line:
 
 ```markdown
-> [!TIP]
-> Use callouts to highlight important tips in AI responses.
+> [!NOTE]
+> A friendly note to keep things calm.
 ```
 
-## 2. Supported Types
-
-| Type | Accent color | Icon | Title |
-|---|---|---|---|
-| `NOTE` | blue | PencilSimple | Note |
-| `TIP` · `HINT` | emerald | Flame | Tip / Hint |
-| `IMPORTANT` | violet | Flame | Important |
-| `WARNING` · `ATTENTION` | amber | Warning | Warning / Attention |
-| `CAUTION` | orange | Warning | Caution |
-| `INFO` | sky | Info | Info |
-| `SUCCESS` | green | CheckCircle | Success |
-| `QUESTION` | indigo | Question | Question |
-| `ABSTRACT` | slate | ListChecks | Abstract |
-| `TODO` | teal | CheckSquare | Todo |
-| `FAILURE` | red | XCircle | Failure |
-| `DANGER` | rose | WarningDiamond | Danger |
-| `BUG` | red | Bug | Bug |
-| `EXAMPLE` | purple | Flask | Example |
-| `QUOTE` | slate | Quotes | Quote |
-
-Each callout renders as a tinted card with a colored left border. The title row (icon + bold text) inherits the type's accent color, and the icons use Phosphor's **duotone** weight.
-
-### Aliases
-
-Obsidian aliases share the icon of their parent type:
-
-| Alias | Behaves like | Icon |
-|---|---|---|
-| `HINT` | `TIP` | Flame |
-| `IMPORTANT` | `TIP` | Flame |
-| `ATTENTION` | `WARNING` | Warning |
-| `CAUTION` | `WARNING` | Warning |
-
-Aliases keep their own title and accent color (`CAUTION` stays orange, `IMPORTANT` stays violet), only the icon is shared.
-
-## 3. Examples
-
 > [!NOTE]
-> This is a helpful note alert.
+> A friendly note to keep things calm.
 
 > [!TIP]
-> This is a tip alert.
-
-> [!IMPORTANT]
-> This is an important alert.
-
-> [!WARNING]
-> Always validate user input before rendering Markdown.
-
-> [!CAUTION]
-> This action cannot be undone.
-
-> [!INFO]
-> Some additional information.
+> A small hint that saves the day.
 
 > [!SUCCESS]
 > Everything worked.
 
-> [!QUESTION]
-> Why does this work?
+> [!IMPORTANT]
+> Pay attention to this one.
 
-> [!ABSTRACT]
-> Here is a short summary.
+> [!WARNING]
+> Be careful here.
 
-> [!TODO]
-> This still needs to be done.
-
-> [!FAILURE]
-> Something went wrong.
+> [!CAUTION]
+> This action cannot be undone.
 
 > [!DANGER]
 > This is dangerous.
 
+> [!INFO]
+> Some context you might want.
+
+> [!QUESTION]
+> Why does this work?
+
+> [!TODO]
+> Ship the thing.
+
 > [!BUG]
-> This is a known bug.
+> A known issue, tracked and visible.
 
 > [!EXAMPLE]
-> Here is an example.
+> Like this one.
+
+> [!ABSTRACT]
+> The big picture in a box.
+
+> [!FAILURE]
+> Something didn't work.
 
 > [!QUOTE]
-> A memorable quote goes here.
+> Words worth repeating.
 
-## 4. Plain Blockquotes
+All types: `NOTE`, `TIP`, `HINT`, `IMPORTANT`, `WARNING`, `CAUTION`, `ATTENTION`, `INFO`, `SUCCESS`, `QUESTION`, `ABSTRACT`, `TODO`, `FAILURE`, `DANGER`, `BUG`, `EXAMPLE`, `QUOTE`.
 
-A blockquote **without** a `[!TYPE]` marker renders as a subtle, italicized quotation, distinct from the callout cards:
+## Anatomy
 
-```markdown
-> A plain blockquote stays a blockquote.
-```
+Each callout renders an icon, a bold title, and the body — accent-colored per type via `--markify-callout-*` tokens (see [theming](/docs/theming)). The container is a `markify-callout` card with a 4px left border and a tinted background.
 
-## 5. Nested Content
+Callout bodies can contain full markdown — lists, code, math, even other callouts.
 
-Callouts render any Markdown content Markify supports, including bold, links, lists, images, code, and more:
+## Plain blockquotes
 
-```markdown
-> [!TIP]
-> Images can live inside callouts too:
->
-> ![alt](image.png)
-```
+A blockquote without the marker renders as a simple styled quote:
+
+> This is a plain blockquote — left border, muted text, italic.

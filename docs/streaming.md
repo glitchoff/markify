@@ -1,62 +1,40 @@
 # Streaming Guide
 
-Markify is purpose-built for rendering **token-by-token streaming output** from LLMs, such as ChatGPT or Claude responses. It reveals markdown progressively while keeping complex blocks (tables, code, mermaid, math) intact as they stream in.
-
-## 1. The `isStreaming` Prop
-
-Set `isStreaming` to `true` while your content is still being received, then flip it to `false` once the stream finishes:
+Markify is built for AI-generated markdown that arrives token by token.
 
 ```tsx
-import { useState } from "react";
-import { Markify } from "@glitchoff/markify";
-
-export function ChatMessage({ text, status }) {
-  return (
-    <Markify isStreaming={status === "streaming"}>
-      {text}
-    </Markify>
-  );
-}
+<Markify isStreaming={generating}>{reply}</Markify>
 ```
 
-> [!NOTE]
-> While `isStreaming` is `true`, Markify uses a *reveal* animation (via `remend`) instead of rendering the raw partial markdown. This avoids broken tables, half-open code fences, and partially-rendered mermaid diagrams mid-stream.
+## What happens while streaming
 
-## 2. Revealing Raw Partial Markdown
+1. **Repair** — the partial markdown is repaired with `remend`: unclosed fences, bold/italic, links, and lists are temporarily closed so nothing flickers or renders broken mid-stream. Math delimiters are deliberately left untouched (repairing them mid-stream produces invalid LaTeX); remark-math renders them correctly the moment the closing delimiter arrives.
+2. **Block splitting** — content is split into top-level blocks (fence-aware, so code blocks containing blank lines stay intact). Every completed block is **memoized**: only the active tail re-renders as tokens arrive. For long AI responses this keeps per-token work O(1) instead of O(document).
+3. **Normalization** — single-line `$$…$$` display math is rewritten to the centered multi-line form.
 
-If you prefer to render the **raw** partial markdown as it arrives (without the reveal animation), render your own text node and rely on Markify only when the stream is complete:
+When the stream ends (`isStreaming={false}`), everything renders statically and memoization keys stabilize.
 
-```tsx
-{isStreaming ? (
-  <div className="whitespace-pre-wrap">{text}</div>
-) : (
-  <Markify>{text}</Markify>
-)}
+## Data attributes
+
+The root wrapper gets `data-streaming` while streaming — useful for styling in-flight states (e.g. a blinking cursor):
+
+```css
+.markify-root[data-streaming] { /* … */ }
 ```
 
-## 3. Using the `useStreamingReveal` Hook Directly
+## Streaming behaviors per feature
 
-The reveal logic is also exposed as a standalone hook, so you can reuse it outside `<Markify>`:
+| Feature | While streaming |
+|---|---|
+| Code blocks | render normally (repair keeps fences closed) |
+| Math | delimiters untouched; partial equations complete naturally |
+| Mermaid | renders when the block completes |
+| Chess (PGN/FEN) | "waiting" state until the full game arrives |
+| YouTube embeds | "Watch on YouTube" link instead of iframe |
+| Tweets | "View tweet on X" link until content completes |
 
-```tsx
-import { useStreamingReveal } from "@glitchoff/markify";
+## Tips
 
-function StreamingText({ content, isStreaming }) {
-  const revealed = useStreamingReveal(content, isStreaming);
-  return <span>{revealed}</span>;
-}
-```
-
-`useStreamingReveal(content, isStreaming)` returns `content` unchanged when not streaming, and the reveal-rendered value when streaming.
-
-## 4. Performance Notes
-
-- **Static blocks are memoized**: non-streaming blocks are wrapped in `React.memo` and keyed by content hash, so unchanged blocks are not re-rendered on every token.
-- **Block splitting**: streaming content is split into logical blocks (paragraphs, code fences, math) so only the *last* active block re-renders per tick.
-- **Web Worker highlighting (optional)**: pass `codeBlockWorker` to offload syntax highlighting to a Worker and keep the UI thread responsive during heavy streams:
-
-```tsx
-<Markify isStreaming codeBlockWorker>
-  {streamingText}
-</Markify>
-```
+- Pass the same `children` string on every render — Markify handles the diffing; don't pre-truncate the markdown yourself.
+- Keep the component mounted between tokens; it's designed for incremental updates, not remounts.
+- For non-AI use, omit `isStreaming` entirely — static rendering skips the repair step.

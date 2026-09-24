@@ -1,0 +1,155 @@
+/*
+ * @glitchoff/markify — tokens.css
+ *
+ * Markify components consume ONLY the --markify-* custom properties below.
+ * Each alias resolves to the host app's standard shadcn token
+ * (--background, --muted, --border, --primary, …) with a neutral fallback,
+ * so in a shadcn app theming is inherited automatically, and in a plain
+ * Tailwind app everything still renders with sensible defaults.
+ *
+ * Override any value with the `theme` prop in markify config, or by
+ * defining the variable yourself anywhere above the markify root.
+ */
+
+.markify-root {
+  /* Vertical rhythm between blocks (see `spacing` in markify config). */
+  --markify-gap: 2rem;
+  --markify-gap-lg: 3.25rem;
+  --markify-gap-sm: 0.5rem;
+
+  --markify-font-sans: var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --markify-font-mono: var(--font-mono, ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace);
+
+  /* ── shadcn token aliases (light defaults for non-shadcn apps) ─────── */
+  --markify-bg: var(--background, oklch(1 0 0));
+  --markify-fg: var(--foreground, oklch(0.145 0 0));
+  --markify-card: var(--card, var(--markify-bg));
+  --markify-card-fg: var(--card-foreground, var(--markify-fg));
+  --markify-popover: var(--popover, var(--markify-bg));
+  --markify-popover-fg: var(--popover-foreground, var(--markify-fg));
+  --markify-primary: var(--primary, oklch(0.205 0 0));
+  --markify-primary-fg: var(--primary-foreground, oklch(0.985 0 0));
+  --markify-secondary: var(--secondary, oklch(0.97 0 0));
+  --markify-secondary-fg: var(--secondary-foreground, oklch(0.205 0 0));
+  --markify-muted: var(--muted, oklch(0.97 0 0));
+  --markify-muted-fg: var(--muted-foreground, oklch(0.556 0 0));
+  --markify-accent: var(--accent, oklch(0.97 0 0));
+  --markify-accent-fg: var(--accent-foreground, oklch(0.205 0 0));
+  --markify-destructive: var(--destructive, oklch(0.577 0.245 27.325));
+  --markify-destructive-fg: var(--destructive-foreground, oklch(0.985 0 0));
+  --markify-border: var(--border, oklch(0.922 0 0));
+  --markify-input: var(--input, oklch(0.922 0 0));
+  --markify-ring: var(--ring, oklch(0.708 0 0));
+
+  /* ── derived alpha variants (color-mix based) ──────────────────────── */
+  --markify-bg-80: color-mix(in oklab, var(--markify-bg) 80%, transparent);
+  --markify-bg-90: color-mix(in oklab, var(--markify-bg) 90%, transparent);
+  --markify-fg-70: color-mix(in oklab, var(--markify-fg) 70%, transparent);
+  --markify-fg-80: color-mix(in oklab, var(--markify-fg) 80%, transparent);
+  --markify-fg-90: color-mix(in oklab, var(--markify-fg) 90%, transparent);
+  --markify-muted-30: color-mix(in oklab, var(--markify-muted) 30%, transparent);
+  --markify-muted-40: color-mix(in oklab, var(--markify-muted) 40%, transparent);
+  --markify-muted-50: color-mix(in oklab, var(--markify-muted) 50%, transparent);
+  --markify-muted-fg-10: color-mix(in oklab, var(--markify-muted-fg) 10%, transparent);
+  --markify-muted-fg-30: color-mix(in oklab, var(--markify-muted-fg) 30%, transparent);
+  --markify-muted-fg-40: color-mix(in oklab, var(--markify-muted-fg) 40%, transparent);
+  --markify-muted-fg-60: color-mix(in oklab, var(--markify-muted-fg) 60%, transparent);
+  --markify-muted-fg-70: color-mix(in oklab, var(--markify-muted-fg) 70%, transparent);
+  --markify-primary-10: color-mix(in oklab, var(--markify-primary) 10%, transparent);
+  --markify-primary-15: color-mix(in oklab, var(--markify-primary) 15%, transparent);
+  --markify-primary-20: color-mix(in oklab, var(--markify-primary) 20%, transparent);
+  --markify-primary-30: color-mix(in oklab, var(--markify-primary) 30%, transparent);
+  --markify-primary-50: color-mix(in oklab, var(--markify-primary) 50%, transparent);
+  --markify-primary-90: color-mix(in oklab, var(--markify-primary) 90%, transparent);
+  --markify-secondary-40: color-mix(in oklab, var(--markify-secondary) 40%, transparent);
+  --markify-secondary-80: color-mix(in oklab, var(--markify-secondary) 80%, transparent);
+  --markify-destructive-10: color-mix(in oklab, var(--markify-destructive) 10%, transparent);
+  --markify-destructive-30: color-mix(in oklab, var(--markify-destructive) 30%, transparent);
+
+  /* ── status accents (callouts, copied states) ──────────────────────── */
+  --markify-success: oklch(0.723 0.219 149.579);
+  --markify-success-20: color-mix(in oklab, var(--markify-success) 20%, transparent);
+  --markify-danger: oklch(0.637 0.237 25.331);
+  --markify-danger-10: color-mix(in oklab, var(--markify-danger) 10%, transparent);
+
+  /* Callout accents: NOTE/TIP/HINT/IMPORTANT/WARNING/CAUTION/ATTENTION/
+   * INFO/SUCCESS/QUESTION/ABSTRACT/TODO/FAILURE/DANGER/BUG/EXAMPLE/QUOTE */
+  --markify-callout-note: oklch(0.623 0.214 259.815);
+  --markify-callout-tip: oklch(0.696 0.17 162.48);
+  --markify-callout-hint: oklch(0.696 0.17 162.48);
+  --markify-callout-important: oklch(0.606 0.25 292.717);
+  --markify-callout-warning: oklch(0.769 0.188 70.08);
+  --markify-callout-caution: oklch(0.705 0.213 47.604);
+  --markify-callout-attention: oklch(0.769 0.188 70.08);
+  --markify-callout-info: oklch(0.685 0.169 237.323);
+  --markify-callout-success: oklch(0.723 0.219 149.579);
+  --markify-callout-question: oklch(0.585 0.233 277.117);
+  --markify-callout-abstract: oklch(0.554 0.046 257.417);
+  --markify-callout-todo: oklch(0.704 0.14 182.503);
+  --markify-callout-failure: oklch(0.637 0.237 25.331);
+  --markify-callout-danger: oklch(0.645 0.246 16.439);
+  --markify-callout-bug: oklch(0.637 0.237 25.331);
+  --markify-callout-example: oklch(0.627 0.265 303.9);
+  --markify-callout-quote: oklch(0.554 0.046 257.417);
+
+  font-family: var(--markify-font-sans);
+  line-height: 1.6;
+}
+
+/* ── Scoped base styles ───────────────────────────────────────────────
+ * Self-contained defaults so Markify renders correctly even in apps with
+ * no global resets. Declared in @layer base so any Tailwind utility (the
+ * comps' own classes, or consumer overrides) always wins over these. */
+
+@layer base {
+  .markify-root :where(*) {
+    border-color: var(--markify-border);
+  }
+
+  /* Preserve whitespace exactly as authored in markdown paragraphs. */
+  .markify-root :where(p) {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  /* Buttons inherit the surrounding typography. */
+  .markify-root :where(button) {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Markdown tables span the card width. */
+  .markify-root :where(table) {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .markify-root :where(img) {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Dark defaults for apps that toggle dark mode with a `.dark` class but do
+ * NOT define shadcn tokens. In shadcn apps the aliases above resolve to the
+ * app's own dark tokens and these rules are no-ops. */
+.dark .markify-root {
+  --markify-bg: var(--background, oklch(0.145 0 0));
+  --markify-fg: var(--foreground, oklch(0.985 0 0));
+  --markify-card: var(--card, oklch(0.205 0 0));
+  --markify-card-fg: var(--card-foreground, var(--markify-fg));
+  --markify-popover: var(--popover, oklch(0.205 0 0));
+  --markify-popover-fg: var(--popover-foreground, var(--markify-fg));
+  --markify-primary: var(--primary, oklch(0.922 0 0));
+  --markify-primary-fg: var(--primary-foreground, oklch(0.205 0 0));
+  --markify-secondary: var(--secondary, oklch(0.269 0 0));
+  --markify-secondary-fg: var(--secondary-foreground, oklch(0.985 0 0));
+  --markify-muted: var(--muted, oklch(0.269 0 0));
+  --markify-muted-fg: var(--muted-foreground, oklch(0.708 0 0));
+  --markify-accent: var(--accent, oklch(0.371 0 0));
+  --markify-accent-fg: var(--accent-foreground, oklch(0.985 0 0));
+  --markify-destructive: var(--destructive, oklch(0.704 0.191 22.216));
+  --markify-destructive-fg: var(--destructive-foreground, oklch(0.985 0 0));
+  --markify-border: var(--border, oklch(1 0 0 / 10%));
+  --markify-input: var(--input, oklch(1 0 0 / 15%));
+  --markify-ring: var(--ring, oklch(0.556 0 0));
+}

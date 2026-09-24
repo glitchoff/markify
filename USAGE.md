@@ -1,209 +1,104 @@
-# Markify (`@glitchoff/markify`) Usage & Integration Guide
+# Usage
 
-A complete guide on the proper real-world setup for **Markify**, covering parent container width control, theme switcher integration, dark mode sync, and key caveats omitted from the official library README.
+## Install
 
----
-
-## 1. Parent Container Width Recommendation
-
-> [!IMPORTANT]
-> **We recommend wrapping `<Markify>` in a container with a defined width constraint.**  
-> Markify renders complex Markdown elements, including wide tables with export controls, code blocks with horizontal scrolling, and zoomable/pannable Mermaid diagrams.  
-> Without an explicit parent container width, these elements can overflow bounds, break page layouts, or stretch infinitely.
-
-### Example: CSS Approach
-```css
-/* index.css */
-.markify-container {
-  width: 90vw;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem;
-  border-radius: 1rem;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-}
-
-html.dark .markify-container {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
+```bash
+npx @glitchoff/markify init
 ```
-```tsx
-import { Markify } from "@glitchoff/markify";
-import "@glitchoff/markify/themes/core.css";
 
-export function ContentViewer({ content }: { content: string }) {
+Copies the scaffold into your project (shadcn `components.json` aware) and installs dependencies. Nothing is imported from the npm package at runtime — everything lives in your repo:
+
+```
+components/markify/
+├── config.tsx        # settings + theming + component map + <Markify>
+├── tokens.css        # shadcn token aliases + fallbacks
+└── comps/            # code-block, table, callout, typography, embeds, mermaid, chess, …
+```
+
+## Render markdown
+
+```tsx
+import { Markify } from "@/components/markify/config";
+
+export function Reply({ text, generating }) {
   return (
-    <div className="markify-container">
-      <Markify isStreaming>{content}</Markify>
-    </div>
+    <Markify isStreaming={generating}>
+      {text}
+    </Markify>
   );
 }
 ```
 
-### Example: Tailwind CSS Approach
-```tsx
-export function ContentViewer({ content }: { content: string }) {
-  return (
-    <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
-        <Markify isStreaming>{content}</Markify>
-      </div>
-    </main>
-  );
-}
-```
+## Props
 
----
-
-## 2. Tailwind CSS & CSS Import
-
-Markify requires **Tailwind CSS** installed in your project. Use the [standard setup](/docs/getting-started) — Tailwind v4 + `@theme inline` token mapping + `core.css`:
-
-```tsx
-import "@glitchoff/markify/themes/core.css";
-```
-
-`core.css` ships the scoped base styles, the pre-compiled utility layer, and the `--markify-*` theme aliases — **without** any global design tokens, so it never overrides your app's theme. Your app provides the tokens (shadcn, daisyUI, Radix, Bootstrap, custom). Only import `@glitchoff/markify/themes/markify.css` (which bundles default shadcn tokens on `:root`/`.dark`) if your app has no theme system at all.
-
----
-
-## 3. Theme Switcher & Dark Mode Integration
-
-Markify reads your app's design tokens through the `--markify-*` aliases (see [docs/theming.md](docs/theming.md)). Dark mode is handled entirely by your app:
-
-1. **Toggle your theme as usual** (`.dark` class, `[data-bs-theme="dark"]`, Radix dark variant, daisyUI dark theme, …). Markify follows automatically.
-2. **Pick a preset** with `themeType` when your tokens aren't shadcn-named: `"shadcn"` (default), `"daisyui"`, `"radix"`, `"bootstrap"`, or `"none"`.
-3. **Code block syntax sync**: pass `hljsTheme={isDark ? "dark" : "light"}` (or `hljsThemeUrl` for external themes) so code blocks follow the active theme.
+Full table in `docs/api-reference.md`. The essentials:
 
 ```tsx
 <Markify
-  isStreaming
-  themeType="shadcn"                       // matches next-themes / shadcn apps by default
-  hljsTheme={resolvedTheme === "dark" ? "dark" : "light"}
+  isStreaming={false}                 // streaming repair + progressive rendering
+  className="max-w-none"              // merged onto the .markify-root wrapper
+  spacing="relaxed"                   // vertical rhythm preset
+  theme={{ primary: "oklch(0.64 0.19 150)" }}  // shadcn token overrides
+  cssVars={{ "--markify-gap": "1.5rem" }}      // raw custom properties
+  components={{ blockquote: MyCallout }}       // override any markdown element
 >
   {markdown}
 </Markify>
 ```
 
-### Complete React Theme Context & Switcher Example
+## Markdown features
 
-```tsx
-// 1. Theme Context (src/context/ThemeContext.tsx)
-import React, { createContext, useContext, useEffect, useState } from "react";
-
-type Theme = "light" | "dark" | "system";
-
-interface ThemeContextType {
-  theme: Theme;
-  resolvedTheme: "light" | "dark";
-  setTheme: (theme: Theme) => void;
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(() =>
-    (localStorage.getItem("theme") as Theme) || "system"
-  );
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem("theme", newTheme);
-  };
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const isDark = theme === "system"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-      : theme === "dark";
-
-    const activeTheme = isDark ? "dark" : "light";
-    setResolvedTheme(activeTheme);
-
-    root.classList.toggle("dark", isDark);
-    root.classList.toggle("light", !isDark);
-    root.setAttribute("data-theme", activeTheme);
-  }, [theme]);
-
-  return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
-
-export const useTheme = () => useContext(ThemeContext)!;
+````markdown
+```ts
+// syntax-highlighted, copyable, auto-collapsing
+const x = 1;
 ```
 
-```tsx
-// 2. Integration in Main App Component
-import { Markify } from "@glitchoff/markify";
-import { useTheme } from "./context/ThemeContext";
+$$\int e^x dx = e^x + C$$
 
-export function MarkdownViewer({ markdown }: { markdown: string }) {
-  const { resolvedTheme } = useTheme();
+> [!TIP]
+> Callouts in 17 tones: NOTE, TIP, HINT, IMPORTANT, WARNING, CAUTION,
+> ATTENTION, INFO, SUCCESS, QUESTION, ABSTRACT, TODO, FAILURE, DANGER,
+> BUG, EXAMPLE, QUOTE.
 
-  return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8">
-      <Markify
-        isStreaming
-        hljsTheme={resolvedTheme === "dark" ? "dark" : "light"}
-      >
-        {markdown}
-      </Markify>
-    </div>
-  );
-}
+| a | b |
+|---|---|
+| 1 | 2 |
+
+```mermaid
+flowchart LR
+  A --> B
 ```
 
-### Per-instance theme overrides
-
-Customize any token for a single render — highest priority, no CSS:
-
-```tsx
-<Markify theme={{ card: "oklch(0.2 0.01 260)", border: "oklch(1 0 0 / 11%)" }}>
-  {markdown}
-</Markify>
+```pgn
+1. e4 e5
 ```
 
----
-
-## 4. KaTeX Math CSS
-
-If your markdown includes inline or block math (`$E = mc^2$` or `$$ \int x dx $$`), remember to import KaTeX CSS in your root file (`App.tsx` or `main.tsx`):
-
-```tsx
-import "katex/dist/katex.min.css";
+```fen
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 ```
 
----
+![](youtube:M5PbLfVGOQs)
+![](twitter:2095773025799127367)
+![alt text](image.png)
+````
 
-## 5. Mermaid Diagram Customization (`mermaidConfig`)
+Embed prefixes go in the **URL position** of image syntax — plain URLs stay plain images.
 
-You can pass custom Mermaid settings directly via the `mermaidConfig` prop on `<Markify>` or `<MermaidBlock>`:
+## Update flow
 
-```tsx
-<Markify
-  mermaidConfig={{
-    theme: "dark",
-    fontFamily: "Inter, sans-serif",
-    flowchart: { curve: "basis" },
-  }}
->
-  {content}
-</Markify>
-```
+- **Restore one component**: `npx @glitchoff/markify add code-block`
+- **List components**: `npx @glitchoff/markify add`
+- **Full refresh**: re-run `init` — it overwrites the scaffold, so review local changes first (or commit them before re-initializing)
 
----
+## Migrating from v2.x
 
-## 6. What Was Lacking in Official README (`README.md`)
-
-| Gap / Missing Detail | Impact on Developer | Correct Approach / Solution |
-| :--- | :--- | :--- |
-| **No Parent Container Width Guidelines** | Code blocks, tables, and Mermaid diagrams overflow page width or break flex/grid layouts. | Explicitly instruct wrapping `<Markify>` in a container div with controlled width (`max-width: 1000px` / `max-w-4xl`). |
-| **Incomplete Theme Switcher Pattern** | Docs mention `isDark ? "/rose-pine.css" : ...` for custom URLs, but omit basic `hljsTheme` prop sync with React theme state. | Use `hljsTheme={isDark ? "dark" : "light"}` connected to `.dark` class toggle on `document.documentElement`. |
-| **KaTeX CSS Requirement Buried** | Math equations render broken unstyled text if developer misses section 4.1. | Clearly highlight `import "katex/dist/katex.min.css";` as a setup requirement when math rendering is enabled. |
-| **Tailwind & Theme Import Requirement** | Confusion on theme setup. | Document that Tailwind CSS is required, recommend importing `@glitchoff/markify/themes/core.css` (scoped, no global tokens), and point to `themeType`/`theme` for token mapping. |
+1. Run `npx @glitchoff/markify init`
+2. Replace `import { Markify } from "@glitchoff/markify"` with an import from your local config
+3. Move old component props into `markifyConfig` in `components/markify/config.tsx`:
+   - `hljsTheme`, `codeBlockWorker`, `codeFontFamily` → `codeBlock: { … }`
+   - `chessEnabled`, `youtubeEnabled`, `twitterEnabled` → `chess.enabled`, `embeds: { … }`
+   - `table`, `mermaidConfig` → `table: { … }`, `mermaid: { … }`
+   - `renderers`, `components` → `components` prop or edit `buildComponents` in config
+   - `themeType` presets (daisyui/radix/bootstrap) were removed — theming is now shadcn tokens + custom overrides only
+   - `theme`, `cssVars`, `spacing`, `className`, `isStreaming` props are unchanged

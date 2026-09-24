@@ -1,32 +1,31 @@
 # Tables
 
-Markify renders GFM tables with hover actions for copying table content as Markdown and downloading as CSV, TSV, or Markdown.
+Tables render in a card with hover actions.
 
-## 1. Table Options Configuration (`table`)
+| Capability | Markify | Plain Markdown |
+| ---------- | ------- | -------------- |
+| Copy as Markdown | ✅ | ❌ |
+| CSV / TSV / MD export | ✅ | ❌ |
+| Sticky styling, row hover | ✅ | ❌ |
+| Horizontal scroll | ✅ | ❌ |
 
-```tsx
-<Markify
-  table={{
-    showCopyButton: true,
-    downloadFormats: ["csv", "tsv", "md"],
-    scrollable: true,
-  }}
->
-  {markdownTable}
-</Markify>
+## Actions
+
+Hovering the table reveals the action bar (top-right):
+
+- **Copy** — the table serialized back into GitHub-flavored Markdown
+- **Download** — as `CSV`, `TSV`, or `MD` per `table.downloadFormats`
+
+## Configuration
+
+```ts
+markifyConfig.table = {
+  showCopyButton: true,
+  downloadFormats: ["csv", "tsv", "md"],  // or [] to disable downloads
+  scrollable: true,                        // horizontal scroll for wide tables
+};
 ```
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `showCopyButton` | `boolean` | `true` | Show the "copy as Markdown" button on hover. |
-| `downloadFormats` | `("csv"\|"tsv"\|"md")[]` | `[]` | Which export buttons to show. |
-| `scrollable` | `boolean` | `true` | Wrap wide tables in a horizontal scroll container. |
+## Structure
 
-## 2. Example Table
-
-| Feature | Supported | Export Formats |
-|---|---|---|
-| Markdown Parsing | ✅ | Markdown |
-| Tables | ✅ | CSV / TSV / MD |
-| Code Blocks | ✅ | Raw Code |
-| Mermaid Diagrams | ✅ | SVG / PNG / MMD |
+`thead` gets a muted header row; `tbody` rows divide cleanly and highlight on hover; cells pad generously with `last:border-r-0` so the card border stays crisp.

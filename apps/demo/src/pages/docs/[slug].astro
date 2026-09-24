@@ -1,0 +1,19 @@
+---
+import Docs from "../../layouts/Docs.astro";
+import DocsContent from "../../components/DocsContent";
+import { FLAT_DOCS } from "../../docs-config";
+import { CONTENT } from "../../docs-content";
+
+export function getStaticPaths() {
+  return FLAT_DOCS.map((doc) => ({
+    params: { slug: doc.id },
+    props: { docId: doc.id, file: doc.file, content: CONTENT[doc.id] ?? "" },
+  }));
+}
+
+const { docId, file, content } = Astro.props;
+---
+
+<Docs slug={docId} file={file} title={file}>
+  <DocsContent client:only="react" docId={docId} file={file} content={content} />
+</Docs>

@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import Demo from "../components/Demo";
+---
+
+<Base active="demo">
+  <Demo client:only="react" />
+</Base>
