@@ -14,7 +14,7 @@
  */
 
 import React, { memo, useMemo, useEffect, lazy, Suspense, type CSSProperties } from "react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -30,7 +30,7 @@ import { CodeBlock, extractLanguage, getCodeText, preloadLanguages, DEFAULT_LANG
 import { H1, H2, H3, H4, H5, H6, Paragraph, Link, InlineCode, OrderedList, UnorderedList, ListItem, Hr } from "./comps/typography";
 import { Blockquote } from "./comps/blockquote";
 import { Table, THead, TBody, TR, TH, TD, TableOptionsContext, type TableOptions } from "./comps/table";
-import { Image, type YouTubeVideo } from "./comps/embeds";
+import { Image, type TwitterEmbedOptions, type YouTubeVideo } from "./comps/embeds";
 import { ChessFallback, MermaidFallback } from "./comps/fallbacks";
 import type { MarkifyMermaidConfig } from "./comps/mermaid";
 import type { ChessGameProps, FenBoardProps } from "./comps/chess";
@@ -89,6 +89,8 @@ export interface EmbedSettings {
   youtube?: boolean;
   /** Enable `![twitter:<url|id>]()` embeds. Default: true */
   twitter?: boolean;
+  /** Tweet card options (layout mode, language). */
+  tweetOptions?: TwitterEmbedOptions;
 }
 
 export interface ChessSettings {
@@ -359,6 +361,7 @@ function buildComponents(
         {...props}
         youtubeEnabled={embeds.youtube}
         twitterEnabled={embeds.twitter}
+        twitterOptions={embeds.tweetOptions}
         isStreaming={isStreaming}
       />
     ),
@@ -388,6 +391,17 @@ const katexOptions = { strict: false, throwOnError: false };
 
 const remarkPlugins: any[] = [remarkGfm, remarkMath, remarkFixKaTeXUnicode];
 const rehypePlugins: any[] = [[rehypeKatex, katexOptions]];
+
+/**
+ * react-markdown's default URL sanitizer strips unknown schemes, which would
+ * blank out embed prefixes like `youtube:https://…` / `twitter:…` before they
+ * ever reach the `img` component. Let those prefixes through untouched and
+ * delegate everything else to the default transform.
+ */
+function markifyUrlTransform(url: string): string {
+  if (/^(youtube|twitter):/i.test(url)) return url;
+  return defaultUrlTransform(url);
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
  * <Markify>
@@ -499,7 +513,7 @@ const StaticBlock = memo(function StaticBlock({
   components: Components;
 }) {
   return (
-    <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
+    <ReactMarkdown urlTransform={markifyUrlTransform} remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
       {block}
     </ReactMarkdown>
   );
@@ -507,7 +521,7 @@ const StaticBlock = memo(function StaticBlock({
 
 function StreamingBlock({ block, components }: { block: string; components: Components }) {
   return (
-    <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
+    <ReactMarkdown urlTransform={markifyUrlTransform} remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
       {block}
     </ReactMarkdown>
   );

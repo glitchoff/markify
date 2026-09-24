@@ -1,6 +1,20 @@
 # Tables
 
-Tables render in a card with hover actions.
+Standard GFM table syntax — Markify renders it in a card with hover actions.
+
+```markdown
+| Feature | Supported | Export Formats |
+|---|---|---|
+| Markdown Parsing | ✅ | Markdown |
+| Tables | ✅ | CSV / TSV / MD |
+| Code Blocks | ✅ | Raw Code |
+```
+
+| Feature | Supported | Export Formats |
+|---|---|---|
+| Markdown Parsing | ✅ | Markdown |
+| Tables | ✅ | CSV / TSV / MD |
+| Code Blocks | ✅ | Raw Code |
 
 | Capability | Markify | Plain Markdown |
 | ---------- | ------- | -------------- |

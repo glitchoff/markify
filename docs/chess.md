@@ -4,7 +4,21 @@ Interactive chess, enabled with `chess.enabled: true` in config. Two block types
 
 ## PGN viewer
 
-` ```pgn ` / ` ```chess ` blocks render a full game viewer:
+Wrap a full game in a ` ```pgn ` (or ` ```chess `) fence:
+
+````markdown
+```pgn
+[Event "A Night at the Opera"]
+[White "Paul Morphy"]
+[Black "Duke Karl / Count Isouard"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5
+6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5
+11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6
+15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0
+```
+````
 
 ```pgn
 [Event "A Night at the Opera"]
@@ -18,9 +32,33 @@ Interactive chess, enabled with `chess.enabled: true` in config. Two block types
 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0
 ```
 
+### Annotations
+
+**Comments** (`{ ... }`) render as inline italic notes and **NAGs** (`$1`, `$3`, …) render as glyphs (`!`, `!!`, `?!` …). **Variations** (`( ... )`) are skipped — only the mainline is shown:
+
+```pgn
+[Event "Opera Game, annotated"]
+[White "Paul Morphy"]
+[Black "Duke Karl / Count Isouard"]
+[Result "1-0"]
+
+1. e4 { Best by test. } e5 2. Nf3 d6 3. d4 Bg4 $6 { This
+pins nothing useful. } 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 $1
+Nf6 7. Qb3 $3 { Double attack on f7 and b7. } Qe7 8. Nc3
+c6 9. Bg5 $1 { Pinning the knight. } b5 10. Nxb5 $! cxb5
+11. Bxb5+ Nbd7 12. O-O-O $16 Rd8 13. Rd7 $! Rxd7 14. Rd1
+$18 Qd6 15. Bxd7+ Nxd7 16. Qb8+ $3 Nxb8 17. Rd8# $1
+```
+
 ## FEN board
 
-` ```fen ` blocks render an interactive board:
+Wrap a single position in a ` ```fen ` fence:
+
+````markdown
+```fen
+r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3
+```
+````
 
 ```fen
 r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3

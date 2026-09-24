@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Play } from "lucide-react";
 import { cn } from "./_lib";
 
-/* ── URL parsing ───────────────────────────────────────────────────────── */
+/* â”€â”€ URL parsing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export interface YouTubeVideo {
   id: string;
@@ -72,7 +72,7 @@ export function parseTweetId(src: string): string | null {
   return match ? match[1] : null;
 }
 
-/* ── YouTube embed ─────────────────────────────────────────────────────── */
+/* â”€â”€ YouTube embed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 function YouTubeEmbed({ src, video, streaming }: { src: string; video: YouTubeVideo; streaming?: boolean }) {
   if (streaming) {
@@ -104,19 +104,13 @@ function YouTubeEmbed({ src, video, streaming }: { src: string; video: YouTubeVi
   );
 }
 
-/* ── Twitter/X embed ───────────────────────────────────────────────────── */
+/* â”€â”€ Twitter/X embed (iframe-free tweet card) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Twitter/X embed (official widget, themed) ─────────────────────────── */
 
-function useDarkMode(): boolean {
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    const root = document.documentElement;
-    const update = () => setIsDark(root.classList.contains("dark"));
-    update();
-    const observer = new MutationObserver(update);
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-  return isDark;
+/** Options controlling how tweet embeds render. */
+export interface TwitterEmbedOptions {
+  /** ISO language code for the widget UI (e.g. "en", "de"). Default: "en". */
+  lang?: string;
 }
 
 declare global {
@@ -138,37 +132,52 @@ function ensureTwitterWidgets(): void {
   const script = document.createElement("script");
   script.id = "twitter-wjs";
   script.async = true;
-  script.src = "https://platform.twitter.com/widgets.js";
+  script.src = "https://platform.x.com/widgets.js";
   document.head.appendChild(script);
 }
 
-const tweetEmbedCache = new Map<string, string>();
+const tweetHtmlCache = new Map<string, string>();
 
-function useTweetEmbed(id: string, isDark: boolean) {
+/** Tracks the app's dark class (the theme toggle flips documentElement). */
+function useDarkMode(): boolean {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
+function TwitterEmbed({ src, id, streaming, options = {} }: { src: string; id: string; streaming?: boolean; options?: TwitterEmbedOptions }) {
+  const isDark = useDarkMode();
+  const lang = options.lang ?? "en";
   const ref = useRef<HTMLSpanElement>(null);
-  const [html, setHtml] = useState<string | null>(null);
+  const [html, setHtml] = useState<string | null>(() => tweetHtmlCache.get(`${id}:${lang}`) ?? null);
   const [failed, setFailed] = useState(false);
 
+  /* X's official embed: fetch the oEmbed blockquote, tag it with
+     data-theme / data-conversation, then let widgets.js upgrade it in place. */
   useEffect(() => {
+    if (html) return;
     let cancelled = false;
-    const theme = isDark ? "dark" : "light";
-    const cacheKey = `${id}:${theme}`;
-    const cached = tweetEmbedCache.get(cacheKey);
-    if (cached) {
-      setHtml(cached);
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    fetch(`https://publish.twitter.com/oembed?url=${encodeURIComponent(`https://x.com/i/status/${id}`)}&dnt=true&theme=${theme}&omit_script=true`)
+    const params = new URLSearchParams({
+      url: `https://x.com/i/status/${id}`,
+      dnt: "true",
+      omit_script: "true",
+      conversation: "none",
+      lang,
+    });
+    fetch(`https://publish.twitter.com/oembed?${params}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
       .then((o) => {
         if (cancelled) return;
         if (typeof o?.html === "string" && o.html) {
-          tweetEmbedCache.set(cacheKey, o.html);
+          tweetHtmlCache.set(`${id}:${lang}`, o.html);
           setHtml(o.html);
-          ensureTwitterWidgets();
         } else {
           setFailed(true);
         }
@@ -176,14 +185,22 @@ function useTweetEmbed(id: string, isDark: boolean) {
       .catch(() => {
         if (!cancelled) setFailed(true);
       });
-
     return () => {
       cancelled = true;
     };
-  }, [id, isDark]);
+  }, [html, id, lang]);
+
+  /* widgets.js styles the embed from the blockquote's data-theme attribute,
+     not the oEmbed theme param — inject it here. Rebuilt on theme toggle. */
+  const themedHtml = useMemo(() => {
+    if (!html) return null;
+    const attrs = [isDark ? 'data-theme="dark"' : "", 'data-conversation="none"'].filter(Boolean).join(" ");
+    return attrs ? html.replace(/class="([^"]*twitter-tweet[^"]*)"/, (_m: string, cls: string) => `class="${cls}" ${attrs}`) : html;
+  }, [html, isDark]);
 
   useEffect(() => {
-    if (!html || typeof window === "undefined") return;
+    if (!themedHtml || typeof window === "undefined") return;
+    ensureTwitterWidgets();
     let tries = 0;
     const upgrade = () => {
       if (window.twttr?.widgets?.load) {
@@ -194,16 +211,9 @@ function useTweetEmbed(id: string, isDark: boolean) {
       }
     };
     upgrade();
-  }, [html]);
+  }, [themedHtml]);
 
-  return { ref, html, failed };
-}
-
-function TwitterEmbed({ src, id, streaming }: { src: string; id: string; streaming?: boolean }) {
-  const isDark = useDarkMode();
-  const { ref, html, failed } = useTweetEmbed(id, isDark);
-
-  if (streaming || !html) {
+  if (streaming || !themedHtml) {
     if (failed) {
       return (
         <a
@@ -217,7 +227,7 @@ function TwitterEmbed({ src, id, streaming }: { src: string; id: string; streami
       );
     }
     return (
-      <span className="my-2 block w-full rounded-lg border border-(--markify-border) bg-(--markify-muted) p-6 text-sm text-(--markify-muted-fg)">
+      <span className="my-2 block w-full rounded-xl border border-(--markify-border) bg-(--markify-muted) p-6 text-sm text-(--markify-muted-fg)">
         Loading tweet…
       </span>
     );
@@ -225,15 +235,16 @@ function TwitterEmbed({ src, id, streaming }: { src: string; id: string; streami
 
   return (
     <span
+      key={isDark ? "dark" : "light"}
       ref={ref}
-      className="my-2 block w-full [&_.twitter-tweet]:mx-auto [&_.twitter-tweet]:my-0 [&_.twitter-tweet]:w-full [&_.twitter-tweet_reply]:hidden"
+      className="my-2 block w-full bg-transparent [&_.twitter-tweet]:mx-auto [&_.twitter-tweet]:my-0 [&_.twitter-tweet]:w-full [&_.twitter-tweet_reply]:hidden"
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: themedHtml }}
     />
   );
 }
 
-/* ── Image (with explicit embed prefixes) ──────────────────────────────── */
+/* â”€â”€ Image (with explicit embed prefixes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export interface EmbedOptions {
   youtubeEnabled?: boolean;
@@ -243,9 +254,9 @@ export interface EmbedOptions {
 /**
  * Renders `![]()` markdown images. Embed prefixes differentiate media types:
  *
- *   ![](youtube:<url or video id>)      → YouTube embed
- *   ![](twitter:<status url or id>)     → X/Twitter embed
- *   ![alt](<plain url>)                 → normal image
+ *   ![](youtube:<url or video id>)      â†’ YouTube embed
+ *   ![](twitter:<status url or id>)     â†’ X/Twitter embed
+ *   ![alt](<plain url>)                 â†’ normal image
  *
  * Alt text is ignored for embeds (except in streaming mode, where it labels
  * the fallback link).
@@ -256,6 +267,7 @@ export function Image({
   title,
   youtubeEnabled = true,
   twitterEnabled = true,
+  twitterOptions,
   isStreaming,
   renderers,
   className,
@@ -266,6 +278,7 @@ export function Image({
   title?: string;
   youtubeEnabled?: boolean;
   twitterEnabled?: boolean;
+  twitterOptions?: TwitterEmbedOptions;
   isStreaming?: boolean;
   renderers?: {
     image?: (props: { src?: string; alt?: string; title?: string; [key: string]: unknown }) => ReactNode;
@@ -293,7 +306,7 @@ export function Image({
     const tweetId = parseTweetId(target);
     if (tweetId) {
       if (renderers?.twitter) return <>{renderers.twitter({ src: target, id: tweetId, isStreaming: !!isStreaming })}</>;
-      return <TwitterEmbed src={target} id={tweetId} streaming={isStreaming} />;
+      return <TwitterEmbed src={target} id={tweetId} streaming={isStreaming} options={twitterOptions} />;
     }
   }
 
