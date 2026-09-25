@@ -63,9 +63,9 @@ export async function init(dirOverride?: string): Promise<void> {
   const pkg = fs.existsSync(pkgPath) ? JSON.parse(fs.readFileSync(pkgPath, "utf8")) : {};
   const depsAll = { ...pkg.dependencies, ...pkg.devDependencies };
   if (!depsAll.react) console.warn(`\n⚠  React was not found in package.json — Markify requires React 18/19.`);
-  if (!fs.existsSync(path.join(root, "tailwind.config.js")) &&
-      !fs.existsSync(path.join(root, "tailwind.config.ts")) &&
-      !hasTailwindV4(pkg)) {
+  const hasTailwindConfig = ["tailwind.config.js", "tailwind.config.ts", "tailwind.config.mjs", "tailwind.config.cjs"]
+    .some((f) => fs.existsSync(path.join(root, f)));
+  if (!hasTailwindConfig && !hasTailwind(pkg)) {
     console.warn(`\n⚠  Tailwind CSS was not detected — Markify components are styled with Tailwind + shadcn tokens.`);
   }
 
@@ -75,9 +75,10 @@ export async function init(dirOverride?: string): Promise<void> {
   console.log(`\nCustomize anything in ${path.relative(root, targetDir)} — it's all yours.`);
 }
 
-function hasTailwindV4(pkg: Record<string, any>): boolean {
+function hasTailwind(pkg: Record<string, any>): boolean {
   const all = { ...pkg.dependencies, ...pkg.devDependencies };
-  const tw = all.tailwindcss ?? "";
-  /* v4 needs no config file. */
-  return typeof tw === "string" && tw.startsWith("4");
+  /* v4 needs no config file — detect via package or PostCSS/Vite plugin. */
+  const twMajor = String(all.tailwindcss ?? "").replace(/[^0-9]/g, "").charAt(0);
+  if (twMajor === "4") return true;
+  return Boolean(all["@tailwindcss/postcss"] || all["@tailwindcss/vite"]);
 }
