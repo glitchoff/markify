@@ -172,7 +172,7 @@ function TwitterEmbed({ src, id, streaming, options = {} }: { src: string; id: s
       lang,
     });
     fetch(`https://publish.twitter.com/oembed?${params}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+      .then((res) => (res.ok ? (res.json() as Promise<{ html?: string }>) : Promise.reject(new Error(String(res.status)))))
       .then((o) => {
         if (cancelled) return;
         if (typeof o?.html === "string" && o.html) {

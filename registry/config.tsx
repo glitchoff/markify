@@ -13,7 +13,7 @@
  * per-instance on <Markify>.
  */
 
-import React, { memo, useMemo, useEffect, lazy, Suspense, type CSSProperties } from "react";
+import { memo, useMemo, useEffect, lazy, Suspense, type CSSProperties } from "react";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
