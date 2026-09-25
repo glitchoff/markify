@@ -83,7 +83,8 @@ All docs live in [`docs/`](docs/) and are rendered by Markify itself in the demo
 4. [Features](docs/features.md) — code, math, callouts, tables, Mermaid, chess, embeds
 5. [Streaming Guide](docs/streaming.md) — how token-by-token rendering works
 6. [Customization](docs/customization.md) — the three levels of ownership
-7. [API Reference](docs/api-reference.md) — every prop and config key
+7. [Other Renderers](docs/other-renderers.md) — Next.js MDX, Fumadocs, any react-markdown host
+8. [API Reference](docs/api-reference.md) — every prop and config key
 
 ## Development
 

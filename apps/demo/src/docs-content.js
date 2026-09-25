@@ -13,6 +13,7 @@ import embeds from "../../../docs/embeds.md?raw";
 import twitter from "../../../docs/twitter.md?raw";
 import streaming from "../../../docs/streaming.md?raw";
 import customization from "../../../docs/customization.md?raw";
+import otherRenderers from "../../../docs/other-renderers.md?raw";
 import apiReference from "../../../docs/api-reference.md?raw";
 
 export const CONTENT = {
@@ -30,5 +31,6 @@ export const CONTENT = {
   twitter,
   streaming,
   customization,
+  "other-renderers": otherRenderers,
   "api-reference": apiReference,
 };

@@ -15,6 +15,7 @@ import {
   Activity,
   Settings2,
   Code2,
+  Blocks,
 } from "lucide-react";
 
 export const DOC_GROUPS = [
@@ -48,6 +49,7 @@ export const DOC_GROUPS = [
     items: [
       { id: "streaming", title: "Streaming Guide", file: "streaming.md", icon: Activity },
       { id: "customization", title: "Customization", file: "customization.md", icon: Settings2 },
+      { id: "other-renderers", title: "Other Renderers", file: "other-renderers.md", icon: Blocks },
       { id: "api-reference", title: "API Reference", file: "api-reference.md", icon: Code2 },
     ],
   },
