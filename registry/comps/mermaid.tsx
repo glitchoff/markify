@@ -98,10 +98,20 @@ function nextRenderId(): string {
 	return `m${renderCounter}`;
 }
 
+/**
+ * Pele errors carry structured fields (`code`, `line`, `column`, `snippet`)
+ * and a message that already embeds the line number. Strip the duplicated
+ * header so the card can lay the line/column out itself.
+ */
 function errorMessage(err: unknown): string {
 	if (err instanceof Error) {
-		const line = (err as { line?: number }).line;
-		return line ? `${err.message} (line ${line})` : err.message;
+		const { line, column } = err as { line?: number; column?: number };
+		const body = err.message.replace(/^Parse error on line \d+:\s*/, "").trim();
+		const where =
+			line && line > 0
+				? `Line ${line}${column && column > 0 ? `, column ${column}` : ""}: `
+				: "";
+		return `${where}${body || err.message}`;
 	}
 	return "Failed to render diagram";
 }

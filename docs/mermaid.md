@@ -112,13 +112,24 @@ Diagrams render only when they scroll into view (`IntersectionObserver`, 10% thr
 
 ## Error handling
 
-A parse failure shows the message, the line number when Pele provides one, a Retry button, and a collapsible **Show source** panel:
+A parse failure shows the message with its line and column, a Retry button, and a collapsible **Show source** panel:
 
 ```
 Failed to render diagram
-Parse error on line 3: unexpected token "-->"
+Line 4, column 1: Expecting 'NODE_STRING', got 'EOF'
 ▸ Show source
 ```
+
+That example is real — it's what Pele returns for a `flowchart LR` whose edge has no target:
+
+````
+```mermaid
+flowchart LR
+  A -->
+```
+````
+
+Pele's `PeleError` carries `code` (`syntax` / `semantic` / `unsupported-diagram` / `limit`), `line`, `column`, and a `snippet` pointing at the offending token. Markify reads those fields directly and strips Pele's own `Parse error on line N:` header so the location is rendered once, not twice.
 
 ## Custom rendering
 
