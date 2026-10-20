@@ -19,6 +19,7 @@ import {
 	RotateCcw,
 	Expand,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 import { cn, copyToClipboard, downloadText, downloadBlob } from "./_lib";
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -225,11 +226,33 @@ function MermaidBlockInner({
 	const bodyRef = useRef<HTMLDivElement>(null);
 	const svgWrapperRef = useRef<HTMLDivElement>(null);
 
-	const baseScale = fit ? fitScale : 1;
+	/*
+	 * In the fullscreen dialog the diagram gets a 20% lift over its natural
+	 * size — inside a large empty modal the source size reads as too small.
+	 * Inline it stays 1:1 so message height doesn't jump.
+	 */
+	const baseScale = fit ? fitScale : fullscreen ? 1.2 : 1;
 	const effectiveScale = scale * baseScale;
 
 	/* Fullscreen */
 	const [fullscreen, setFullscreen] = useState(false);
+
+	/* Overlay behaviour: lock page scroll and close on Escape while open. */
+	useEffect(() => {
+		if (!fullscreen) return;
+		const { overflow } = document.body.style;
+		document.body.style.overflow = "hidden";
+
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setFullscreen(false);
+		};
+		window.addEventListener("keydown", onKey);
+
+		return () => {
+			document.body.style.overflow = overflow;
+			window.removeEventListener("keydown", onKey);
+		};
+	}, [fullscreen]);
 
 	/* Fit to container */
 	const computeFit = useCallback(() => {
@@ -429,18 +452,20 @@ function MermaidBlockInner({
 		}
 	}, [code]);
 
-	return (
+	const shell = (
 		<div
 			ref={containerRef}
 			className={cn(
 				"markify-mermaid relative mt-[calc(var(--markify-gap)_*_0.75)] mb-(--markify-gap) overflow-hidden flex flex-col",
 				showBackground &&
 					"rounded-lg border border-(--markify-border) bg-(--markify-card)",
-				fullscreen && "fixed inset-0 z-50 m-0 rounded-none h-screen w-screen",
+				fullscreen &&
+					"h-[85dvh] w-[min(92vw,80rem)] rounded-xl shadow-2xl",
 				className,
 			)}
 			data-engine={state.status === "success" ? state.engine : undefined}
 			data-streaming={isStreaming || undefined}
+			data-fullscreen={fullscreen || undefined}
 		>
 			{/* Header */}
 			{showHeader && (
@@ -586,6 +611,31 @@ function MermaidBlockInner({
 			)}
 		</div>
 	);
+
+	/*
+	 * Fullscreen escapes to <body>. A `position: fixed` box is trapped inside
+	 * any ancestor that establishes a containing block — a transform, filter,
+	 * backdrop-filter, or `contain` — and chat UIs are full of those (animated
+	 * message shells, blurred toolbars). Portalling sidesteps the whole class
+	 * of bug instead of fighting it with z-index.
+	 */
+	if (fullscreen && typeof document !== "undefined") {
+		return createPortal(
+			<div
+				className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+				onClick={() => setFullscreen(false)}
+				role="dialog"
+				aria-modal="true"
+				aria-label="Diagram"
+			>
+				<div onClick={(e) => e.stopPropagation()} className="contents">
+					{shell}
+				</div>
+			</div>,
+			document.body,
+		);
+	}
+	return shell;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

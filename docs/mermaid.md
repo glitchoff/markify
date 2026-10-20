@@ -334,6 +334,20 @@ journey
     Sit down: 5: Me
 ```
 
+## ZenUML
+
+Sequence-style diagrams with actor/boundary annotations. Not supported by Pele, so this one always goes through the mermaid.js fallback.
+
+```mermaid
+zenuml
+title Order service
+@Actor Client
+@Boundary API
+Client->API: placeOrder()
+API->API: validate()
+API->Client: orderId
+```
+
 ## Git graph
 
 Branches, merges, cherry-picks, tags, and commit types.
