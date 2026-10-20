@@ -226,6 +226,9 @@ function MermaidBlockInner({
 	const bodyRef = useRef<HTMLDivElement>(null);
 	const svgWrapperRef = useRef<HTMLDivElement>(null);
 
+	/* Fullscreen */
+	const [fullscreen, setFullscreen] = useState(false);
+
 	/*
 	 * In the fullscreen dialog the diagram gets a 20% lift over its natural
 	 * size — inside a large empty modal the source size reads as too small.
@@ -234,8 +237,26 @@ function MermaidBlockInner({
 	const baseScale = fit ? fitScale : fullscreen ? 1.2 : 1;
 	const effectiveScale = scale * baseScale;
 
-	/* Fullscreen */
-	const [fullscreen, setFullscreen] = useState(false);
+	/*
+	 * Snapshot the inherited `--markify-*` custom properties so the portalled
+	 * dialog can re-apply them. Values are resolved strings, so a light/dark
+	 * switch while the dialog is open won't update — that's acceptable for a
+	 * transient overlay, and it avoids re-reading on every token change.
+	 */
+	const [themeStyle, setThemeStyle] = useState<React.CSSProperties>({});
+
+	useEffect(() => {
+		if (!fullscreen || !containerRef.current) return;
+		const root = containerRef.current.closest(".markify-root") ?? document.documentElement;
+		const computed = getComputedStyle(root);
+		const vars: Record<string, string> = {};
+		for (const name of Array.from(computed)) {
+			if (name.startsWith("--markify-") || name.startsWith("--pele-")) {
+				vars[name] = computed.getPropertyValue(name);
+			}
+		}
+		setThemeStyle(vars as React.CSSProperties);
+	}, [fullscreen]);
 
 	/* Overlay behaviour: lock page scroll and close on Escape while open. */
 	useEffect(() => {
@@ -614,15 +635,21 @@ function MermaidBlockInner({
 
 	/*
 	 * Fullscreen escapes to <body>. A `position: fixed` box is trapped inside
-	 * any ancestor that establishes a containing block — a transform, filter,
-	 * backdrop-filter, or `contain` — and chat UIs are full of those (animated
+	 * any ancestor that establishes a containing block - a transform, filter,
+	 * backdrop-filter, or `contain` - and chat UIs are full of those (animated
 	 * message shells, blurred toolbars). Portalling sidesteps the whole class
 	 * of bug instead of fighting it with z-index.
+	 *
+	 * The portal leaves the `.markify-root` wrapper behind, and that wrapper is
+	 * what carries the `--markify-*` token overrides, so the tokens are copied
+	 * onto the dialog and the shell or the modal would fall back to the
+	 * stylesheet's default palette.
 	 */
 	if (fullscreen && typeof document !== "undefined") {
 		return createPortal(
 			<div
-				className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+				className="markify-root markify-mermaid-dialog fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+				style={themeStyle}
 				onClick={() => setFullscreen(false)}
 				role="dialog"
 				aria-modal="true"
