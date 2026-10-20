@@ -193,6 +193,8 @@ export const markifyConfig = {
     showHeader: true,
     showBackground: true,
     fit: false,
+    renderer: "pele",
+    fallback: true,
   } as MarkifyMermaidConfig,
 
   chess: {
@@ -304,12 +306,13 @@ function buildComponents(
     const codeText = getCodeText(props.children);
 
     if (lang === "mermaid") {
-      const resolvedConfig = mermaid.theme
-        ? mermaid
-        : ({ ...mermaid, theme: code.hljsTheme === "dark" ? ("dark" as const) : ("default" as const) });
       return (
         <Suspense fallback={<MermaidFallback />}>
-          <LazyMermaidBlock code={codeText} config={resolvedConfig} />
+          <LazyMermaidBlock
+            code={codeText}
+            config={mermaid}
+            isStreaming={isStreaming}
+          />
         </Suspense>
       );
     }

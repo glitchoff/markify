@@ -41,6 +41,21 @@
   --markify-input: var(--input, oklch(0.922 0 0));
   --markify-ring: var(--ring, oklch(0.708 0 0));
 
+  /* ── Pele diagram tokens (mermaid renderer) ────────────────────────────
+     Pele paints entirely from CSS variables, so diagrams inherit the app
+     palette and follow theme switches without re-rendering. */
+  --pele-bg: var(--markify-card);
+  --pele-fg: var(--markify-fg);
+  --pele-muted: var(--markify-muted-fg);
+  --pele-line: var(--markify-fg);
+  --pele-surface: var(--markify-muted);
+  --pele-surface-alt: var(--markify-secondary);
+  --pele-border: var(--markify-border);
+  --pele-accent: var(--markify-primary);
+  --pele-font: var(--markify-font-sans);
+  --pele-font-mono: var(--markify-font-mono);
+  --pele-radius: 4px;
+
   /* ── derived alpha variants (color-mix based) ──────────────────────── */
   --markify-bg-80: color-mix(in oklab, var(--markify-bg) 80%, transparent);
   --markify-bg-90: color-mix(in oklab, var(--markify-bg) 90%, transparent);

@@ -1,98 +1,141 @@
-# Mermaid Diagrams
+# Mermaid diagrams
 
-```` ```mermaid ```` blocks render interactive diagrams with zoom, pan, fullscreen, and export built in.
+Markify renders ```` ```mermaid ```` fences as interactive diagrams — zoom, pan, fullscreen, and export — instead of a wall of syntax.
 
-## Syntax
+The default engine is **[Pele](https://pele.run)** (`obsidianmd/pele`): Obsidian's Mermaid-to-SVG renderer. It's synchronous, has zero runtime dependencies, and paints entirely from CSS variables, so diagrams follow your app's palette and switch themes without re-rendering. `mermaid.js` stays available as a fallback for syntax Pele's Mermaid 12.1.0 coverage doesn't handle yet.
 
-Wrap any [Mermaid diagram](https://mermaid.js.org/) in a fenced code block tagged `mermaid`:
+## Install
 
-````markdown
-```mermaid
-graph TD
-    A[User] -->|Input| B[Process]
-    B -->|Valid| C[Markify]
-    C -->|Render| D[Output]
-```
-````
-
-### Live example
-
-```mermaid
-graph LR
-    A[Markdown] --> B[remark-gfm]
-    B --> C[remark-math]
-    C --> D[rehype-katex]
-    D --> E[Mermaid]
+```bash
+npx markify@latest add mermaid
 ```
 
-Mermaid isn't just for flowcharts. Here are a few diagram types you can drop straight into everyday notes.
+This copies `comps/mermaid.tsx` into your project and adds `pele` (plus `mermaid` if you use the fallback) to your dependencies.
 
-### Gantt: planning a trip
-
-```mermaid
-gantt
-    title Vacation Countdown
-    dateFormat YYYY-MM-DD
-    axisFormat %b %d
-
-    section Research
-    Pick a destination         :r1, 2026-08-01, 5d
-    Book flights               :r2, after r1, 3d
-
-    section Booking
-    Reserve the hotel          :b1, after r2, 4d
-    Plan the itinerary         :b2, after b1, 6d
-
-    section Prep
-    Pack bags                  :p1, 2026-08-20, 2d
-    Head to the airport        :milestone, p2, 2026-08-22, 0d
-```
-
-### Pie: where the weekend went
-
-```mermaid
-pie title Where the Weekend Went
-    "Sleeping" : 34
-    "Outdoor time" : 22
-    "Cooking & eating" : 16
-    "Streaming" : 14
-    "Errands" : 10
-    "Scrolling" : 4
-```
-
-### Timeline: a three-day road trip
-
-```mermaid
-timeline
-    title Road Trip: 3 Days, 2 Cities
-    Day 1 : Drive to the coast : Sunset at the pier
-    Day 2 : Hike the cliffs : Picnic lunch : Beach bonfire
-    Day 3 : Brunch in town : Drive home
-```
-
-## Interactions
-
-- **Pan** — drag the diagram (mouse or touch)
-- **Zoom** — buttons bottom-left, Ctrl/Cmd + wheel zooms toward the cursor, pinch on touch
-- **Reset** — double-click anywhere, or the reset button
-- **Fullscreen** — the toolbar's expand button
-- **Export** — SVG, PNG (2× rasterized), or the raw `.mmd` source
-- **Copy** — diagram source to clipboard
-
-## Lazy rendering
-
-Diagrams render only when scrolled into view (IntersectionObserver). On render errors, the last valid SVG is kept and an error card offers a retry with the source shown.
-
-## Configuration
+## Configure
 
 ```ts
-markifyConfig.mermaid = {
-  showHeader: true,       // toolbar with copy/download/fullscreen
-  showBackground: true,   // card border and background
-  fit: false,             // auto-fit diagram to container width
-  theme: "dark",          // any mermaid MermaidConfig option passes through
-  securityLevel: "loose",
-};
+// components/markify/config.tsx
+mermaid: {
+  showHeader: true,     // copy / download / fullscreen toolbar. Default: true
+  showBackground: true, // card border + background. Default: true
+  fit: false,           // auto-fit diagram to container width. Default: false
+  renderer: "pele",     // "pele" | "mermaid". Default: "pele"
+  fallback: true,       // fall back to mermaid.js when Pele can't parse. Default: true
+}
 ```
 
-When `mermaid.theme` isn't set explicitly, it follows the code block theme (`dark` → mermaid `dark`, light → `default`).
+### Options
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `showHeader` | `true` | Toolbar with copy, download, fit, and fullscreen. |
+| `showBackground` | `true` | Rounded card border and background around the diagram. |
+| `fit` | `false` | Scale the diagram down to fit the container on mount and resize. |
+| `renderer` | `"pele"` | Which engine renders the SVG. |
+| `fallback` | `true` | On a Pele parse error, retry with mermaid.js before showing an error. |
+
+## Engines
+
+### Pele (default)
+
+- **Synchronous.** `render()` returns an SVG immediately — no async race with streaming tokens.
+- **Zero dependencies.** No `d3`, no `dagre`, no `cytoscape`.
+- **33 diagram types**, each in its own lazily-loaded chunk. Only what you render is downloaded.
+- **CSS-variable theming.** Set `--pele-*` on any ancestor and every diagram repaints.
+
+Markify's `tokens.css` maps Pele's variables onto the `--markify-*` tokens:
+
+```css
+--pele-bg: var(--markify-card);
+--pele-fg: var(--markify-fg);
+--pele-muted: var(--markify-muted-fg);
+--pele-line: var(--markify-fg);
+--pele-surface: var(--markify-muted);
+--pele-surface-alt: var(--markify-secondary);
+--pele-border: var(--markify-border);
+--pele-accent: var(--markify-primary);
+--pele-font: var(--markify-font-sans);
+--pele-font-mono: var(--markify-font-mono);
+--pele-radius: 4px;
+```
+
+Override any of them per-instance to restyle a single diagram:
+
+```tsx
+<Markify cssVars={{ "--pele-accent": "oklch(0.65 0.2 280)" }}>
+  {content}
+</Markify>
+```
+
+Charts (`xychart`, `pie`, `quadrantChart`, `radar`, `treemap`) use `--pele-series-1` through `--pele-series-8`.
+
+### mermaid.js (fallback)
+
+Set `renderer: "mermaid"` to use mermaid.js everywhere, or leave `fallback: true` (the default) to let it catch anything Pele rejects. It's dynamically imported, so it never lands in the base bundle unless you actually use it.
+
+> **Version note:** Pele targets Mermaid **12.1.0** syntax. If your content relies on newer syntax, keep `fallback: true` until Pele catches up.
+
+## Streaming
+
+Streaming a fence means the source is incomplete on almost every token — `flowchart LR\n  A -->` doesn't parse. Markify handles this by keeping the **last SVG that rendered successfully** and swapping in a new one only when the next attempt succeeds:
+
+```tsx
+<Markify isStreaming={isStreaming}>{content}</Markify>
+```
+
+A half-written diagram shows the previous frame rather than an error flash. The error card only appears if the very first render fails.
+
+## Toolbar
+
+| Control | Action |
+| --- | --- |
+| Copy | Copies the Mermaid source to the clipboard. |
+| Download → SVG | The rendered vector. |
+| Download → PNG | Rasterised at 2× via canvas. |
+| Download → MMD | The raw `.mmd` source file. |
+| Fit | Re-fit the diagram to the container (shown when `fit` is on). |
+| Fullscreen | Expand to fill the viewport. |
+
+## Interaction
+
+- **Zoom** — <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + wheel, anchored on the cursor.
+- **Pan** — drag with the mouse, or drag with one finger on touch.
+- **Pinch** — two-finger zoom on touch.
+- **Reset** — double-click, or the reset button in the zoom panel.
+
+Transform transitions are disabled under `prefers-reduced-motion`.
+
+## Performance
+
+Diagrams render only when they scroll into view (`IntersectionObserver`, 10% threshold). Combined with Pele's per-type chunks, a page with one flowchart downloads only the flowchart parser — not the other 32.
+
+## Error handling
+
+A parse failure shows the message, the line number when Pele provides one, a Retry button, and a collapsible **Show source** panel:
+
+```
+Failed to render diagram
+Parse error on line 3: unexpected token "-->"
+▸ Show source
+```
+
+## Custom rendering
+
+Swap the whole component if you need to:
+
+```tsx
+<Markify
+  components={{
+    pre: (props) => <MyDiagram {...props} />,
+  }}
+>
+  {content}
+</Markify>
+```
+
+## Next
+
+- [Theming](/docs/theming) — full token reference
+- [Streaming](/docs/streaming) — how block-level streaming works
+- [Pele docs](https://pele.run) — API, theming, and security
