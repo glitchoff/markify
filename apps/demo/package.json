@@ -18,6 +18,7 @@
     "katex": "^0.16.28",
     "lucide-react": "^1.17.0",
     "mermaid": "^11.12.2",
+    "pele": "^1.7.0",
     "react": "^19.0.0",
     "react-chessboard": "^5.12.1",
     "react-dom": "^19.0.0",

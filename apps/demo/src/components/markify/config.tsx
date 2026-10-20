@@ -13,7 +13,7 @@
  * per-instance on <Markify>.
  */
 
-import React, { memo, useMemo, useEffect, lazy, Suspense, type CSSProperties } from "react";
+import { memo, useMemo, useEffect, lazy, Suspense, type CSSProperties } from "react";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -26,7 +26,6 @@ import "./tokens.css";
 import "katex/dist/katex.min.css";
 
 import { cn } from "./comps/_lib";
-import { withBase } from "../../base";
 import { CodeBlock, extractLanguage, getCodeText, preloadLanguages, DEFAULT_LANGUAGES, ALL_LANGUAGES, type HljsTheme } from "./comps/code-block";
 import { H1, H2, H3, H4, H5, H6, Paragraph, Link, InlineCode, OrderedList, UnorderedList, ListItem, Hr } from "./comps/typography";
 import { Blockquote } from "./comps/blockquote";
@@ -194,10 +193,12 @@ export const markifyConfig = {
     showHeader: true,
     showBackground: true,
     fit: false,
+    renderer: "pele",
+    fallback: true,
   } as MarkifyMermaidConfig,
 
   chess: {
-    enabled: true,
+    enabled: false,
     maxWidth: 420,
     showNotation: true,
   } as ChessSettings,
@@ -305,12 +306,13 @@ function buildComponents(
     const codeText = getCodeText(props.children);
 
     if (lang === "mermaid") {
-      const resolvedConfig = mermaid.theme
-        ? mermaid
-        : ({ ...mermaid, theme: code.hljsTheme === "dark" ? ("dark" as const) : ("default" as const) });
       return (
         <Suspense fallback={<MermaidFallback />}>
-          <LazyMermaidBlock code={codeText} config={resolvedConfig} />
+          <LazyMermaidBlock
+            code={codeText}
+            config={mermaid}
+            isStreaming={isStreaming}
+          />
         </Suspense>
       );
     }
@@ -355,9 +357,7 @@ function buildComponents(
     h5: (props: any) => <H5 {...props} />,
     h6: (props: any) => <H6 {...props} />,
     p: (props: any) => <Paragraph {...props} />,
-    a: (props: any) => (
-      <Link {...props} href={withBase(props.href)} />
-    ),
+    a: (props: any) => <Link {...props} />,
     code: (props: any) => <InlineCode {...props} />,
     img: (props: any) => (
       <Image
